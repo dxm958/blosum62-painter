@@ -294,7 +294,10 @@ button.ghost.sm{padding:5px 11px;font-size:12px}
     <fieldset>
       <legend>Sequences &middot; FASTA</legend>
       <textarea id="fasta" spellcheck="false" aria-label="Sequences in FASTA format" placeholder=">CLK2_HUMAN&#10;MPHPRRYHSSERGSRGSYREHYRSRKHKRRRSRSWSS...&#10;>DOA_DROME&#10;MPRTRRLHHSRDRSSAGTRDKRRRHDTADHSPPLAEA..."></textarea>
-      <button class="ghost" id="loadExSide" type="button">Load example</button>
+      <div class="btn-row">
+        <button class="ghost" id="loadExSide" type="button">Load example</button>
+        <button class="ghost" id="clearAll" type="button">Clear</button>
+      </div>
       <p class="hint">Two sequences are aligned pairwise. Three or more must already be aligned (paste a Clustal/MUSCLE result) &mdash; a column is shaded only if <em>every</em> pair in it qualifies.</p>
     </fieldset>
 
@@ -340,7 +343,7 @@ button.ghost.sm{padding:5px 11px;font-size:12px}
 
     <fieldset>
       <legend>Figure</legend>
-      <div class="f"><span class="lbl">Title</span><input type="text" id="figTitle" value="DOA/CLK2"></div>
+      <div class="f"><span class="lbl">Title</span><input type="text" id="figTitle" value="" placeholder="Figure title"></div>
       <div class="row2">
         <div class="f"><span class="lbl">Residues per line</span><input type="number" id="perLine" value="100" min="10" max="240" step="5"></div>
         <div class="f"><span class="lbl">Cell width (px)</span><input type="number" id="cellW" value="8.5" min="5" max="20" step="0.5"></div>
@@ -376,7 +379,7 @@ button.ghost.sm{padding:5px 11px;font-size:12px}
 
     <fieldset>
       <legend>Annotations</legend>
-      <textarea id="annots" spellcheck="false" aria-label="Domain annotations">163-479 Kinase domain</textarea>
+      <textarea id="annots" spellcheck="false" aria-label="Domain annotations" placeholder="163-479 Kinase domain"></textarea>
       <p class="hint">One per line: <code>start-end Label</code>, numbered along the first sequence.</p>
     </fieldset>
 
@@ -424,7 +427,7 @@ button.ghost.sm{padding:5px 11px;font-size:12px}
 </div>
 
 <footer class="colophon">
-  <span class="ver"><svg class="mark-sm" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><rect x="1" y="1" width="62" height="62" rx="13" fill="#FFFFFF" stroke="#C9C9D2" stroke-width="1.5"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#DC0806" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(0 32 32)"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#FE6B00" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(60 32 32)"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#DC0806" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(120 32 32)"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#FE6B00" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(180 32 32)"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#DC0806" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(240 32 32)"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#FE6B00" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(300 32 32)"/><circle cx="32" cy="32" r="4.4" fill="#FFFFFF"/><text x="32.00" y="18.40" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">B</text><text x="43.78" y="25.20" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">L</text><text x="43.78" y="38.80" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">O</text><text x="32.00" y="45.60" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">S</text><text x="20.22" y="38.80" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">U</text><text x="20.22" y="25.20" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">M</text></svg>BLOSUM Alignment Painter v1.7.1</span>
+  <span class="ver"><svg class="mark-sm" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><rect x="1" y="1" width="62" height="62" rx="13" fill="#FFFFFF" stroke="#C9C9D2" stroke-width="1.5"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#DC0806" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(0 32 32)"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#FE6B00" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(60 32 32)"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#DC0806" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(120 32 32)"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#FE6B00" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(180 32 32)"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#DC0806" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(240 32 32)"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#FE6B00" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(300 32 32)"/><circle cx="32" cy="32" r="4.4" fill="#FFFFFF"/><text x="32.00" y="18.40" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">B</text><text x="43.78" y="25.20" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">L</text><text x="43.78" y="38.80" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">O</text><text x="32.00" y="45.60" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">S</text><text x="20.22" y="38.80" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">U</text><text x="20.22" y="25.20" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">M</text></svg>BLOSUM Alignment Painter v1.8.0</span>
   <span>The mark is a blossom whose six petals spell the matrix in amino acid codes &mdash;
     B (Asx), L (Leu), O (pyrrolysine), S (Ser), U (selenocysteine), M (Met).</span>
   <span>Colour scheme after McQuarrie DWJ, Bian W &amp; Soller M (2024).
@@ -952,8 +955,11 @@ $("copyAln").addEventListener("click", function(){
 /* ---------- wiring ---------- */
 function loadExample(){ $("fasta").value = EXAMPLE; $("figTitle").value = "DOA/CLK2";
   $("annots").value = "163-479 Kinase domain"; render(); }
+function clearAll(){ $("fasta").value = ""; $("figTitle").value = ""; $("annots").value = "";
+  $("fasta").focus(); render(); }
 $("loadEx").addEventListener("click", loadExample);
 $("loadExSide").addEventListener("click", loadExample);
+$("clearAll").addEventListener("click", clearAll);
 $("render").addEventListener("click", render);
 document.querySelectorAll('input[name=mode]').forEach(function(r){
   r.addEventListener("change", function(){
