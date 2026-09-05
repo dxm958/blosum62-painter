@@ -50,7 +50,7 @@ You can also download and open `index.html`.
 
 If you use this tool in published work, please cite it:
 
-> McQuarrie DWJ (2026). *BLOSUM Alignment Painter* (v1.7.0).
+> McQuarrie DWJ (2026). *BLOSUM Alignment Painter* (v1.7.1).
 > https://github.com/dxm958/blosum62-painter
 
 GitHub's **Cite this repository** button renders that as BibTeX or APA from `CITATION.cff`.
