@@ -823,6 +823,12 @@ applyTheme();
 
 /* ---------- offline support (https only; no-op on file://) ---------- */
 if("serviceWorker" in navigator && location.protocol.indexOf("http") === 0){
+  var hadController = !!navigator.serviceWorker.controller, reloading = false;
+  navigator.serviceWorker.addEventListener("controllerchange", function(){
+    // a newer version took over an already-cached page: refresh once so the
+    // viewer sees it instead of yesterday's copy
+    if(hadController && !reloading){ reloading = true; location.reload(); }
+  });
   window.addEventListener("load", function(){
     navigator.serviceWorker.register("sw.js").catch(function(){});
   });
