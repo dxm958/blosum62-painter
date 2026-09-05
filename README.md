@@ -8,7 +8,6 @@ similarity, then export a publication-ready SVG or PNG.
 **→ [Open the app](https://dxm958.github.io/blosum62-painter/)**
 
 No install, no account, no server: one static HTML file that does all the work in your browser.
-Your sequences never leave your machine.
 
 **Using it for a figure? Please cite it — see [How to cite](#how-to-cite).**
 
@@ -45,7 +44,7 @@ Open the site in Chrome or Edge and use **Install** in the address bar (Chrome: 
 Cast, Save and Share → Install page as app). It gets its own window and Dock icon, and works
 offline afterwards. In Safari, use **File → Add to Dock**.
 
-You can also just download `index.html` and double-click it — it is fully self-contained.
+You can also download and open `index.html`.
 
 ## How to cite
 
@@ -58,7 +57,7 @@ GitHub's **Cite this repository** button renders that as BibTeX or APA from `CIT
 
 ## References
 
-The colour scheme implemented here is the one used in:
+The colour scheme implemented here is used in:
 
 > McQuarrie DWJ, Bian W, Soller M (2024). *DOA/CLK2 phosphorylates Fl(2)d/WTAP to enhance
 > m<sup>6</sup>A mRNA methyltransferase complex activity.* bioRxiv 2024.11.25.625202.
