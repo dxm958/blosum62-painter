@@ -60,7 +60,6 @@ If you use this tool in published work, please cite it:
 > https://github.com/dxm958/blosum62-painter
 
 GitHub's **Cite this repository** button renders that as BibTeX or APA from `CITATION.cff`.
-A versioned DOI is on the way via Zenodo; cite the DOI once it is listed here.
 
 ## References
 
