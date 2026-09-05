@@ -17,14 +17,19 @@ Your sequences never leave your machine.
 | Anything below threshold, and any column containing a gap | unmarked | |
 
 The default threshold is **≥ 0**, which reproduces the scheme used in Supplementary Fig. 1 of
-McQuarrie, Bian & Soller, *DOA/CLK2 phosphorylates Fl(2)d/WTAP to enhance m6A mRNA
-methyltransferase complex activity*.
+the DOA/CLK2 paper (below). Loading the built-in example reproduces that figure exactly,
+kinase-domain bar included.
 
 Note that Stryer's *Biochemistry* (5th ed., §7.2) defines a conservative substitution more
 strictly, as a score **> 0**. One click switches between the two. The difference is not
 cosmetic — on the DOA/CLK2 alignment it is 99 similar columns versus 60, because BLOSUM-62
 scores exactly 0 for pairs such as A/G, A/V, D/S, E/H, E/N, E/R, E/S, F/I, G/S, H/Q, H/R,
 K/N, K/S, Q/S and T/V.
+
+## Getting started
+
+The app opens empty. Paste FASTA into the left-hand panel, or press **Load example** for the
+DOA/CLK2 alignment.
 
 ## What it does
 
@@ -51,9 +56,23 @@ Use the **Cite this repository** button, or mint a DOI: link the repo at
 [zenodo.org/account/settings/github](https://zenodo.org/account/settings/github), then publish
 a GitHub release. Zenodo archives that release and issues a permanent DOI, free.
 
-## Credits
+## References
 
-Substitution scores are BLOSUM-62 (Henikoff & Henikoff, *PNAS* 89:10915–10919, 1992).
-Typeface is IBM Plex (SIL Open Font License).
+The colour scheme implemented here is the one used in:
 
-MIT licensed.
+> McQuarrie DWJ, Bian W, Soller M (2024). *DOA/CLK2 phosphorylates Fl(2)d/WTAP to enhance
+> m<sup>6</sup>A mRNA methyltransferase complex activity.* bioRxiv 2024.11.25.625202.
+> <https://doi.org/10.1101/2024.11.25.625202>
+
+Substitution scores are BLOSUM-62:
+
+> Henikoff S, Henikoff JG (1992). *Amino acid substitution matrices from protein blocks.*
+> PNAS 89:10915–10919. <https://doi.org/10.1073/pnas.89.22.10915>
+
+The alignment algorithm is Needleman–Wunsch with Gotoh's affine gap costs. Typeface is
+IBM Plex (SIL Open Font License).
+
+## Licence
+
+Code is MIT (see `LICENSE`) — an OSI-approved licence, which software journals such as JOSS
+require. Documentation and figures in this repository are CC BY 4.0.

@@ -231,6 +231,31 @@ button:disabled{opacity:.45;cursor:not-allowed}
 .note{
   font-size:12px;color:var(--muted);line-height:1.55;max-width:78ch;
 }
+.empty{
+  background:var(--panel);border:1px solid var(--rule);border-radius:3px;
+  padding:34px 30px;display:flex;flex-direction:column;align-items:flex-start;gap:14px;
+  max-width:72ch;
+}
+.empty h2{font-size:17px;font-weight:600;letter-spacing:-.01em}
+.empty p{font-size:13px;color:var(--muted);max-width:60ch;line-height:1.6}
+.empty .cite{font-size:11.5px;line-height:1.6}
+.empty .cite a{color:var(--ink-2)}
+.empty a{text-decoration:underline;text-underline-offset:2px}
+.rulecard{
+  display:flex;flex-direction:column;gap:9px;
+  background:#FFFFFF;border:1px solid var(--sheet-rule);border-radius:3px;
+  padding:16px 18px;width:100%;
+}
+.rr{display:flex;align-items:center;gap:13px;font-size:12.5px;color:#231F20}
+.pair{display:inline-flex;flex-direction:column;flex:none}
+.pair .cell{
+  width:17px;height:15px;line-height:15px;text-align:center;
+  font-family:var(--sans);font-size:11px;color:#231F20;
+}
+.cell.i{background:var(--ident)}
+.cell.s{background:var(--similar)}
+.cell.n{background:#FFFFFF;box-shadow:inset 0 0 0 1px var(--sheet-rule)}
+.rr b{font-family:var(--mono);font-weight:500;font-size:11.5px}
 .note code{font-family:var(--mono);font-size:11.5px;background:var(--panel-2);border:1px solid var(--rule);border-radius:2px;padding:.5px 4px}
 .err{
   font-family:var(--mono);font-size:12px;color:var(--ident);
@@ -259,7 +284,8 @@ button:disabled{opacity:.45;cursor:not-allowed}
   <aside class="rail">
     <fieldset>
       <legend>Sequences &middot; FASTA</legend>
-      <textarea id="fasta" spellcheck="false" aria-label="Sequences in FASTA format"></textarea>
+      <textarea id="fasta" spellcheck="false" aria-label="Sequences in FASTA format" placeholder=">CLK2_HUMAN&#10;MPHPRRYHSSERGSRGSYREHYRSRKHKRRRSRSWSS...&#10;>DOA_DROME&#10;MPRTRRLHHSRDRSSAGTRDKRRRHDTADHSPPLAEA..."></textarea>
+      <button class="ghost" id="loadExSide" type="button">Load example</button>
       <p class="hint">Two sequences are aligned pairwise. Three or more must already be aligned (paste a Clustal/MUSCLE result) &mdash; a column is shaded only if <em>every</em> pair in it qualifies.</p>
     </fieldset>
 
@@ -323,6 +349,23 @@ button:disabled{opacity:.45;cursor:not-allowed}
 
   <main class="stage">
     <div class="err" id="err" hidden></div>
+    <section class="empty" id="empty" hidden>
+      <h2>Paste sequences to begin</h2>
+      <p>FASTA goes in the panel on the left. Two sequences are aligned for you with
+         Needleman&ndash;Wunsch; three or more must already be aligned.</p>
+      <div class="rulecard">
+        <div class="rr"><span class="pair"><span class="cell i">W</span><span class="cell i">W</span></span>
+          <span>Identical &mdash; shaded red.</span></div>
+        <div class="rr"><span class="pair"><span class="cell s">I</span><span class="cell s">V</span></span>
+          <span>Substitution scoring <b>+3</b>, at or above the threshold &mdash; shaded orange.</span></div>
+        <div class="rr"><span class="pair"><span class="cell n">P</span><span class="cell n">Q</span></span>
+          <span>Substitution scoring <b>&minus;1</b>, below the threshold &mdash; left unmarked, as are gaps.</span></div>
+      </div>
+      <button class="primary" id="loadEx" type="button">Load the DOA/CLK2 example</button>
+      <p class="cite">The example is the DOA/CLK2 alignment from McQuarrie DWJ, Bian W &amp; Soller M (2024),
+         <a href="https://doi.org/10.1101/2024.11.25.625202">bioRxiv 2024.11.25.625202</a>, whose
+         Supplementary Fig. 1 this colour scheme reproduces.</p>
+    </section>
     <section class="stats" id="stats"></section>
     <div class="sheetwrap" id="sheetwrap"></div>
     <p class="note" id="note"></p>
@@ -330,9 +373,12 @@ button:disabled{opacity:.45;cursor:not-allowed}
 </div>
 
 <footer class="colophon">
-  <span class="ver">BLOSUM Alignment Painter v1.0.0</span>
-  <span>Colour rule after McQuarrie, Bian &amp; Soller, Supplementary Fig. 1.</span>
-  <span>Scores: Henikoff &amp; Henikoff BLOSUM-62 (1992).</span>
+  <span class="ver">BLOSUM Alignment Painter v1.1.0</span>
+  <span>Colour scheme after McQuarrie DWJ, Bian W &amp; Soller M (2024).
+    <em>DOA/CLK2 phosphorylates Fl(2)d/WTAP to enhance m<sup>6</sup>A mRNA methyltransferase
+    complex activity.</em> bioRxiv 2024.11.25.625202.
+    <a href="https://doi.org/10.1101/2024.11.25.625202">doi.org/10.1101/2024.11.25.625202</a></span>
+  <span>Substitution scores: Henikoff S &amp; Henikoff JG (1992) <em>PNAS</em> 89:10915&ndash;10919.</span>
   <span><a href="https://github.com/dxm958/blosum62-painter">Source &amp; issues</a></span>
 </footer>
 
@@ -383,8 +429,7 @@ var DEFAULT_H = "MPHPRRYHSS-ERGSRGSYREHYRSRKHKRRRSRSWSSSSDRTRRRRREDSYHVRSRSSYDDR
 var DEFAULT_D = "MPRTRRLHHSRDRSSAGTRDKRRRHDTADHSPPLAEAPSPPRITNTHHTRSAAKRRRHELDAKKAQISKEPTFDDSISTRRRKERSKRSHRKSPAASRRQHKYRY-RDETS---HSSSRRRHRDRAKDERDSGRNNRQSQAKTAKPVIQDDADGHLIYHTGDILHHRYKIMATLGEGTFGRVVKVKDMER-DYCMALKIIKNVEKYREAAKLEINALEKIAQKDPHCDHLCVKMIDWFDYHGHMCIVFEMLGLSVFDFLRENNYEPYPLDQVRHMAYQLCYSVKFLHDNRLTHTDLKPENILFVDSDYTSHYNHKINREVRRVKNTDVRLIDFGSATFDHEHHSTIVSTRHYRAPEVILELGWSQPCDVWSIGCILFELYLGITLFQTHDNREHLAMMERILGQIPYRMARKT-KTKYFYHGKLDWDEKSSAGRYVRDHCKPLFLCQLSDSEDHCELFSLIKKMLEYEPSSRITLGEALHHPFFDRLPPHHRVGEVSNKQPLSSGSSSRERSHSLSR";
 
 function wrap(s,n){ var out=[]; for(var k=0;k<s.length;k+=n) out.push(s.slice(k,k+n)); return out.join("\n"); }
-document.getElementById("fasta").value =
-  ">H. sap\n" + wrap(DEFAULT_H,60) + "\n>D. mel\n" + wrap(DEFAULT_D,60);
+var EXAMPLE = ">H. sap\n" + wrap(DEFAULT_H,60) + "\n>D. mel\n" + wrap(DEFAULT_D,60);
 
 function parseFasta(text){
   var lines = text.split(/\r?\n/), recs = [], cur = null, anon = 0;
@@ -583,15 +628,31 @@ function parseAnnots(text, refSeq){
   return out;
 }
 
+function setExports(on){
+  ["expSvg","expPng","copyAln"].forEach(function(id){ $(id).disabled = !on; });
+}
+function blank(){
+  $("sheetwrap").innerHTML = ""; $("stats").innerHTML = "";
+  ["stats","sheetwrap","note"].forEach(function(id){ $(id).hidden = true; });
+  state = { rows:[], cls:[], draw:null, score:null, aligned:false };
+  setExports(false);
+}
+function showEmpty(){ blank(); $("err").hidden = true; $("empty").hidden = false; }
 function fail(msg){
+  blank(); $("empty").hidden = true;
   var e = $("err"); e.textContent = msg; e.hidden = false;
-  $("sheetwrap").innerHTML = ""; $("stats").innerHTML = ""; $("note").textContent = "";
 }
 
 function render(){
   $("err").hidden = true;
-  var recs = parseFasta($("fasta").value);
-  if(recs.length < 2) return fail("Need at least two sequences in FASTA format.");
+  var raw = $("fasta").value;
+  if(!raw.trim()) return showEmpty();
+  var recs = parseFasta(raw);
+  if(recs.length < 2) return fail("Need at least two sequences in FASTA format — " +
+    (recs.length ? "only one was found." : "none were found."));
+  $("empty").hidden = true;
+  ["stats","sheetwrap","note"].forEach(function(id){ $(id).hidden = false; });
+  setExports(true);
 
   var mode = document.querySelector('input[name=mode]:checked').value;
   var score = null, aligned = false;
@@ -707,6 +768,10 @@ $("copyAln").addEventListener("click", function(){
 });
 
 /* ---------- wiring ---------- */
+function loadExample(){ $("fasta").value = EXAMPLE; $("figTitle").value = "DOA/CLK2";
+  $("annots").value = "163-479 Kinase domain"; render(); }
+$("loadEx").addEventListener("click", loadExample);
+$("loadExSide").addEventListener("click", loadExample);
 $("render").addEventListener("click", render);
 document.querySelectorAll('input[name=mode]').forEach(function(r){
   r.addEventListener("change", function(){

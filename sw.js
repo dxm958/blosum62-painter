@@ -1,5 +1,5 @@
 /* BLOSUM Alignment Painter - offline app shell */
-var CACHE = "bap-v1.0.0";
+var CACHE = "bap-v1.1.0";
 var SHELL = ["./", "./index.html", "./manifest.webmanifest",
              "./icons/icon.svg", "./icons/icon-192.png", "./icons/icon-512.png"];
 
