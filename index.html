@@ -328,6 +328,19 @@ button.ghost.sm{padding:5px 11px;font-size:12px}
     </fieldset>
 
     <fieldset>
+      <legend>Colour by</legend>
+      <select id="colourBy">
+        <option value="column" selected>Whole column &mdash; every pair must qualify</option>
+        <option value="ref">Each residue vs sequence 1</option>
+        <option value="majority">Each residue vs column majority</option>
+      </select>
+      <p class="hint">With three or more sequences the per-residue modes shade cells
+         individually, so one outlier no longer blanks its column. Sequence&nbsp;1 mode blanks a
+         column where sequence&nbsp;1 has a gap; majority mode does not. Both fall back to the
+         pairwise rule for two sequences.</p>
+    </fieldset>
+
+    <fieldset>
       <legend>Figure</legend>
       <div class="f"><span class="lbl">Title</span><input type="text" id="figTitle" value="DOA/CLK2"></div>
       <div class="row2">
@@ -408,7 +421,7 @@ button.ghost.sm{padding:5px 11px;font-size:12px}
 </div>
 
 <footer class="colophon">
-  <span class="ver"><svg class="mark-sm" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><rect x="1" y="1" width="62" height="62" rx="13" fill="#FFFFFF" stroke="#C9C9D2" stroke-width="1.5"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#DC0806" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(0 32 32)"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#FE6B00" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(60 32 32)"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#DC0806" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(120 32 32)"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#FE6B00" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(180 32 32)"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#DC0806" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(240 32 32)"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#FE6B00" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(300 32 32)"/><circle cx="32" cy="32" r="4.4" fill="#FFFFFF"/><text x="32.00" y="18.40" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">B</text><text x="43.78" y="25.20" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">L</text><text x="43.78" y="38.80" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">O</text><text x="32.00" y="45.60" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">S</text><text x="20.22" y="38.80" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">U</text><text x="20.22" y="25.20" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">M</text></svg>BLOSUM Alignment Painter v1.5.0</span>
+  <span class="ver"><svg class="mark-sm" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><rect x="1" y="1" width="62" height="62" rx="13" fill="#FFFFFF" stroke="#C9C9D2" stroke-width="1.5"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#DC0806" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(0 32 32)"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#FE6B00" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(60 32 32)"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#DC0806" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(120 32 32)"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#FE6B00" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(180 32 32)"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#DC0806" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(240 32 32)"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#FE6B00" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(300 32 32)"/><circle cx="32" cy="32" r="4.4" fill="#FFFFFF"/><text x="32.00" y="18.40" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">B</text><text x="43.78" y="25.20" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">L</text><text x="43.78" y="38.80" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">O</text><text x="32.00" y="45.60" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">S</text><text x="20.22" y="38.80" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">U</text><text x="20.22" y="25.20" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">M</text></svg>BLOSUM Alignment Painter v1.6.0</span>
   <span>The mark is a blossom whose six petals spell the matrix in amino acid codes &mdash;
     B (Asx), L (Leu), O (pyrrolysine), S (Ser), U (selenocysteine), M (Met).</span>
   <span>Colour scheme after McQuarrie DWJ, Bian W &amp; Soller M (2024).
@@ -531,25 +544,75 @@ function align(a, b, go, ge){
 }
 
 /* ---------- classification: the published rule ---------- */
-function classify(rows, thr){
-  var L = rows[0].seq.length, out = new Array(L), N = rows.length;
-  for(var c=0;c<L;c++){
-    var col = [], gap = false;
-    for(var r=0;r<N;r++){
-      var ch = rows[r].seq[c];
-      if(ch === "-"){ gap = true; break; }
-      col.push(ch);
+function classify(rows, thr, mode){
+  var L = rows[0].seq.length, N = rows.length, out = [], r, c;
+  // With two sequences a column has no majority, so that mode would make
+  // sequence 1 red everywhere. Fall back to the pairwise verdict.
+  if(mode === "majority" && N < 3) mode = "column";
+  for(r=0;r<N;r++) out.push(new Array(L).fill(0));
+
+  for(c=0;c<L;c++){
+    if(mode === "column"){
+      // one verdict for the whole column: every pair must qualify
+      var col = [], gap = false;
+      for(r=0;r<N;r++){
+        var ch = rows[r].seq[c];
+        if(ch === "-"){ gap = true; break; }
+        col.push(ch);
+      }
+      if(gap) continue;                                   // gap anywhere -> unmarked
+      var same = true;
+      for(var k=1;k<col.length;k++) if(col[k] !== col[0]){ same = false; break; }
+      var v;
+      if(same) v = 2;
+      else {
+        var ok = true;
+        outer: for(var x=0;x<col.length;x++)
+          for(var y=x+1;y<col.length;y++)
+            if(b62(col[x],col[y]) < thr){ ok = false; break outer; }
+        v = ok ? 1 : 0;
+      }
+      for(r=0;r<N;r++) out[r][c] = v;
+      continue;
     }
-    if(gap){ out[c] = 0; continue; }               // gap column -> unmarked
-    var same = true;
-    for(var k=1;k<col.length;k++) if(col[k] !== col[0]){ same = false; break; }
-    if(same){ out[c] = 2; continue; }              // identity -> red
-    var ok = true;
-    outer: for(var x=0;x<col.length;x++)
-      for(var y=x+1;y<col.length;y++)
-        if(b62(col[x],col[y]) < thr){ ok = false; break outer; }
-    out[c] = ok ? 1 : 0;                            // similar -> orange, else unmarked
+
+    // per-residue modes: pick the residue each cell is judged against
+    var target;
+    if(mode === "majority"){
+      var tally = {}, best = null, bestN = 0;
+      for(r=0;r<N;r++){
+        var a = rows[r].seq[c];
+        if(a === "-") continue;
+        tally[a] = (tally[a]||0) + 1;
+        if(tally[a] > bestN){ bestN = tally[a]; best = a; }   // ties keep the earliest row
+      }
+      target = best;
+    } else {
+      target = rows[0].seq[c];                            // "ref": sequence 1
+      if(target === "-") target = null;
+    }
+    if(target === null || target === undefined) continue;  // nothing to compare against
+
+    var bestSeen = 0;
+    for(r=0;r<N;r++){
+      var res = rows[r].seq[c];
+      if(res === "-") continue;
+      if(mode === "ref" && r === 0) continue;              // reference row scored below
+      var val = (res === target) ? 2 : (b62(res, target) >= thr ? 1 : 0);
+      out[r][c] = val;
+      if(val > bestSeen) bestSeen = val;
+    }
+    if(mode === "ref" && rows[0].seq[c] !== "-") out[0][c] = bestSeen;
   }
+  return out;
+}
+
+/* Per-column summary of a per-cell classification, for the strip. */
+function columnMax(cls){
+  var L = cls[0].length, out = new Array(L).fill(0);
+  for(var c=0;c<L;c++)
+    for(var r=0;r<cls.length;r++)
+      if(cls[r][c] > out[c]) out[c] = cls[r][c];
   return out;
 }
 
@@ -621,7 +684,7 @@ function buildOps(rows, cls, opt){
       ops.push({t:"text", x:labelW-6, y:ry+rh/2, s:rows[r].name, fill:C_INK,
                 size:Math.max(6,fs*0.82), anchor:"end", italic:true});
       for(var c=start;c<end;c++){
-        var k = cls[c], cx = labelW + (c-start)*cw;
+        var k = cls[r][c], cx = labelW + (c-start)*cw;
         if(k) ops.push({t:"rect", x:cx, y:ry, w:cw, h:rh, fill: k===2?C_IDENT:C_SIM});
         var ch = seq[c];
         if(ch !== "-") counts[r]++;
@@ -753,7 +816,9 @@ function render(){
 
   var thr = +$("thr").value;
   if(!isFinite(thr)) thr = 0;
-  var cls = classify(recs, thr);
+  var colourMode = $("colourBy").value;
+  var cls = classify(recs, thr, colourMode);
+  var colCls = columnMax(cls);
 
   var pick = $("fontSel").value;
   var font = FONTS[pick] || FONTS.arial;
@@ -772,7 +837,7 @@ function render(){
 
   var strip = null;
   if($("showStrip").checked){
-    strip = buildStripOps(cls, {
+    strip = buildStripOps(colCls, {
       labelFont: labelFont,
       stripW: Math.max(200, Math.min(2000, +$("stripW").value || 600)),
       annots: parseAnnots($("annots").value, recs[0].seq)
@@ -785,20 +850,34 @@ function render(){
   ["expStripSvg","expStripPng"].forEach(function(id){ $(id).disabled = !strip; });
 
   /* stats */
-  var L2 = cls.length, nI=0, nS=0, nN=0, nG=0;
+  var L2 = cls[0].length, perCell = (colourMode !== "column");
+  var nI=0, nS=0, nN=0, nG=0, total;
   for(var c=0;c<L2;c++){
-    var isGap = recs.some(function(r){ return r.seq[c] === "-"; });
-    if(isGap) nG++;
-    if(cls[c]===2) nI++; else if(cls[c]===1) nS++; else nN++;
+    if(recs.some(function(r){ return r.seq[c] === "-"; })) nG++;
   }
-  var pct = function(x){ return (100*x/L2).toFixed(1) + "%"; };
+  if(perCell){
+    total = L2 * recs.length;
+    for(var r2=0;r2<recs.length;r2++)
+      for(var c2=0;c2<L2;c2++){
+        var v2 = cls[r2][c2];
+        if(v2===2) nI++; else if(v2===1) nS++; else nN++;
+      }
+  } else {
+    total = L2;
+    for(var c3=0;c3<L2;c3++){
+      var v3 = cls[0][c3];
+      if(v3===2) nI++; else if(v3===1) nS++; else nN++;
+    }
+  }
+  var unit = perCell ? " cells" : " columns";
+  var pct = function(x){ return (100*x/total).toFixed(1) + "%"; };
   var cells = [
     ["Columns", String(L2), recs.length + " sequences"],
-    ["Identical", pct(nI), nI + " columns", C_IDENT],
-    ["Similar", pct(nS), nS + " columns", C_SIM],
-    ["Identical + similar", pct(nI+nS), (nI+nS) + " columns"],
-    ["Unmarked", pct(nN), nN + " columns"],
-    ["Gapped", pct(nG), nG + " columns"]
+    ["Identical", pct(nI), nI + unit, C_IDENT],
+    ["Similar", pct(nS), nS + unit, C_SIM],
+    ["Identical + similar", pct(nI+nS), (nI+nS) + unit],
+    ["Unmarked", pct(nN), nN + unit],
+    ["Gapped", (100*nG/L2).toFixed(1)+"%", nG + " columns"]
   ];
   if(score !== null) cells.push(["Alignment score", String(score), "BLOSUM-62, affine"]);
   $("stats").innerHTML = cells.map(function(c){
@@ -899,7 +978,7 @@ function syncThrChips(){
 ["thr","perLine","cellW","gapOpen","gapExt","figTitle","fontSel","stripW"].forEach(function(id){
   $(id).addEventListener("change", function(){ syncThrChips(); render(); });
 });
-["showNums","boldRes","showStrip","whiteText"].forEach(function(id){ $(id).addEventListener("change", render); });
+["showNums","boldRes","showStrip","whiteText","colourBy"].forEach(function(id){ $(id).addEventListener("change", render); });
 ["fasta","annots"].forEach(function(id){
   var t;
   $(id).addEventListener("input", function(){ clearTimeout(t); t = setTimeout(render, 400); });
