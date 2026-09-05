@@ -721,16 +721,11 @@ function render(){
 }
 
 /* ---------- exports ---------- */
-var dl = null;
-if(window.claude && window.claude.use){
-  window.claude.use("downloads").then(function(d){ dl = d; }).catch(function(){});
-}
 function toast(m){ $("toast").textContent = m; clearTimeout(toast._t); toast._t = setTimeout(function(){ $("toast").textContent = ""; }, 4000); }
 function slug(){ return ($("figTitle").value.trim() || "alignment").replace(/[^A-Za-z0-9]+/g,"-").replace(/^-|-$/g,"").toLowerCase(); }
 
 function save(filename, data, mime){
-  if(dl) return dl.save({ filename:filename, data:data });   // inside a Claude Artifact
-  try{                                                        // ordinary web page
+  try{
     var blob = (data instanceof Blob) ? data : new Blob([data], {type: mime || "application/octet-stream"});
     var url = URL.createObjectURL(blob);
     var a = document.createElement("a");
@@ -740,12 +735,7 @@ function save(filename, data, mime){
     return Promise.resolve({ status:"saved" });
   }catch(e){ return Promise.reject({ code:"unavailable" }); }
 }
-function handle(err){
-  var c = err && err.code;
-  if(c === "declined") toast("Save cancelled.");
-  else if(c === "rate_limited") toast("A save prompt is already open — try again in a moment.");
-  else toast("Couldn't save the file.");
-}
+function handle(){ toast("Couldn't save the file."); }
 
 $("expSvg").addEventListener("click", function(){
   if(!state.draw) return;
