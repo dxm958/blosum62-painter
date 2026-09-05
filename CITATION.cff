@@ -1,0 +1,22 @@
+cff-version: 1.2.0
+title: BLOSUM Alignment Painter
+message: If you use this tool in a publication, please cite it.
+type: software
+authors:
+  - given-names: David W. J.
+    family-names: McQuarrie
+repository-code: 'https://github.com/dxm958/blosum62-painter'
+url: 'https://dxm958.github.io/blosum62-painter/'
+abstract: >-
+  A browser-based tool that aligns amino acid sequences with
+  Needleman-Wunsch and BLOSUM-62, then shades each alignment column
+  red for identity or orange for a substitution scoring at or above a
+  chosen BLOSUM-62 threshold. Exports publication-ready SVG and PNG.
+keywords:
+  - sequence alignment
+  - BLOSUM62
+  - protein
+  - bioinformatics
+  - figure generation
+license: MIT
+version: 1.0.0
