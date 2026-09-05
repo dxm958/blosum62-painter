@@ -405,7 +405,7 @@ button.ghost.sm{padding:5px 11px;font-size:12px}
 </div>
 
 <footer class="colophon">
-  <span class="ver"><svg class="mark-sm" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><rect x="1" y="1" width="62" height="62" rx="13" fill="#FFFFFF" stroke="#C9C9D2" stroke-width="1.5"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#DC0806" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(0 32 32)"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#FE6B00" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(60 32 32)"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#DC0806" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(120 32 32)"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#FE6B00" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(180 32 32)"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#DC0806" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(240 32 32)"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#FE6B00" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(300 32 32)"/><circle cx="32" cy="32" r="4.4" fill="#FFFFFF"/><text x="32.00" y="18.40" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">B</text><text x="43.78" y="25.20" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">L</text><text x="43.78" y="38.80" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">O</text><text x="32.00" y="45.60" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">S</text><text x="20.22" y="38.80" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">U</text><text x="20.22" y="25.20" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">M</text></svg>BLOSUM Alignment Painter v1.4.1</span>
+  <span class="ver"><svg class="mark-sm" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><rect x="1" y="1" width="62" height="62" rx="13" fill="#FFFFFF" stroke="#C9C9D2" stroke-width="1.5"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#DC0806" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(0 32 32)"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#FE6B00" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(60 32 32)"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#DC0806" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(120 32 32)"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#FE6B00" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(180 32 32)"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#DC0806" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(240 32 32)"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#FE6B00" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(300 32 32)"/><circle cx="32" cy="32" r="4.4" fill="#FFFFFF"/><text x="32.00" y="18.40" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">B</text><text x="43.78" y="25.20" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">L</text><text x="43.78" y="38.80" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">O</text><text x="32.00" y="45.60" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">S</text><text x="20.22" y="38.80" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">U</text><text x="20.22" y="25.20" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">M</text></svg>BLOSUM Alignment Painter v1.4.2</span>
   <span>The mark is a blossom whose six petals spell the matrix in amino acid codes &mdash;
     B (Asx), L (Leu), O (pyrrolysine), S (Ser), U (selenocysteine), M (Met).</span>
   <span>Colour scheme after McQuarrie DWJ, Bian W &amp; Soller M (2024).
@@ -583,7 +583,7 @@ function buildStripOps(cls, opt){
     ops.push({t:"rect", x:c*cw, y:y, w:Math.max(cw,0.55), h:H, fill: cls[c]===2?C_IDENT:C_SIM});
   }
   ops.push({t:"rect", x:0, y:y, w:W, h:H, fill:"none", stroke:C_INK, sw:1.2});
-  return { ops:ops, width:Math.ceil(W), height:Math.ceil(y+H), font:opt.font };
+  return { ops:ops, width:Math.ceil(W), height:Math.ceil(y+H), labelFont:opt.labelFont };
 }
 
 function buildOps(rows, cls, opt){
@@ -623,7 +623,7 @@ function buildOps(rows, cls, opt){
         var ch = seq[c];
         if(ch !== "-") counts[r]++;
         ops.push({t:"text", x:cx+cw/2, y:ry+rh/2, s:ch, fill:C_INK, size:fs, anchor:"middle",
-                weight: opt.bold ? 700 : undefined});
+                font: opt.font, weight: opt.bold ? 700 : undefined});
       }
       if(opt.showNums)
         ops.push({t:"text", x:labelW+span*cw+8, y:ry+rh/2, s:String(counts[r]),
@@ -631,14 +631,15 @@ function buildOps(rows, cls, opt){
     }
     y += N*rh + Math.round(rh*1.7);
   }
-  return { ops:ops, width:Math.ceil(width), height:Math.ceil(y), font:opt.font };
+  return { ops:ops, width:Math.ceil(width), height:Math.ceil(y),
+           font:opt.font, labelFont:opt.labelFont };
 }
 
 function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
 
 function toSVG(d, pad, withBg){
   var W = d.width + pad*2, H = d.height + pad*2, p = [];
-  p.push('<svg xmlns="http://www.w3.org/2000/svg" width="'+W+'" height="'+H+'" viewBox="0 0 '+W+' '+H+'" font-family="'+(d.font||FONTS.arial)+'">');
+  p.push('<svg xmlns="http://www.w3.org/2000/svg" width="'+W+'" height="'+H+'" viewBox="0 0 '+W+' '+H+'" font-family="'+(d.labelFont||FONTS.arial)+'">');
   if(withBg) p.push('<rect x="0" y="0" width="'+W+'" height="'+H+'" fill="#FFFFFF"/>');
   p.push('<g transform="translate('+pad+','+pad+')" shape-rendering="crispEdges">');
   d.ops.forEach(function(o){
@@ -649,6 +650,7 @@ function toSVG(d, pad, withBg){
       p.push('<line x1="'+o.x1.toFixed(2)+'" y1="'+o.y1.toFixed(2)+'" x2="'+o.x2.toFixed(2)+'" y2="'+o.y2.toFixed(2)+'" stroke="'+o.stroke+'" stroke-width="'+o.w+'"/>');
     else
       p.push('<text x="'+o.x.toFixed(2)+'" y="'+o.y.toFixed(2)+'" fill="'+o.fill+'" font-size="'+o.size+'"'
+        + (o.font?' font-family="'+o.font+'"':'')
         + (o.weight?' font-weight="'+o.weight+'"':'')
         + (o.italic?' font-style="italic"':'')
         + (o.anchor?' text-anchor="'+o.anchor+'"':'')
@@ -675,7 +677,7 @@ function toCanvas(d, pad, scale){
       g.beginPath(); g.moveTo(o.x1,o.y1); g.lineTo(o.x2,o.y2); g.stroke(); }
     else {
       g.fillStyle=o.fill;
-      g.font = (o.italic?"italic ":"") + (o.weight||400) + " " + o.size + "px " + (d.font||FONTS.arial);
+      g.font = (o.italic?"italic ":"") + (o.weight||400) + " " + o.size + "px " + (o.font||d.labelFont||FONTS.arial);
       g.textAlign = o.anchor==="end" ? "right" : (o.anchor==="middle" ? "center" : "left");
       g.fillText(o.s, o.x, o.y);
     }
@@ -748,9 +750,12 @@ function render(){
   if(!isFinite(thr)) thr = 0;
   var cls = classify(recs, thr);
 
-  var font = FONTS[$("fontSel").value] || FONTS.arial;
+  var pick = $("fontSel").value;
+  var font = FONTS[pick] || FONTS.arial;
+  // Courier is for the residues only; labels, numbers and annotations stay proportional
+  var labelFont = (pick === "courier") ? FONTS.arial : font;
   var draw = buildOps(recs, cls, {
-    font: font, bold: $("boldRes").checked,
+    font: font, labelFont: labelFont, bold: $("boldRes").checked,
     perLine: Math.max(10, Math.min(240, +$("perLine").value || 105)),
     cellW: Math.max(5, Math.min(20, +$("cellW").value || 9)),
     labelW: 8 + Math.max.apply(null, recs.map(function(r){ return r.name.length; })) * 5.4,
@@ -762,7 +767,7 @@ function render(){
   var strip = null;
   if($("showStrip").checked){
     strip = buildStripOps(cls, {
-      font: font,
+      labelFont: labelFont,
       stripW: Math.max(200, Math.min(2000, +$("stripW").value || 600)),
       annots: parseAnnots($("annots").value, recs[0].seq)
     });
