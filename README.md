@@ -20,15 +20,16 @@ Your sequences never leave your machine.
 | Non-identical, every pair scoring BLOSUM-62 ≥ threshold | orange | `#FE6B00` |
 | Anything below threshold, and any column containing a gap | unmarked | |
 
-The default threshold is **≥ 0**, which reproduces the scheme used in Supplementary Fig. 1 of
-the DOA/CLK2 paper (below). Loading the built-in example reproduces that figure exactly,
-kinase-domain bar included.
+Stryer's *Biochemistry* (5th ed., §7.2) defines a conservative substitution as one scoring
+**> 0**. The more inclusive **≥ 0** is sometimes used instead, and the two are one click
+apart here.
 
-Note that Stryer's *Biochemistry* (5th ed., §7.2) defines a conservative substitution more
-strictly, as a score **> 0**. One click switches between the two. The difference is not
-cosmetic — on the DOA/CLK2 alignment it is 99 similar columns versus 60, because BLOSUM-62
-scores exactly 0 for pairs such as A/G, A/V, D/S, E/H, E/N, E/R, E/S, F/I, G/S, H/Q, H/R,
-K/N, K/S, Q/S and T/V.
+The choice is worth stating in your legend, because it is not cosmetic: on the DOA/CLK2
+alignment it is 60 similar columns against 99, since BLOSUM-62 scores exactly 0 for pairs
+such as A/G, A/V, D/S, E/H, E/N, E/R, E/S, F/I, G/S, H/Q, H/R, K/N, K/S, Q/S and T/V.
+
+The built-in example uses ≥ 0, which is what Supplementary Fig. 1 of the DOA/CLK2 paper
+(below) uses — loading it reproduces that figure exactly, kinase-domain bar included.
 
 ## Getting started
 
