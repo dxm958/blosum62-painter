@@ -8,6 +8,8 @@ similarity, then export a publication-ready SVG or PNG.
 No install, no account, no server: one static HTML file that does all the work in your browser.
 Your sequences never leave your machine.
 
+**Using it for a figure? Please cite it — see [How to cite](#how-to-cite).**
+
 ## The colour rule
 
 | Column | Colour | |
@@ -52,18 +54,13 @@ You can also just download `index.html` and double-click it — it is fully self
 
 ## How to cite
 
-The MIT licence does **not** require citation. It requires only that the copyright notice
-travel with copies of the source. Using this tool and publishing the resulting figures without
-citing it is fully compliant — citation here is an academic norm, and a request:
+If you use this tool in published work, please cite it:
 
 > McQuarrie DWJ (2026). *BLOSUM Alignment Painter* (v1.1.0).
 > https://github.com/dxm958/blosum62-painter
 
 GitHub's **Cite this repository** button renders that as BibTeX or APA from `CITATION.cff`.
-
-For a permanent, indexed reference, mint a DOI: link the repo at
-[zenodo.org/account/settings/github](https://zenodo.org/account/settings/github), then publish a
-GitHub release. Zenodo archives that release and issues a DOI, free.
+A versioned DOI is on the way via Zenodo; cite the DOI once it is listed here.
 
 ## References
 
