@@ -21,15 +21,7 @@ Your sequences never leave your machine.
 | Anything below threshold, and any column containing a gap | unmarked | |
 
 Stryer's *Biochemistry* (5th ed., §7.2) defines a conservative substitution as one scoring
-**> 0**. The more inclusive **≥ 0** is sometimes used instead, and the two are one click
-apart here.
-
-The choice is worth stating in your legend, because it is not cosmetic: on the DOA/CLK2
-alignment it is 60 similar columns against 99, since BLOSUM-62 scores exactly 0 for pairs
-such as A/G, A/V, D/S, E/H, E/N, E/R, E/S, F/I, G/S, H/Q, H/R, K/N, K/S, Q/S and T/V.
-
-The built-in example uses ≥ 0, which is what Supplementary Fig. 1 of the DOA/CLK2 paper
-(below) uses — loading it reproduces that figure exactly, kinase-domain bar included.
+**> 0**. The more inclusive **≥ 0** is sometimes used instead.
 
 ## Getting started
 
