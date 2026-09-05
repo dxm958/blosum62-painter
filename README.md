@@ -1,3 +1,5 @@
+<img src="icons/icon-192.png" width="76" alt="">
+
 # BLOSUM Alignment Painter
 
 Align amino acid sequences and shade every column by identity or BLOSUM-62 substitution
@@ -56,7 +58,7 @@ You can also just download `index.html` and double-click it — it is fully self
 
 If you use this tool in published work, please cite it:
 
-> McQuarrie DWJ (2026). *BLOSUM Alignment Painter* (v1.2.0).
+> McQuarrie DWJ (2026). *BLOSUM Alignment Painter* (v1.3.0).
 > https://github.com/dxm958/blosum62-painter
 
 GitHub's **Cite this repository** button renders that as BibTeX or APA from `CITATION.cff`.
@@ -76,6 +78,12 @@ Substitution scores are BLOSUM-62:
 
 The alignment algorithm is Needleman–Wunsch with Gotoh's affine gap costs. Typeface is
 IBM Plex (SIL Open Font License).
+
+## The mark
+
+A blossom, for BLOSUM. Its six petals spell the matrix name in amino acid single-letter
+codes — **B** (Asx), **L** (Leu), **O** (pyrrolysine), **S** (Ser), **U** (selenocysteine),
+**M** (Met) — in the red and apricot of the figures it produces.
 
 ## Licence
 
