@@ -2,7 +2,7 @@
    The document is network-first, so an online visitor always gets the current
    release; the cached copy is the offline fallback. Static assets are
    cache-first, since their contents change only with the cache version. */
-var CACHE = "bap-v1.10.3";
+var CACHE = "bap-v1.11.0";
 var SHELL = ["./", "./index.html", "./manifest.webmanifest",
              "./icons/icon.svg", "./icons/icon-192.png", "./icons/icon-512.png"];
 
