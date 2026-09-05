@@ -50,11 +50,20 @@ offline afterwards. In Safari, use **File → Add to Dock**.
 
 You can also just download `index.html` and double-click it — it is fully self-contained.
 
-## Citing
+## How to cite
 
-Use the **Cite this repository** button, or mint a DOI: link the repo at
-[zenodo.org/account/settings/github](https://zenodo.org/account/settings/github), then publish
-a GitHub release. Zenodo archives that release and issues a permanent DOI, free.
+The MIT licence does **not** require citation. It requires only that the copyright notice
+travel with copies of the source. Using this tool and publishing the resulting figures without
+citing it is fully compliant — citation here is an academic norm, and a request:
+
+> McQuarrie DWJ (2026). *BLOSUM Alignment Painter* (v1.1.0).
+> https://github.com/dxm958/blosum62-painter
+
+GitHub's **Cite this repository** button renders that as BibTeX or APA from `CITATION.cff`.
+
+For a permanent, indexed reference, mint a DOI: link the repo at
+[zenodo.org/account/settings/github](https://zenodo.org/account/settings/github), then publish a
+GitHub release. Zenodo archives that release and issues a DOI, free.
 
 ## References
 
