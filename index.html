@@ -9,6 +9,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="icons/icon-192.png">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/3Dmol/2.5.5/3Dmol-min.js"></script>
 <title>BLOSUM Alignment Painter</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -239,6 +240,39 @@ button:disabled{opacity:.45;cursor:not-allowed}
 .panelhead .sp{flex:1}
 button.ghost.sm{padding:5px 11px;font-size:12px}
 .panel{display:flex;flex-direction:column}
+.tabs{display:flex;gap:2px;border-bottom:1px solid var(--rule);margin-bottom:16px}
+.tab{
+  font-family:var(--sans);font-size:13px;font-weight:500;
+  padding:9px 16px;border:0;background:none;color:var(--muted);cursor:pointer;
+  border-bottom:2px solid transparent;margin-bottom:-1px;
+}
+.tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--ident)}
+.tab:hover{color:var(--ink)}
+.structopts{
+  display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;
+  padding:12px 14px;border:1px solid var(--rule);border-radius:3px;background:var(--panel);
+}
+.structopts label{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--ink-2)}
+.structopts select{width:auto;min-width:120px}
+.rmsd{font-family:var(--mono);font-size:12px;color:var(--ink-2);margin-left:auto}
+.structlist{display:flex;flex-direction:column;gap:6px}
+.srow{
+  display:flex;flex-wrap:wrap;align-items:center;gap:8px;
+  padding:8px 12px;border:1px solid var(--rule);border-radius:3px;background:var(--panel);
+}
+.srow .nm{font-size:12.5px;font-weight:500;min-width:96px}
+.srow .acc{width:150px;flex:none}
+.srow .st{font-family:var(--mono);font-size:11px;color:var(--muted);margin-left:auto;text-align:right}
+.srow .swatch3{width:11px;height:11px;border-radius:2px;flex:none}
+.filebtn{position:relative;overflow:hidden;display:inline-block}
+.filebtn input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%}
+.viewerwrap{
+  position:relative;height:520px;border:1px solid var(--rule);border-radius:3px;
+  background:#F7F7F9;overflow:hidden;
+}
+:root[data-theme="dark"] .viewerwrap{background:#0E0E12}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .viewerwrap{background:#0E0E12}}
+#viewer{position:relative;width:100%;height:100%}
 
 .note{
   font-size:12px;color:var(--muted);line-height:1.55;max-width:78ch;
@@ -420,6 +454,37 @@ button.ghost.sm{padding:5px 11px;font-size:12px}
   </aside>
 
   <main class="stage">
+    <nav class="tabs" role="tablist">
+      <button class="tab" id="tabAlign" type="button" role="tab" aria-selected="true">Alignment</button>
+      <button class="tab" id="tabStruct" type="button" role="tab" aria-selected="false">Structure</button>
+    </nav>
+
+    <div id="paneStruct" hidden>
+      <div class="err" id="sErr" hidden></div>
+      <div class="structopts">
+        <label>Colour by
+          <select id="sColour">
+            <option value="cons" selected>Conservation</option>
+            <option value="plddt">Model confidence (pLDDT)</option>
+            <option value="seq">Sequence</option>
+          </select></label>
+        <label>Style
+          <select id="sStyle">
+            <option value="cartoon" selected>Cartoon</option>
+            <option value="stick">Stick</option>
+            <option value="sphere">Sphere</option>
+          </select></label>
+        <button class="ghost sm" id="sSuperpose" type="button">Superpose</button>
+        <button class="ghost sm" id="sReset" type="button">Reset view</button>
+        <button class="ghost sm" id="sPng" type="button">PNG</button>
+        <span class="rmsd" id="sRmsd"></span>
+      </div>
+      <div class="structlist" id="structList" style="margin:14px 0"></div>
+      <div class="viewerwrap"><div id="viewer"></div></div>
+      <p class="note" id="sNote" style="margin-top:12px"></p>
+    </div>
+
+    <div id="paneAlign">
     <div class="err" id="err" hidden></div>
     <section class="empty" id="empty" hidden>
       <h2>Paste sequences to begin</h2>
@@ -455,11 +520,12 @@ button.ghost.sm{padding:5px 11px;font-size:12px}
       <div class="sheetwrap" id="rowswrap"></div>
     </section>
     <p class="note" id="note"></p>
+    </div>
   </main>
 </div>
 
 <footer class="colophon">
-  <span class="ver"><svg class="mark-sm" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><rect x="1" y="1" width="62" height="62" rx="13" fill="#FFFFFF" stroke="#C9C9D2" stroke-width="1.5"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#DC0806" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(0 32 32)"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#FE6B00" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(60 32 32)"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#DC0806" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(120 32 32)"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#FE6B00" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(180 32 32)"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#DC0806" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(240 32 32)"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#FE6B00" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(300 32 32)"/><circle cx="32" cy="32" r="4.4" fill="#FFFFFF"/><text x="32.00" y="18.40" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">B</text><text x="43.78" y="25.20" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">L</text><text x="43.78" y="38.80" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">O</text><text x="32.00" y="45.60" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">S</text><text x="20.22" y="38.80" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">U</text><text x="20.22" y="25.20" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">M</text></svg>BLOSUM Alignment Painter v1.13.0</span>
+  <span class="ver"><svg class="mark-sm" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><rect x="1" y="1" width="62" height="62" rx="13" fill="#FFFFFF" stroke="#C9C9D2" stroke-width="1.5"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#DC0806" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(0 32 32)"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#FE6B00" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(60 32 32)"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#DC0806" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(120 32 32)"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#FE6B00" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(180 32 32)"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#DC0806" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(240 32 32)"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#FE6B00" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(300 32 32)"/><circle cx="32" cy="32" r="4.4" fill="#FFFFFF"/><text x="32.00" y="18.40" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">B</text><text x="43.78" y="25.20" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">L</text><text x="43.78" y="38.80" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">O</text><text x="32.00" y="45.60" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">S</text><text x="20.22" y="38.80" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">U</text><text x="20.22" y="25.20" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">M</text></svg>BLOSUM Alignment Painter v2.0.0</span>
   <span>The mark is a blossom whose six petals spell the matrix in amino acid codes &mdash;
     B (Asx), L (Leu), O (pyrrolysine), S (Ser), U (selenocysteine), M (Met).</span>
   <span>Colour scheme after McQuarrie DWJ, Bian W &amp; Soller M (2024).
@@ -1047,6 +1113,7 @@ function render(){
 
   var thrTxt = thr === 0 ? "≥ 0" : "≥ " + thr;
   $("legendThr").textContent = thrTxt;
+  if(!$("paneStruct").hidden) syncStructList();
   $("note").innerHTML = "Identity is shaded red; a non-identical column whose every pair scores BLOSUM-62 " +
     esc(thrTxt) + " is shaded orange; everything else, gaps included, is left unmarked. " +
     (aligned ? "Aligned here with Needleman–Wunsch (gap open " + esc($("gapOpen").value) + ", extend " + esc($("gapExt").value) + ")."
@@ -1169,6 +1236,340 @@ $("colourBy").addEventListener("change", function(){ colourByTouched = true; });
 });
 
 render();
+
+/* ---------- structure view ---------- */
+var AA3 = {ALA:"A",ARG:"R",ASN:"N",ASP:"D",CYS:"C",GLN:"Q",GLU:"E",GLY:"G",HIS:"H",ILE:"I",
+  LEU:"L",LYS:"K",MET:"M",PHE:"F",PRO:"P",SER:"S",THR:"T",TRP:"W",TYR:"Y",VAL:"V",
+  MSE:"M",SEC:"U",PYL:"O"};
+var PLDDT = [[90,"#0053D6"],[70,"#65CBF3"],[50,"#FFDB13"],[-1,"#FF7D45"]];
+var SEQCOL = ["#DC0806","#0072B2","#009E73","#CC79A7","#E69F00","#56B4E9","#7B2D8E","#3F3F46"];
+var C_NONE3D = "#D9D9DF";
+
+var viewer = null, structs = [];
+
+function sNote(m){ $("sNote").textContent = m || ""; }
+function sFail(m){ var e = $("sErr"); e.textContent = m || ""; e.hidden = !m; }
+
+function ensureViewer(){
+  if(viewer) return viewer;
+  if(!window.$3Dmol){ sFail("The 3D viewer library did not load. Check the network and reload."); return null; }
+  viewer = $3Dmol.createViewer(document.getElementById("viewer"), { backgroundColor:"white" });
+  return viewer;
+}
+
+/* UniProt accession inside a FASTA header, e.g. sp|P49760|CLK2_HUMAN */
+function guessAcc(name){
+  var m = String(name).match(/\b([OPQ][0-9][A-Z0-9]{3}[0-9]|[A-NR-Z][0-9](?:[A-Z][A-Z0-9]{2}[0-9]){1,2})\b/);
+  return m ? m[1] : "";
+}
+
+function syncStructList(){
+  var rows = state.rows || [];
+  var key = rows.map(function(r){ return r.name; }).join("");
+  if(structs._key !== key){
+    if(viewer) viewer.removeAllModels();
+    structs = rows.map(function(r){
+      return { show:true, loaded:false, model:null, ca:[], seq:"", colByResi:{},
+               source:"", plddt:null, status:"not loaded", acc:guessAcc(r.name) };
+    });
+    structs._key = key;
+    $("sRmsd").textContent = "";
+  } else {
+    structs.forEach(function(st, i){ mapStruct(i); });
+  }
+
+  $("structList").innerHTML = rows.map(function(r, i){
+    var st = structs[i];
+    return '<div class="srow">' +
+      '<span class="swatch3" style="background:' + SEQCOL[i % SEQCOL.length] + '"></span>' +
+      '<label style="display:flex;align-items:center;gap:6px">' +
+        '<input type="checkbox" data-show="' + i + '"' + (st.show ? " checked" : "") + ' style="width:auto">' +
+        '<span class="nm">' + esc(r.name) + '</span></label>' +
+      '<input type="text" class="acc" data-acc="' + i + '" placeholder="UniProt accession" value="' + esc(st.acc) + '">' +
+      '<button class="chip" type="button" data-fetch="' + i + '">Fetch AlphaFold</button>' +
+      '<label class="chip filebtn">Upload file<input type="file" accept=".pdb,.cif,.mmcif,.ent" data-file="' + i + '"></label>' +
+      '<span class="st" data-st="' + i + '">' + esc(st.status) + '</span>' +
+    '</div>';
+  }).join("");
+  wireStructRows();
+}
+
+function setStatus(i, msg){
+  structs[i].status = msg;
+  var el = document.querySelector('[data-st="' + i + '"]');
+  if(el) el.textContent = msg;
+}
+
+function wireStructRows(){
+  document.querySelectorAll("[data-show]").forEach(function(cb){
+    cb.addEventListener("change", function(){
+      structs[+cb.dataset.show].show = cb.checked;
+      applyStructStyles();
+    });
+  });
+  document.querySelectorAll("[data-acc]").forEach(function(inp){
+    inp.addEventListener("change", function(){ structs[+inp.dataset.acc].acc = inp.value.trim(); });
+  });
+  document.querySelectorAll("[data-fetch]").forEach(function(b){
+    b.addEventListener("click", function(){ fetchAF(+b.dataset.fetch); });
+  });
+  document.querySelectorAll("[data-file]").forEach(function(f){
+    f.addEventListener("change", function(){
+      var file = f.files && f.files[0]; if(!file) return;
+      var i = +f.dataset.file, fmt = /\.(cif|mmcif)$/i.test(file.name) ? "cif" : "pdb";
+      var rd = new FileReader();
+      rd.onload = function(){ loadStruct(i, String(rd.result), fmt, file.name); };
+      rd.onerror = function(){ setStatus(i, "could not read the file"); };
+      rd.readAsText(file);
+    });
+  });
+}
+
+function fetchAF(i){
+  var acc = (structs[i].acc || "").trim();
+  if(!acc) return setStatus(i, "enter an accession first");
+  sFail("");
+  setStatus(i, "fetching...");
+  fetch("https://alphafold.ebi.ac.uk/api/prediction/" + encodeURIComponent(acc))
+    .then(function(r){ if(!r.ok) throw new Error("no AlphaFold entry for " + acc); return r.json(); })
+    .then(function(j){
+      var e = j && j[0];
+      if(!e || !e.pdbUrl) throw new Error("no model for " + acc);
+      return fetch(e.pdbUrl).then(function(r){ return r.text(); }).then(function(t){
+        loadStruct(i, t, "pdb", "AlphaFold DB " + acc + " v" + e.latestVersion);
+      });
+    })
+    .catch(function(err){ setStatus(i, err.message || "fetch failed"); });
+}
+
+function loadStruct(i, text, format, source){
+  var v = ensureViewer(); if(!v) return;
+  var st = structs[i];
+  if(st.model){ try { v.removeModel(st.model); } catch(e){} st.model = null; }
+  var m;
+  try { m = v.addModel(text, format); }
+  catch(e){ return setStatus(i, "could not parse the " + format.toUpperCase()); }
+
+  var atoms = m.selectedAtoms({}), chain = null, ca = [];
+  atoms.forEach(function(a){
+    if(a.atom !== "CA") return;
+    if(chain === null) chain = a.chain;
+    if(a.chain !== chain) return;
+    ca.push({ resi:a.resi, one:AA3[String(a.resn).toUpperCase()] || "X", x:a.x, y:a.y, z:a.z, b:a.b });
+  });
+  if(!ca.length){ try { v.removeModel(m); } catch(e){} return setStatus(i, "no C-alpha atoms found"); }
+
+  st.model = m; st.ca = ca; st.chain = chain;
+  st.seq = ca.map(function(r){ return r.one; }).join("");
+  st.loaded = true; st.source = source;
+  var bs = ca.filter(function(r){ return typeof r.b === "number"; });
+  st.plddt = bs.length ? bs.reduce(function(t, r){ return t + r.b; }, 0) / bs.length : null;
+
+  mapStruct(i);
+  var n = Object.keys(st.colByResi).length;
+  setStatus(i, ca.length + " aa" +
+               (st.plddt !== null ? " · pLDDT " + st.plddt.toFixed(0) : "") +
+               " · " + n + " mapped");
+  applyStructStyles();
+  v.zoomTo(); v.render();
+}
+
+/* residue number in the model -> column in the alignment */
+function mapStruct(i){
+  var st = structs[i], row = (state.rows || [])[i];
+  if(!st) return;
+  st.colByResi = {};
+  if(!row || !st.loaded || !st.seq) return;
+  var ung = row.seq.replace(/-/g, ""), colOf = [], n = 0, c;
+  for(c = 0; c < row.seq.length; c++) if(row.seq[c] !== "-") colOf[n++] = c;
+  if(!ung) return;
+  var r = align(st.seq, ung, 12, 2), si = 0, ui = 0;
+  for(var k = 0; k < r.a.length; k++){
+    if(r.a[k] !== "-" && r.b[k] !== "-"){
+      var col = colOf[ui];
+      if(col !== undefined && st.ca[si]) st.colByResi[st.ca[si].resi] = col;
+    }
+    if(r.a[k] !== "-") si++;
+    if(r.b[k] !== "-") ui++;
+  }
+}
+
+function colourFor(i, resi, b){
+  var mode = $("sColour").value;
+  if(mode === "seq") return SEQCOL[i % SEQCOL.length];
+  if(mode === "plddt"){
+    for(var k = 0; k < PLDDT.length; k++) if(b >= PLDDT[k][0]) return PLDDT[k][1];
+    return C_NONE3D;
+  }
+  var col = structs[i].colByResi[resi];
+  if(col === undefined || !state.cls || !state.cls[i]) return C_NONE3D;
+  var vv = state.cls[i][col];
+  return vv === 2 ? C_IDENT : (vv === 1 ? C_SIM : C_NONE3D);
+}
+
+function applyStructStyles(){
+  var v = ensureViewer(); if(!v) return;
+  var style = $("sStyle").value;
+  structs.forEach(function(st, i){
+    if(!st.model) return;
+    if(!st.show){ st.model.setStyle({}, {}); return; }
+    var spec = {}, fn = function(atom){ return colourFor(i, atom.resi, atom.b); };
+    if(style === "cartoon") spec.cartoon = { colorfunc: fn, arrows: true };
+    else if(style === "stick") spec.stick = { colorfunc: fn, radius: 0.16 };
+    else spec.sphere = { colorfunc: fn, radius: 0.9 };
+    st.model.setStyle({}, spec);
+  });
+  v.render();
+  var shown = structs.filter(function(s){ return s.loaded && s.show; }).length;
+  sNote(shown
+    ? "Conservation colours come from the alignment on the Alignment tab, so the threshold, "
+      + "colouring mode and colour choices there apply here too. Grey marks an unmarked residue, "
+      + "or one with no counterpart in the alignment."
+    : "Fetch a model from AlphaFold DB by UniProt accession, or upload a PDB or mmCIF file "
+      + "— including AlphaFold 3 output downloaded from the AlphaFold Server.");
+}
+
+/* ---------- superposition: quaternion Kabsch ---------- */
+function jacobiTop(A){
+  var n = 4, a = A.map(function(r){ return r.slice(); }),
+      v = [[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]], i, j, k;
+  for(var sweep = 0; sweep < 100; sweep++){
+    var off = 0;
+    for(i = 0; i < n; i++) for(j = i + 1; j < n; j++) off += a[i][j] * a[i][j];
+    if(off < 1e-22) break;
+    for(i = 0; i < n; i++) for(j = i + 1; j < n; j++){
+      if(Math.abs(a[i][j]) < 1e-20) continue;
+      var theta = (a[j][j] - a[i][i]) / (2 * a[i][j]);
+      var sgn = theta >= 0 ? 1 : -1;
+      var t = sgn / (Math.abs(theta) + Math.sqrt(theta * theta + 1));
+      var c = 1 / Math.sqrt(t * t + 1), sn = t * c;
+      for(k = 0; k < n; k++){
+        var aik = a[i][k], ajk = a[j][k];
+        a[i][k] = c * aik - sn * ajk; a[j][k] = sn * aik + c * ajk;
+      }
+      for(k = 0; k < n; k++){
+        var aki = a[k][i], akj = a[k][j];
+        a[k][i] = c * aki - sn * akj; a[k][j] = sn * aki + c * akj;
+        var vki = v[k][i], vkj = v[k][j];
+        v[k][i] = c * vki - sn * vkj; v[k][j] = sn * vki + c * vkj;
+      }
+    }
+  }
+  var best = 0;
+  for(i = 1; i < n; i++) if(a[i][i] > a[best][best]) best = i;
+  return [v[0][best], v[1][best], v[2][best], v[3][best]];
+}
+
+function kabsch(P, Q){
+  var n = P.length, cP = [0,0,0], cQ = [0,0,0], i;
+  for(i = 0; i < n; i++){
+    cP[0] += P[i].x; cP[1] += P[i].y; cP[2] += P[i].z;
+    cQ[0] += Q[i].x; cQ[1] += Q[i].y; cQ[2] += Q[i].z;
+  }
+  for(i = 0; i < 3; i++){ cP[i] /= n; cQ[i] /= n; }
+  var Sxx=0, Sxy=0, Sxz=0, Syx=0, Syy=0, Syz=0, Szx=0, Szy=0, Szz=0;
+  for(i = 0; i < n; i++){
+    var px = P[i].x - cP[0], py = P[i].y - cP[1], pz = P[i].z - cP[2];
+    var qx = Q[i].x - cQ[0], qy = Q[i].y - cQ[1], qz = Q[i].z - cQ[2];
+    Sxx += px*qx; Sxy += px*qy; Sxz += px*qz;
+    Syx += py*qx; Syy += py*qy; Syz += py*qz;
+    Szx += pz*qx; Szy += pz*qy; Szz += pz*qz;
+  }
+  var e = jacobiTop([
+    [Sxx+Syy+Szz,  Syz-Szy,      Szx-Sxz,      Sxy-Syx],
+    [Syz-Szy,      Sxx-Syy-Szz,  Sxy+Syx,      Szx+Sxz],
+    [Szx-Sxz,      Sxy+Syx,     -Sxx+Syy-Szz,  Syz+Szy],
+    [Sxy-Syx,      Szx+Sxz,      Syz+Szy,     -Sxx-Syy+Szz]
+  ]);
+  var q0 = e[0], q1 = e[1], q2 = e[2], q3 = e[3];
+  var R = [
+    [q0*q0+q1*q1-q2*q2-q3*q3, 2*(q1*q2-q0*q3),         2*(q1*q3+q0*q2)],
+    [2*(q1*q2+q0*q3),         q0*q0-q1*q1+q2*q2-q3*q3, 2*(q2*q3-q0*q1)],
+    [2*(q1*q3-q0*q2),         2*(q2*q3+q0*q1),         q0*q0-q1*q1-q2*q2+q3*q3]
+  ];
+  var sum = 0;
+  for(i = 0; i < n; i++){
+    var ax = P[i].x - cP[0], ay = P[i].y - cP[1], az = P[i].z - cP[2];
+    var rx = R[0][0]*ax + R[0][1]*ay + R[0][2]*az;
+    var ry = R[1][0]*ax + R[1][1]*ay + R[1][2]*az;
+    var rz = R[2][0]*ax + R[2][1]*ay + R[2][2]*az;
+    var dx = rx - (Q[i].x - cQ[0]), dy = ry - (Q[i].y - cQ[1]), dz = rz - (Q[i].z - cQ[2]);
+    sum += dx*dx + dy*dy + dz*dz;
+  }
+  return { R:R, cP:cP, cQ:cQ, rmsd:Math.sqrt(sum / n), n:n };
+}
+
+function moveAtom(a, f){
+  var x = a.x - f.cP[0], y = a.y - f.cP[1], z = a.z - f.cP[2];
+  a.x = f.R[0][0]*x + f.R[0][1]*y + f.R[0][2]*z + f.cQ[0];
+  a.y = f.R[1][0]*x + f.R[1][1]*y + f.R[1][2]*z + f.cQ[1];
+  a.z = f.R[2][0]*x + f.R[2][1]*y + f.R[2][2]*z + f.cQ[2];
+}
+
+function superpose(){
+  var v = ensureViewer(); if(!v) return;
+  sFail("");
+  var idx = [];
+  structs.forEach(function(st, i){ if(st.loaded && st.show) idx.push(i); });
+  if(idx.length < 2){
+    $("sRmsd").textContent = "";
+    return sFail("Load and tick at least two structures to superpose.");
+  }
+
+  var ref = idx[0], lines = [], refByCol = {};
+  structs[ref].ca.forEach(function(r){
+    var c = structs[ref].colByResi[r.resi];
+    if(c !== undefined) refByCol[c] = r;
+  });
+
+  for(var j = 1; j < idx.length; j++){
+    var mob = idx[j], P = [], Q = [];
+    structs[mob].ca.forEach(function(r){
+      var c = structs[mob].colByResi[r.resi];
+      if(c !== undefined && refByCol[c]){ P.push(r); Q.push(refByCol[c]); }
+    });
+    if(P.length < 3){
+      lines.push(state.rows[mob].name + ": too few paired residues");
+      continue;
+    }
+    var fit = kabsch(P, Q);
+    structs[mob].model.selectedAtoms({}).forEach(function(a){ moveAtom(a, fit); });
+    structs[mob].ca.forEach(function(r){ moveAtom(r, fit); });
+    lines.push(state.rows[mob].name + " to " + state.rows[ref].name +
+               ": RMSD " + fit.rmsd.toFixed(2) + " Å over " + fit.n + " C-alpha");
+  }
+  applyStructStyles();
+  v.zoomTo(); v.render();
+  $("sRmsd").textContent = lines.join("   ·   ");
+}
+
+/* ---------- tabs + structure wiring ---------- */
+function showTab(which){
+  var onStruct = which === "struct";
+  $("paneStruct").hidden = !onStruct;
+  $("paneAlign").hidden = onStruct;
+  $("tabStruct").setAttribute("aria-selected", String(onStruct));
+  $("tabAlign").setAttribute("aria-selected", String(!onStruct));
+  if(onStruct){
+    syncStructList();
+    var v = ensureViewer();
+    if(v){ v.resize(); applyStructStyles(); v.render(); }
+  }
+}
+$("tabAlign").addEventListener("click", function(){ showTab("align"); });
+$("tabStruct").addEventListener("click", function(){ showTab("struct"); });
+$("sColour").addEventListener("change", applyStructStyles);
+$("sStyle").addEventListener("change", applyStructStyles);
+$("sSuperpose").addEventListener("click", superpose);
+$("sReset").addEventListener("click", function(){ var v = ensureViewer(); if(v){ v.zoomTo(); v.render(); } });
+$("sPng").addEventListener("click", function(){
+  var v = ensureViewer(); if(!v) return;
+  fetch(v.pngURI()).then(function(r){ return r.blob(); }).then(function(b){
+    save(slug() + "-structure.png", b, "image/png")
+      .then(function(){ toast("Structure PNG saved."); }, handle);
+  });
+});
+window.addEventListener("resize", function(){ if(viewer && !$("paneStruct").hidden) viewer.resize(); });
 
 /* ---------- theme ---------- */
 var MODES = ["auto","light","dark"], mode = "auto";
