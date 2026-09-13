@@ -20,6 +20,20 @@ keywords:
   - figure generation
 license: MIT
 version: 2.4.0
+# When the paper describing this tool is published, uncomment and fill this in.
+# GitHub's citation widget then offers the paper instead of the software, while the
+# software metadata above stays available for citing a specific version.
+#
+# preferred-citation:
+#   type: article
+#   title: ""
+#   authors:
+#     - given-names: David W. J.
+#       family-names: McQuarrie
+#   year: 2026
+#   journal: ""
+#   doi: ""
+
 references:
   - type: article
     title: >-

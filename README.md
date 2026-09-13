@@ -48,12 +48,24 @@ You can also download and open `index.html`.
 
 ## How to cite
 
-If you use this tool in published work, please cite it:
+If you use this tool in published work, please cite it.
+
+**Once the paper describing it is out**, cite that — it is the fuller description and
+the one to prefer:
+
+> *(paper citation to follow)*
+
+**In the meantime**, or to pin the exact version you used:
 
 > McQuarrie DWJ (2026). *BLOSUM Alignment Painter* (v2.4.0).
 > https://github.com/dxm958/blosum62-painter
 
-GitHub's **Cite this repository** button renders that as BibTeX or APA from `CITATION.cff`.
+GitHub's **Cite this repository** button renders whichever of these is current from
+`CITATION.cff`. A Zenodo DOI will replace the bare URL above once the repository is
+archived there.
+
+Whichever you cite, **state the similarity threshold you used** — `> 0` or `≥ 0`. It is
+the one setting that materially changes the figure, and it is rarely reported.
 
 ## References
 
