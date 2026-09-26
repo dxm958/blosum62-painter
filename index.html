@@ -264,6 +264,11 @@ button.ghost.sm{padding:5px 11px;font-size:12px}
 .srow .acc{width:150px;flex:none}
 .srow .st{font-family:var(--mono);font-size:11px;color:var(--muted);margin-left:auto;text-align:right}
 .srow .swatch3{width:11px;height:11px;border-radius:2px;flex:none}
+#orthList{max-height:210px;overflow-y:auto;border:1px solid var(--field-rule);border-radius:3px;padding:4px}
+.orow{display:flex;align-items:center;gap:7px;padding:3px 5px;font-size:11.5px;cursor:pointer;border-radius:2px}
+.orow:hover{background:var(--panel-2)}
+.orow input{width:auto;flex:none}
+.orow .om{margin-left:auto;font-family:var(--mono);font-size:10px;color:var(--muted);white-space:nowrap}
 .filebtn{position:relative;overflow:hidden;display:inline-block}
 .filebtn input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%}
 .viewerwrap{
@@ -337,6 +342,18 @@ button.ghost.sm{padding:5px 11px;font-size:12px}
         <button class="ghost" id="clearAll" type="button">Clear</button>
       </div>
       <p class="hint">Two sequences are aligned pairwise. Three or more must already be aligned (paste a Clustal/MUSCLE result) &mdash; a column is shaded only if <em>every</em> pair in it qualifies.</p>
+    </fieldset>
+
+    <fieldset>
+      <legend>Species</legend>
+      <div class="btn-row">
+        <button class="ghost" id="orthFind" type="button">Find orthologues</button>
+        <button class="ghost" id="orthAdd" type="button">Add ticked</button>
+      </div>
+      <div id="orthList"><p class="hint">no orthologues loaded</p></div>
+      <p class="hint" id="orthStatus"></p>
+      <p class="hint">From OMA, one entry per species, with a reference set of model organisms
+         pre-ticked so the sampling spans a phylogeny rather than forty mammals.</p>
     </fieldset>
 
     <fieldset>
@@ -563,7 +580,7 @@ button.ghost.sm{padding:5px 11px;font-size:12px}
 </div>
 
 <footer class="colophon">
-  <span class="ver"><svg class="mark-sm" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><rect x="1" y="1" width="62" height="62" rx="13" fill="#FFFFFF" stroke="#C9C9D2" stroke-width="1.5"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#DC0806" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(0 32 32)"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#FE6B00" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(60 32 32)"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#DC0806" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(120 32 32)"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#FE6B00" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(180 32 32)"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#DC0806" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(240 32 32)"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#FE6B00" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(300 32 32)"/><circle cx="32" cy="32" r="4.4" fill="#FFFFFF"/><text x="32.00" y="18.40" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">B</text><text x="43.78" y="25.20" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">L</text><text x="43.78" y="38.80" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">O</text><text x="32.00" y="45.60" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">S</text><text x="20.22" y="38.80" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">U</text><text x="20.22" y="25.20" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">M</text></svg>BLOSUM Alignment Painter v2.5.1</span>
+  <span class="ver"><svg class="mark-sm" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><rect x="1" y="1" width="62" height="62" rx="13" fill="#FFFFFF" stroke="#C9C9D2" stroke-width="1.5"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#DC0806" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(0 32 32)"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#FE6B00" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(60 32 32)"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#DC0806" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(120 32 32)"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#FE6B00" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(180 32 32)"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#DC0806" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(240 32 32)"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#FE6B00" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(300 32 32)"/><circle cx="32" cy="32" r="4.4" fill="#FFFFFF"/><text x="32.00" y="18.40" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">B</text><text x="43.78" y="25.20" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">L</text><text x="43.78" y="38.80" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">O</text><text x="32.00" y="45.60" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">S</text><text x="20.22" y="38.80" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">U</text><text x="20.22" y="25.20" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">M</text></svg>BLOSUM Alignment Painter v2.6.0</span>
   <span>The mark is a blossom whose six petals spell the matrix in amino acid codes &mdash;
     B (Asx), L (Leu), O (pyrrolysine), S (Ser), U (selenocysteine), M (Met).</span>
   <span>Colour scheme after McQuarrie DWJ, Bian W &amp; Soller M (2024).
@@ -1012,6 +1029,136 @@ function toCanvas(d, pad, scale){
   return cv;
 }
 
+/* ---------- orthologues and multiple alignment ---------- */
+
+/* A phylogenetic ladder rather than the forty mammals that would otherwise
+   dominate. Conservation means little if the sampling is all one clade. */
+var LADDER = [
+  [9606,"Human"], [10090,"Mouse"], [9913,"Cow"], [13616,"Opossum"], [9031,"Chicken"],
+  [28377,"Anole lizard"], [8364,"Frog"], [7955,"Zebrafish"], [7757,"Lamprey"],
+  [7719,"Ciona"], [7668,"Sea urchin"], [7227,"Drosophila"], [7165,"Anopheles"],
+  [6239,"C. elegans"], [6183,"Schistosoma"], [45351,"Nematostella"], [10228,"Trichoplax"],
+  [400682,"Amphimedon"], [44689,"Dictyostelium"], [4932,"Budding yeast"],
+  [559292,"Budding yeast"], [4896,"Fission yeast"], [3702,"Arabidopsis"],
+  [3055,"Chlamydomonas"]
+];
+var LADDER_IDX = {};
+LADDER.forEach(function(e, i){ LADDER_IDX[e[0]] = { rank:i, label:e[1] }; });
+
+var orthologs = [];
+
+function setOrthStatus(m){ $("orthStatus").textContent = m || ""; }
+
+function findOrthologs(acc){
+  acc = (acc || "").trim();
+  if(!acc) return setOrthStatus("need an accession for sequence 1 first");
+  setOrthStatus("querying OMA...");
+  orthologs = [];
+  fetch("https://omabrowser.org/api/protein/" + encodeURIComponent(acc) + "/orthologs/")
+    .then(function(r){ if(!r.ok) throw new Error("OMA has no entry for " + acc); return r.json(); })
+    .then(function(d){
+      orthologs = (d || []).map(function(e){
+        var sp = e.species || {};
+        var lad = LADDER_IDX[sp.taxon_id];
+        return { acc:e.canonicalid, species:sp.species || "?", taxon:sp.taxon_id,
+                 rel:e.rel_type, len:e.sequence_length,
+                 rank: lad ? lad.rank : 999, label: lad ? lad.label : null };
+      }).filter(function(o){ return o.acc; });
+
+      // one per species, best relationship first, ladder species to the top
+      var best = {}, order = [];
+      orthologs.sort(function(a, b){
+        var ra = a.rel === "1:1" ? 0 : 1, rb = b.rel === "1:1" ? 0 : 1;
+        return a.rank - b.rank || ra - rb;
+      });
+      orthologs.forEach(function(o){
+        if(best[o.taxon]) return;
+        best[o.taxon] = 1; order.push(o);
+      });
+      orthologs = order;
+      renderOrthList();
+      var nLad = orthologs.filter(function(o){ return o.rank < 999; }).length;
+      setOrthStatus(orthologs.length + " species (" + nLad + " on the reference ladder)");
+    })
+    .catch(function(e){ setOrthStatus(e.message || "OMA lookup failed"); });
+}
+
+function renderOrthList(){
+  var box = $("orthList");
+  if(!orthologs.length){ box.innerHTML = '<p class="hint">no orthologues loaded</p>'; return; }
+  box.innerHTML = orthologs.slice(0, 60).map(function(o, i){
+    var tag = o.label ? '<strong>' + esc(o.label) + '</strong> ' : "";
+    return '<label class="orow">' +
+      '<input type="checkbox" data-orth="' + i + '"' + (o.rank < 999 ? " checked" : "") + '>' +
+      '<span>' + tag + esc(o.species.slice(0, 40)) + "</span>" +
+      '<span class="om">' + esc(o.acc) + " · " + esc(o.rel) + "</span>" +
+    "</label>";
+  }).join("");
+}
+
+function addSelectedOrthologs(){
+  var picked = [];
+  document.querySelectorAll("[data-orth]").forEach(function(cb){
+    if(cb.checked) picked.push(orthologs[+cb.dataset.orth]);
+  });
+  if(!picked.length) return setOrthStatus("tick at least one species");
+  setOrthStatus("fetching " + picked.length + " sequences...");
+  Promise.all(picked.map(function(o){
+    return fetch("https://rest.uniprot.org/uniprotkb/" + o.acc + ".fasta")
+      .then(function(r){ return r.ok ? r.text() : ""; })
+      .catch(function(){ return ""; });
+  })).then(function(texts){
+    var got = texts.filter(function(t){ return t.trim(); });
+    var cur = $("fasta").value.trim();
+    $("fasta").value = (cur ? cur + "\n" : "") + got.map(function(t){ return t.trim(); }).join("\n");
+    setOrthStatus("added " + got.length + " sequences");
+    if(got.length && document.querySelector('input[name=mode][value=align]'))
+      document.querySelector('input[name=mode][value=align]').checked = true;
+    render();
+  });
+}
+
+/* ---------- multiple alignment ----------
+   Star alignment on sequence 1. Every sequence is aligned pairwise to the
+   reference and the results merged into one set of columns. It is not as
+   accurate as a progressive aligner, but it anchors every column on the
+   reference — which is what the region selection, the numbering and the
+   "score against sequence 1" colouring all assume anyway. */
+function starAlign(seqs, go, ge){
+  var centre = seqs[0].replace(/-/g, "");
+  var msa = [centre];
+
+  for(var i = 1; i < seqs.length; i++){
+    var pw = align(centre, seqs[i].replace(/-/g, ""), go, ge);
+    var rows = [], fresh = "", p = 0, q = 0, r;
+    for(r = 0; r < msa.length; r++) rows.push("");
+
+    while(p < msa[0].length || q < pw.a.length){
+      if(p >= msa[0].length){                     // trailing insertion in the new pair
+        for(r = 0; r < msa.length; r++) rows[r] += "-";
+        fresh += pw.b[q]; q++; continue;
+      }
+      if(q >= pw.a.length){                       // trailing gap already in the block
+        for(r = 0; r < msa.length; r++) rows[r] += msa[r][p];
+        fresh += "-"; p++; continue;
+      }
+      var inBlock = msa[0][p] === "-", inPair = pw.a[q] === "-";
+      if(inBlock && !inPair){                     // block has a gap the pair does not
+        for(r = 0; r < msa.length; r++) rows[r] += msa[r][p];
+        fresh += "-"; p++;
+      } else if(!inBlock && inPair){              // pair inserts relative to the reference
+        for(r = 0; r < msa.length; r++) rows[r] += "-";
+        fresh += pw.b[q]; q++;
+      } else {                                    // both gaps, or both reference residues
+        for(r = 0; r < msa.length; r++) rows[r] += msa[r][p];
+        fresh += pw.b[q]; p++; q++;
+      }
+    }
+    msa = rows.concat([fresh]);
+  }
+  return msa;
+}
+
 /* ---------- annotated features and region selection ---------- */
 
 /* Regions are held in sequence 1's own residue numbering, because that is what
@@ -1196,14 +1343,22 @@ function render(){
   var score = null, aligned = false;
 
   if(mode === "align"){
-    if(recs.length !== 2) return fail("Built-in alignment is pairwise. For " + recs.length + " sequences, align them elsewhere and switch to “Keep as pasted”.");
-    var a = recs[0].seq.replace(/-/g,""), b = recs[1].seq.replace(/-/g,"");
-    if(a.length * b.length > 6.5e6) return fail("Sequences are too long to align in the browser (" + a.length + " × " + b.length + " cells). Align externally and paste the result.");
     var go = Math.max(0, +$("gapOpen").value || 0), ge = Math.max(0, +$("gapExt").value || 0);
-    var res = align(a, b, go, ge);
-    recs = [{name:recs[0].name, full:recs[0].full, seq:res.a},
-            {name:recs[1].name, full:recs[1].full, seq:res.b}];
-    score = res.score; aligned = true;
+    var ref = recs[0].seq.replace(/-/g,"");
+    var longest = Math.max.apply(null, recs.map(function(r){ return r.seq.replace(/-/g,"").length; }));
+    if(ref.length * longest > 6.5e6)
+      return fail("Sequences are too long to align in the browser (" + ref.length + " \u00D7 " +
+                  longest + " cells). Align externally and paste the result.");
+    if(recs.length === 2){
+      var res = align(ref, recs[1].seq.replace(/-/g,""), go, ge);
+      recs = [{name:recs[0].name, full:recs[0].full, seq:res.a},
+              {name:recs[1].name, full:recs[1].full, seq:res.b}];
+      score = res.score;
+    } else {
+      var rows = starAlign(recs.map(function(r){ return r.seq; }), go, ge);
+      recs = recs.map(function(r, i){ return { name:r.name, full:r.full, seq:rows[i] }; });
+    }
+    aligned = true;
   } else {
     var L = recs[0].seq.length, bad = recs.filter(function(r){ return r.seq.length !== L; });
     if(bad.length) return fail("Sequences are not the same length (" + recs.map(function(r){return r.seq.length;}).join(", ") + "). Switch to “Align now”, or paste an aligned FASTA.");
@@ -1391,6 +1546,8 @@ function clearAll(){ $("fasta").value = ""; $("figTitle").value = ""; $("annots"
 $("loadEx").addEventListener("click", loadExample);
 $("loadExSide").addEventListener("click", loadExample);
 $("clearAll").addEventListener("click", clearAll);
+$("orthFind").addEventListener("click", function(){ findOrthologs($("featAcc").value); });
+$("orthAdd").addEventListener("click", addSelectedOrthologs);
 $("featFetch").addEventListener("click", function(){ loadFeatures($("featAcc").value); });
 $("featList").addEventListener("change", applyFeatureSelection);
 $("regClear").addEventListener("click", clearRegion);
