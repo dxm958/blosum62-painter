@@ -19,7 +19,7 @@ keywords:
   - bioinformatics
   - figure generation
 license: MIT
-version: 2.5.0
+version: 2.5.1
 # When the paper describing this tool is published, uncomment and fill this in.
 # GitHub's citation widget then offers the paper instead of the software, while the
 # software metadata above stays available for citing a specific version.
