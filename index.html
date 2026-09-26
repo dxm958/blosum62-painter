@@ -265,14 +265,15 @@ button.ghost.sm{padding:5px 11px;font-size:12px}
 .srow .st{font-family:var(--mono);font-size:11px;color:var(--muted);margin-left:auto;text-align:right}
 .srow .swatch3{width:11px;height:11px;border-radius:2px;flex:none}
 #hitList{max-height:200px;overflow-y:auto;border:1px solid var(--field-rule);border-radius:3px}
-.hrow{display:grid;grid-template-columns:auto 1fr auto;gap:2px 8px;width:100%;text-align:left;
-  padding:6px 9px;border:0;border-bottom:1px solid var(--rule);background:none;cursor:pointer;font-family:var(--sans)}
+.hrow{display:grid;grid-template-columns:auto auto 1fr auto;gap:2px 8px;width:100%;
+  padding:6px 9px;border-bottom:1px solid var(--rule);cursor:pointer;font-family:var(--sans);align-items:baseline}
+.hrow input{width:auto;grid-row:1}
 .hrow:last-child{border-bottom:0}
 .hrow:hover{background:var(--panel-2)}
 .hrow .hid{font-family:var(--mono);font-size:11px;font-weight:600;color:var(--ink)}
 .hrow .hn{font-size:11.5px;color:var(--ink-2)}
-.hrow .hx{font-family:var(--mono);font-size:10px;color:var(--muted);grid-column:3;grid-row:1}
-.hrow .ho{font-size:10.5px;color:var(--muted);font-style:italic;grid-column:2/4}
+.hrow .hx{font-family:var(--mono);font-size:10px;color:var(--muted);grid-column:4;grid-row:1}
+.hrow .ho{font-size:10.5px;color:var(--muted);font-style:italic;grid-column:2/5}
 .constable{border:1px solid var(--rule);border-radius:3px;background:var(--panel);overflow:hidden}
 .crow{display:grid;grid-template-columns:1fr auto auto;gap:14px;align-items:baseline;
   padding:9px 14px;border-bottom:1px solid var(--rule)}
@@ -357,6 +358,10 @@ button.ghost.sm{padding:5px 11px;font-size:12px}
       <div class="btn-row">
         <input type="text" id="searchQ" placeholder="LARP1, CLK2, Doa&hellip;">
         <button class="ghost" id="searchGo" type="button">Search</button>
+      </div>
+      <div class="btn-row" style="margin-top:6px">
+        <button class="primary" id="searchLoad" type="button">Load ticked</button>
+        <button class="ghost" id="searchNone" type="button">Untick all</button>
       </div>
       <div id="hitList"><p class="hint">search UniProt by protein or gene name</p></div>
       <p class="hint" id="searchStatus"></p>
@@ -448,6 +453,7 @@ button.ghost.sm{padding:5px 11px;font-size:12px}
       </div>
       <div class="chips">
         <button class="chip" type="button" data-ci="#DC0806" data-cs="#FE6B00" aria-pressed="true">Default</button>
+        <button class="chip" type="button" data-ci="#F50057" data-cs="#00B8D4">Vivid</button>
         <button class="chip" type="button" data-ci="#0072B2" data-cs="#56B4E9">Colour-safe</button>
         <button class="chip" type="button" data-ci="#3F3F46" data-cs="#A1A1AA">Greyscale</button>
       </div>
@@ -621,7 +627,7 @@ button.ghost.sm{padding:5px 11px;font-size:12px}
 </div>
 
 <footer class="colophon">
-  <span class="ver"><svg class="mark-sm" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><rect x="1" y="1" width="62" height="62" rx="13" fill="#FFFFFF" stroke="#C9C9D2" stroke-width="1.5"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#DC0806" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(0 32 32)"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#FE6B00" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(60 32 32)"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#DC0806" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(120 32 32)"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#FE6B00" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(180 32 32)"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#DC0806" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(240 32 32)"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#FE6B00" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(300 32 32)"/><circle cx="32" cy="32" r="4.4" fill="#FFFFFF"/><text x="32.00" y="18.40" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">B</text><text x="43.78" y="25.20" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">L</text><text x="43.78" y="38.80" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">O</text><text x="32.00" y="45.60" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">S</text><text x="20.22" y="38.80" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">U</text><text x="20.22" y="25.20" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">M</text></svg>BLOSUM Alignment Painter v2.8.1</span>
+  <span class="ver"><svg class="mark-sm" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><rect x="1" y="1" width="62" height="62" rx="13" fill="#FFFFFF" stroke="#C9C9D2" stroke-width="1.5"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#DC0806" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(0 32 32)"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#FE6B00" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(60 32 32)"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#DC0806" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(120 32 32)"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#FE6B00" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(180 32 32)"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#DC0806" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(240 32 32)"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#FE6B00" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(300 32 32)"/><circle cx="32" cy="32" r="4.4" fill="#FFFFFF"/><text x="32.00" y="18.40" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">B</text><text x="43.78" y="25.20" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">L</text><text x="43.78" y="38.80" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">O</text><text x="32.00" y="45.60" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">S</text><text x="20.22" y="38.80" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">U</text><text x="20.22" y="25.20" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">M</text></svg>BLOSUM Alignment Painter v2.9.0</span>
   <span>The mark is a blossom whose six petals spell the matrix in amino acid codes &mdash;
     B (Asx), L (Leu), O (pyrrolysine), S (Ser), U (selenocysteine), M (Met).</span>
   <span>Colour scheme after McQuarrie DWJ, Bian W &amp; Soller M (2024).
@@ -1327,15 +1333,42 @@ function renderHits(){
   var box = $("hitList");
   if(!hits.length){ box.innerHTML = '<p class="hint">no results</p>'; return; }
   box.innerHTML = hits.map(function(h, i){
-    return '<button class="hrow" type="button" data-hit="' + i + '">' +
+    return '<label class="hrow">' +
+      '<input type="checkbox" data-hit="' + i + '"' + (i === 0 ? " checked" : "") + ">" +
       '<span class="hid">' + esc(h.id || h.acc) + "</span>" +
-      '<span class="hn">' + esc(h.name.slice(0, 44)) + "</span>" +
+      '<span class="hn">' + esc(h.name.slice(0, 40)) + "</span>" +
       '<span class="ho">' + esc(h.org.slice(0, 26)) + "</span>" +
-      '<span class="hx">' + (h.reviewed ? "SP" : "TR") + " · " + h.len + " aa</span>" +
-    "</button>";
+      '<span class="hx">' + (h.reviewed ? "SP" : "TR") + " \u00B7 " + h.len + " aa</span>" +
+    "</label>";
   }).join("");
-  box.querySelectorAll("[data-hit]").forEach(function(b){
-    b.addEventListener("click", function(){ pickProtein(hits[+b.dataset.hit]); });
+}
+
+function loadTickedProteins(){
+  var picked = [];
+  document.querySelectorAll("#hitList [data-hit]").forEach(function(cb){
+    if(cb.checked) picked.push(hits[+cb.dataset.hit]);
+  });
+  if(!picked.length) return setSearchStatus("tick at least one entry");
+  setSearchStatus("loading " + picked.length + "...");
+  var wasEmpty = !$("fasta").value.trim();
+  Promise.all(picked.map(function(h){
+    return fetch("https://rest.uniprot.org/uniprotkb/" + h.acc + ".fasta")
+      .then(function(r){ return r.ok ? r.text() : ""; })
+      .catch(function(){ return ""; });
+  })).then(function(texts){
+    var got = texts.filter(function(t){ return t.trim(); }).map(function(t){ return t.trim(); });
+    var cur = $("fasta").value.trim();
+    $("fasta").value = (cur ? cur + "\n" : "") + got.join("\n");
+    if(wasEmpty){
+      var first = picked[0];
+      $("featAcc").value = first.acc;
+      $("figTitle").value = first.name ? first.name.split(/[,(]/)[0].trim() : (first.id || first.acc);
+    }
+    if(($("fasta").value.match(/^>/gm) || []).length > 1)
+      document.querySelector('input[name=mode][value=align]').checked = true;
+    setSearchStatus("loaded " + got.length + " of " + picked.length);
+    render();
+    if(wasEmpty) loadFeatures(picked[0].acc);
   });
 }
 
@@ -1430,6 +1463,7 @@ function renderDomainChips(){
 function annotationsFromFeatures(){
   var list = pickableFeatures();
   if(!list.length) return;
+  annotsAuto = true;
   var lines = list.slice(0, 8).map(function(f){
     return f.start + "-" + f.end + " " + shortFeatureName(f);
   });
@@ -1582,7 +1616,20 @@ function starAlign(seqs, go, ge){
 
 /* Regions are held in sequence 1's own residue numbering, because that is what
    a domain annotation is expressed in. Alignment columns are derived. */
-var features = [], featAccLoaded = "";
+var features = [], featAccLoaded = "", featSeqKey = "", annotsAuto = false;
+
+/* Anything fetched for the previous protein has to go when sequence 1 changes. */
+function resetFeaturesIfRefChanged(rows){
+  var key = rows.length ? rows[0].seq.replace(/-/g, "") : "";
+  if(key === featSeqKey) return;
+  featSeqKey = key;
+  if(!features.length && !featAccLoaded) return;
+  features = []; featAccLoaded = "";
+  $("featAcc").value = "";
+  $("regFrom").value = ""; $("regTo").value = "";
+  if(annotsAuto){ $("annots").value = ""; annotsAuto = false; }
+  setFeatStatus("sequence 1 changed - fetch its domains again");
+}
 
 function featRank(f){
   var order = { domain:0, repeat:1, motif:2, "binding site":3, "active site":4,
@@ -1793,6 +1840,7 @@ function render(){
   var colourMode = $("colourBy").value;
   var cls = classify(recs, thr, colourMode);
   var colCls = columnMax(cls);
+  resetFeaturesIfRefChanged(recs);
   var reg = regionAligned ? null : regionCols();
   var c0 = reg ? reg.c0 : 0, c1 = reg ? reg.c1 : cls[0].length - 1;
 
@@ -1968,6 +2016,10 @@ $("loadEx").addEventListener("click", loadExample);
 $("loadExSide").addEventListener("click", loadExample);
 $("clearAll").addEventListener("click", clearAll);
 $("searchGo").addEventListener("click", function(){ searchProtein($("searchQ").value); });
+$("searchLoad").addEventListener("click", loadTickedProteins);
+$("searchNone").addEventListener("click", function(){
+  document.querySelectorAll("#hitList [data-hit]").forEach(function(cb){ cb.checked = false; });
+});
 $("searchQ").addEventListener("keydown", function(e){ if(e.key === "Enter") searchProtein($("searchQ").value); });
 $("orthFind").addEventListener("click", function(){
   setOrthStatus("identifying sequence 1...");
