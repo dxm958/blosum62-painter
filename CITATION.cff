@@ -19,20 +19,26 @@ keywords:
   - bioinformatics
   - figure generation
 license: MIT
-version: 2.9.1
-# When the paper describing this tool is published, uncomment and fill this in.
-# GitHub's citation widget then offers the paper instead of the software, while the
-# software metadata above stays available for citing a specific version.
-#
-# preferred-citation:
-#   type: article
-#   title: ""
-#   authors:
-#     - given-names: David W. J.
-#       family-names: McQuarrie
-#   year: 2026
-#   journal: ""
-#   doi: ""
+version: 3.0.0
+preferred-citation:
+  type: article
+  title: >-
+    LARP1-DM15/Sgt is a reader for cap-adjacent 2'-O-ribose methylation in TOP
+    ribosomal protein mRNAs required for localization to synapses
+  authors:
+    - {given-names: "Yuan W.", family-names: Tian}
+    - {given-names: Yavor, family-names: Hadzhiev}
+    - {given-names: Giancarlo, family-names: Abis}
+    - {given-names: Martin, family-names: Dodel}
+    - {given-names: "Emilie L.", family-names: Alard}
+    - {given-names: "David W. J.", family-names: McQuarrie}
+    - {given-names: "Faraz K.", family-names: Mardakheh}
+    - {given-names: "Maria R.", family-names: Conte}
+    - {given-names: Ferenc, family-names: "Müller"}
+    - {given-names: Matthias, family-names: Soller}
+  year: 2026
+  journal: bioRxiv
+  doi: 10.64898/2026.09.17.752351
 
 references:
   - type: article

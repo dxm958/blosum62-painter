@@ -281,6 +281,11 @@ button.ghost.sm{padding:5px 11px;font-size:12px}
 .crow .ck{font-size:12.5px;color:var(--ink-2)}
 .crow .cv{font-family:var(--mono);font-size:15px;font-weight:500;font-variant-numeric:tabular-nums}
 .crow .cd{font-family:var(--mono);font-size:11px;color:var(--muted);min-width:180px;text-align:right}
+.sqchips{display:flex;flex-wrap:wrap;gap:5px;margin-top:2px}
+.sqchip{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-family:var(--mono);
+  background:var(--panel-2);border:1px solid var(--rule);border-radius:2px;padding:2px 4px 2px 7px}
+.sqchip button{border:0;background:none;cursor:pointer;color:var(--muted);font-size:13px;line-height:1;padding:0 2px}
+.sqchip button:hover{color:var(--ident)}
 .dchips{display:flex;flex-wrap:wrap;gap:5px}
 .dchip .rng{font-family:var(--mono);font-size:9.5px;opacity:.65;margin-left:3px}
 #orthList{max-height:210px;overflow-y:auto;border:1px solid var(--field-rule);border-radius:3px;padding:4px}
@@ -374,6 +379,7 @@ button.ghost.sm{padding:5px 11px;font-size:12px}
         <button class="ghost" id="loadExSide" type="button">Load example</button>
         <button class="ghost" id="clearAll" type="button">Clear</button>
       </div>
+      <div class="sqchips" id="seqList"></div>
       <p class="hint">Two sequences are aligned pairwise. Three or more must already be aligned (paste a Clustal/MUSCLE result) &mdash; a column is shaded only if <em>every</em> pair in it qualifies.</p>
     </fieldset>
 
@@ -596,9 +602,7 @@ button.ghost.sm{padding:5px 11px;font-size:12px}
           <span>Substitution scoring <b>&minus;1</b>, below the threshold &mdash; left unmarked, as are gaps.</span></div>
       </div>
       <button class="primary" id="loadEx" type="button">Load the DOA/CLK2 example</button>
-      <p class="cite">The example is the DOA/CLK2 alignment from McQuarrie DWJ, Bian W &amp; Soller M (2024),
-         <a href="https://doi.org/10.1101/2024.11.25.625202">bioRxiv 2024.11.25.625202</a>, whose
-         Supplementary Fig. 1 this colour scheme reproduces.</p>
+      <p class="cite">Described in Tian YW, Hadzhiev Y, Abis G, Dodel M, Alard EL, McQuarrie DWJ, Mardakheh FK, Conte MR, M&uuml;ller F &amp; Soller M (2026). <em>LARP1-DM15/Sgt is a reader for cap-adjacent 2&rsquo;-<em>O</em>-ribose methylation in TOP ribosomal protein mRNAs required for localization to synapses.</em> bioRxiv 2026.09.17.752351. <a href="https://doi.org/10.64898/2026.09.17.752351">doi.org/10.64898/2026.09.17.752351</a>. The built-in example is a DOA/CLK2 alignment, one application of the colour scheme.</p>
     </section>
     <section class="stats" id="stats"></section>
     <div class="sheetwrap" id="sheetwrap"></div>
@@ -627,13 +631,10 @@ button.ghost.sm{padding:5px 11px;font-size:12px}
 </div>
 
 <footer class="colophon">
-  <span class="ver"><svg class="mark-sm" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><rect x="1" y="1" width="62" height="62" rx="13" fill="#FFFFFF" stroke="#C9C9D2" stroke-width="1.5"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#DC0806" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(0 32 32)"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#FE6B00" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(60 32 32)"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#DC0806" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(120 32 32)"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#FE6B00" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(180 32 32)"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#DC0806" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(240 32 32)"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#FE6B00" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(300 32 32)"/><circle cx="32" cy="32" r="4.4" fill="#FFFFFF"/><text x="32.00" y="18.40" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">B</text><text x="43.78" y="25.20" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">L</text><text x="43.78" y="38.80" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">O</text><text x="32.00" y="45.60" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">S</text><text x="20.22" y="38.80" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">U</text><text x="20.22" y="25.20" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">M</text></svg>BLOSUM Alignment Painter v2.9.1</span>
+  <span class="ver"><svg class="mark-sm" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><rect x="1" y="1" width="62" height="62" rx="13" fill="#FFFFFF" stroke="#C9C9D2" stroke-width="1.5"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#DC0806" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(0 32 32)"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#FE6B00" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(60 32 32)"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#DC0806" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(120 32 32)"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#FE6B00" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(180 32 32)"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#DC0806" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(240 32 32)"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#FE6B00" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(300 32 32)"/><circle cx="32" cy="32" r="4.4" fill="#FFFFFF"/><text x="32.00" y="18.40" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">B</text><text x="43.78" y="25.20" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">L</text><text x="43.78" y="38.80" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">O</text><text x="32.00" y="45.60" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">S</text><text x="20.22" y="38.80" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">U</text><text x="20.22" y="25.20" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">M</text></svg>BLOSUM Alignment Painter v3.0.0</span>
   <span>The mark is a blossom whose six petals spell the matrix in amino acid codes &mdash;
     B (Asx), L (Leu), O (pyrrolysine), S (Ser), U (selenocysteine), M (Met).</span>
-  <span>Colour scheme after McQuarrie DWJ, Bian W &amp; Soller M (2024).
-    <em>DOA/CLK2 phosphorylates Fl(2)d/WTAP to enhance m<sup>6</sup>A mRNA methyltransferase
-    complex activity.</em> bioRxiv 2024.11.25.625202.
-    <a href="https://doi.org/10.1101/2024.11.25.625202">doi.org/10.1101/2024.11.25.625202</a></span>
+  <span>Cite: Tian YW, Hadzhiev Y, Abis G, Dodel M, Alard EL, McQuarrie DWJ, Mardakheh FK, Conte MR, M&uuml;ller F &amp; Soller M (2026). <em>LARP1-DM15/Sgt is a reader for cap-adjacent 2&rsquo;-<em>O</em>-ribose methylation in TOP ribosomal protein mRNAs required for localization to synapses.</em> bioRxiv 2026.09.17.752351. <a href="https://doi.org/10.64898/2026.09.17.752351">doi.org/10.64898/2026.09.17.752351</a></span>
   <span>Substitution scores: Henikoff S &amp; Henikoff JG (1992) <em>PNAS</em> 89:10915&ndash;10919.</span>
   <span><strong>Using this for a figure?</strong> Please cite it &mdash;
     <a href="https://github.com/dxm958/blosum62-painter#how-to-cite">how to cite</a>.</span>
@@ -1343,6 +1344,40 @@ function renderHits(){
   }).join("");
 }
 
+/* Records currently in the box, so duplicates can be refused and single
+   sequences removed without editing FASTA by hand. */
+function currentRecords(){
+  return parseFasta($("fasta").value).map(function(r, i){
+    return { i:i, name:r.name, acc:guessAcc(r.full || r.name), key:r.seq.replace(/-/g, "").toUpperCase() };
+  });
+}
+
+function writeRecords(recs){
+  $("fasta").value = recs.map(function(r){
+    return ">" + (r.full || r.name) + "\n" + wrap(r.seq, 60);
+  }).join("\n");
+}
+
+function removeSequence(i){
+  var recs = parseFasta($("fasta").value);
+  recs.splice(i, 1);
+  writeRecords(recs);
+  render();
+}
+
+function renderSeqList(){
+  var box = $("seqList"); if(!box) return;
+  var recs = state.rows || [];
+  if(!recs.length){ box.innerHTML = ""; return; }
+  box.innerHTML = recs.map(function(r, i){
+    return '<span class="sqchip">' + esc(r.name) +
+      '<button type="button" data-rm="' + i + '" title="remove">\u00D7</button></span>';
+  }).join("");
+  box.querySelectorAll("[data-rm]").forEach(function(b){
+    b.addEventListener("click", function(){ removeSequence(+b.dataset.rm); });
+  });
+}
+
 function loadTickedProteins(){
   var picked = [];
   document.querySelectorAll("#hitList [data-hit]").forEach(function(cb){
@@ -1356,9 +1391,18 @@ function loadTickedProteins(){
       .then(function(r){ return r.ok ? r.text() : ""; })
       .catch(function(){ return ""; });
   })).then(function(texts){
-    var got = texts.filter(function(t){ return t.trim(); }).map(function(t){ return t.trim(); });
+    var have = {};
+    currentRecords().forEach(function(r){ have[r.key] = 1; if(r.acc) have[r.acc] = 1; });
+    var dup = 0;
+    var got = texts.filter(function(t){ return t.trim(); }).map(function(t){ return t.trim(); })
+      .filter(function(t){
+        var seq = t.split(/\r?\n/).slice(1).join("").replace(/[^A-Za-z]/g, "").toUpperCase();
+        if(have[seq]){ dup++; return false; }
+        have[seq] = 1; return true;
+      });
     var cur = $("fasta").value.trim();
     $("fasta").value = (cur ? cur + "\n" : "") + got.join("\n");
+    window.__dupSkipped = dup;
     if(wasEmpty){
       var first = picked[0];
       $("featAcc").value = first.acc;
@@ -1366,7 +1410,8 @@ function loadTickedProteins(){
     }
     if(($("fasta").value.match(/^>/gm) || []).length > 1)
       document.querySelector('input[name=mode][value=align]').checked = true;
-    setSearchStatus("loaded " + got.length + " of " + picked.length);
+    setSearchStatus("loaded " + got.length + " of " + picked.length +
+      (window.__dupSkipped ? " (" + window.__dupSkipped + " already present)" : ""));
     render();
     if(wasEmpty) loadFeatures(picked[0].acc);
   });
@@ -1561,10 +1606,18 @@ function addSelectedOrthologs(){
       })
       .catch(function(){ return ""; });
   })).then(function(texts){
-    var got = texts.filter(function(t){ return t.trim(); });
+    var have = {};
+    currentRecords().forEach(function(r){ have[r.key] = 1; });
+    var dup = 0;
+    var got = texts.filter(function(t){ return t.trim(); }).filter(function(t){
+      var seq = t.split(/\r?\n/).slice(1).join("").replace(/[^A-Za-z]/g, "").toUpperCase();
+      if(have[seq]){ dup++; return false; }
+      have[seq] = 1; return true;
+    });
     var cur = $("fasta").value.trim();
     $("fasta").value = (cur ? cur + "\n" : "") + got.join("\n");
-    setOrthStatus("added " + got.length + " of " + picked.length + " sequences");
+    setOrthStatus("added " + got.length + " of " + picked.length +
+      (dup ? " (" + dup + " already present)" : ""));
     if(got.length && document.querySelector('input[name=mode][value=align]'))
       document.querySelector('input[name=mode][value=align]').checked = true;
     render();
@@ -1932,6 +1985,7 @@ function render(){
   $("legendThr").textContent = thrTxt;
   if(!$("paneStruct").hidden){ syncStructList(); applyStructStyles(); scheduleAuto(); }
   renderDomainChips();
+  renderSeqList();
   renderConservation(recs, reg);
   $("note").innerHTML = "Identity is shaded red; a non-identical column whose every pair scores BLOSUM-62 " +
     esc(thrTxt) + " is shaded orange; everything else, gaps included, is left unmarked. " +
@@ -2010,8 +2064,14 @@ $("copyAln").addEventListener("click", function(){
 /* ---------- wiring ---------- */
 function loadExample(){ $("fasta").value = EXAMPLE; $("figTitle").value = "DOA/CLK2";
   $("annots").value = "163-479 Kinase domain"; render(); }
-function clearAll(){ $("fasta").value = ""; $("figTitle").value = ""; $("annots").value = "";
-  $("fasta").focus(); render(); }
+function clearAll(){
+  $("fasta").value = ""; $("figTitle").value = ""; $("annots").value = "";
+  $("featAcc").value = ""; $("regFrom").value = ""; $("regTo").value = "";
+  features = []; featAccLoaded = ""; featSeqKey = ""; annotsAuto = false;
+  setFeatStatus(""); renderDomainChips();
+  orthologs = []; renderOrthList(); setOrthStatus("");
+  $("fasta").focus(); render();
+}
 $("loadEx").addEventListener("click", loadExample);
 $("loadExSide").addEventListener("click", loadExample);
 $("clearAll").addEventListener("click", clearAll);

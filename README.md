@@ -48,10 +48,12 @@ You can also download and open `index.html`.
 
 ## How to cite
 
-If you use this tool in published work, please cite it:
+If you use this tool in published work, please cite the paper it is described in:
 
-> McQuarrie DWJ (2026). *BLOSUM Alignment Painter* (v2.9.1).
-> https://github.com/dxm958/blosum62-painter
+> Tian YW, Hadzhiev Y, Abis G, Dodel M, Alard EL, McQuarrie DWJ, Mardakheh FK, Conte MR,
+> Müller F, Soller M (2026). *LARP1-DM15/Sgt is a reader for cap-adjacent
+> 2’-O-ribose methylation in TOP ribosomal protein mRNAs required for localization to
+> synapses.* bioRxiv 2026.09.17.752351. <https://doi.org/10.64898/2026.09.17.752351>
 
 GitHub's **Cite this repository** button renders that from `CITATION.cff`.
 
@@ -60,19 +62,21 @@ the one setting that materially changes the figure, and it is rarely reported.
 
 ## References
 
-The colour scheme implemented here is used in:
-
-> McQuarrie DWJ, Bian W, Soller M (2024). *DOA/CLK2 phosphorylates Fl(2)d/WTAP to enhance
-> m<sup>6</sup>A mRNA methyltransferase complex activity.* bioRxiv 2024.11.25.625202.
-> <https://doi.org/10.1101/2024.11.25.625202>
-
 Substitution scores are BLOSUM-62:
 
 > Henikoff S, Henikoff JG (1992). *Amino acid substitution matrices from protein blocks.*
 > PNAS 89:10915–10919. <https://doi.org/10.1073/pnas.89.22.10915>
 
-The alignment algorithm is Needleman–Wunsch with Gotoh's affine gap costs. Typeface is
-IBM Plex (SIL Open Font License).
+The built-in example is a DOA/CLK2 alignment — one application of the colour scheme,
+from:
+
+> McQuarrie DWJ, Bian W, Soller M (2024). *DOA/CLK2 phosphorylates Fl(2)d/WTAP to enhance
+> m<sup>6</sup>A mRNA methyltransferase complex activity.* bioRxiv 2024.11.25.625202.
+> <https://doi.org/10.1101/2024.11.25.625202>
+
+Alignment is Needleman–Wunsch with Gotoh affine gaps; multiple sequences are aligned by
+star alignment on sequence 1. Structures come from AlphaFold DB; orthologues from OMA;
+domain annotations from UniProt and InterPro. Typeface is IBM Plex (SIL OFL).
 
 ## The mark
 
