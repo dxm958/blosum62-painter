@@ -273,6 +273,13 @@ button.ghost.sm{padding:5px 11px;font-size:12px}
 .hrow .hn{font-size:11.5px;color:var(--ink-2)}
 .hrow .hx{font-family:var(--mono);font-size:10px;color:var(--muted);grid-column:3;grid-row:1}
 .hrow .ho{font-size:10.5px;color:var(--muted);font-style:italic;grid-column:2/4}
+.constable{border:1px solid var(--rule);border-radius:3px;background:var(--panel);overflow:hidden}
+.crow{display:grid;grid-template-columns:1fr auto auto;gap:14px;align-items:baseline;
+  padding:9px 14px;border-bottom:1px solid var(--rule)}
+.crow:last-child{border-bottom:0}
+.crow .ck{font-size:12.5px;color:var(--ink-2)}
+.crow .cv{font-family:var(--mono);font-size:15px;font-weight:500;font-variant-numeric:tabular-nums}
+.crow .cd{font-family:var(--mono);font-size:11px;color:var(--muted);min-width:180px;text-align:right}
 .dchips{display:flex;flex-wrap:wrap;gap:5px}
 .dchip .rng{font-family:var(--mono);font-size:9.5px;opacity:.65;margin-left:3px}
 #orthList{max-height:210px;overflow-y:auto;border:1px solid var(--field-rule);border-radius:3px;padding:4px}
@@ -392,9 +399,14 @@ button.ghost.sm{padding:5px 11px;font-size:12px}
         <button class="primary" id="regApply" type="button">Apply range</button>
         <button class="ghost" id="regClear" type="button">Whole protein</button>
       </div>
+      <label style="display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--ink-2);cursor:pointer;margin-top:4px">
+        <input type="checkbox" id="regAlign" style="width:auto"> Align to the region itself
+      </label>
       <p class="hint" id="featStatus"></p>
       <p class="hint">Numbering follows sequence&nbsp;1. A region trims the figure, both overviews,
-         the statistics, the structure view and the superposition.</p>
+         the statistics, the structure view and the superposition. Ticking the box above realigns
+         each sequence against the region alone, which holds up better than aligning full length
+         and cropping when the sequences diverge outside the domain.</p>
     </fieldset>
 
     <fieldset>
@@ -591,6 +603,11 @@ button.ghost.sm{padding:5px 11px;font-size:12px}
       </div>
       <div class="sheetwrap" id="stripwrap"></div>
     </section>
+    <section class="panel" id="consPanel" hidden style="margin-bottom:16px">
+      <div class="panelhead"><h2>Conservation</h2></div>
+      <div id="consTable" class="constable"></div>
+      <p class="note" id="consNote" style="margin-top:8px"></p>
+    </section>
     <section class="panel" id="rowsPanel" hidden>
       <div class="panelhead"><h2>Per-sequence overview</h2><span class="sp"></span>
         <button class="ghost sm" id="expRowsSvg" type="button">SVG</button>
@@ -604,7 +621,7 @@ button.ghost.sm{padding:5px 11px;font-size:12px}
 </div>
 
 <footer class="colophon">
-  <span class="ver"><svg class="mark-sm" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><rect x="1" y="1" width="62" height="62" rx="13" fill="#FFFFFF" stroke="#C9C9D2" stroke-width="1.5"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#DC0806" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(0 32 32)"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#FE6B00" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(60 32 32)"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#DC0806" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(120 32 32)"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#FE6B00" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(180 32 32)"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#DC0806" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(240 32 32)"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#FE6B00" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(300 32 32)"/><circle cx="32" cy="32" r="4.4" fill="#FFFFFF"/><text x="32.00" y="18.40" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">B</text><text x="43.78" y="25.20" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">L</text><text x="43.78" y="38.80" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">O</text><text x="32.00" y="45.60" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">S</text><text x="20.22" y="38.80" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">U</text><text x="20.22" y="25.20" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">M</text></svg>BLOSUM Alignment Painter v2.7.0</span>
+  <span class="ver"><svg class="mark-sm" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><rect x="1" y="1" width="62" height="62" rx="13" fill="#FFFFFF" stroke="#C9C9D2" stroke-width="1.5"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#DC0806" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(0 32 32)"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#FE6B00" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(60 32 32)"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#DC0806" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(120 32 32)"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#FE6B00" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(180 32 32)"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#DC0806" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(240 32 32)"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#FE6B00" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(300 32 32)"/><circle cx="32" cy="32" r="4.4" fill="#FFFFFF"/><text x="32.00" y="18.40" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">B</text><text x="43.78" y="25.20" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">L</text><text x="43.78" y="38.80" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">O</text><text x="32.00" y="45.60" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">S</text><text x="20.22" y="38.80" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">U</text><text x="20.22" y="25.20" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">M</text></svg>BLOSUM Alignment Painter v2.8.0</span>
   <span>The mark is a blossom whose six petals spell the matrix in amino acid codes &mdash;
     B (Asx), L (Leu), O (pyrrolysine), S (Ser), U (selenocysteine), M (Met).</span>
   <span>Colour scheme after McQuarrie DWJ, Bian W &amp; Soller M (2024).
@@ -1055,6 +1072,226 @@ function toCanvas(d, pad, scale){
   return cv;
 }
 
+/* ---------- aligning a region rather than trimming to it ---------- */
+
+/* Semi-global: every residue of `short` must be placed, but the flanks of
+   `long` are free. Used to find where a domain sits in each orthologue,
+   which is more reliable than aligning full length and cropping when the
+   sequences diverge outside the domain. */
+function semiGlobal(short, long, go, ge){
+  var n = short.length, m = long.length, NEG = -1e9, w = m + 1;
+  var M = new Float64Array((n+1)*w), X = new Float64Array((n+1)*w), Y = new Float64Array((n+1)*w);
+  var pM = new Uint8Array((n+1)*w), pX = new Uint8Array((n+1)*w), pY = new Uint8Array((n+1)*w);
+  M.fill(NEG); X.fill(NEG); Y.fill(NEG);
+  M[0] = 0;
+  for(var i2 = 1; i2 <= n; i2++){ X[i2*w] = -go - (i2-1)*ge; pX[i2*w] = 1; }
+  for(var j2 = 1; j2 <= m; j2++){ Y[j2] = 0; pY[j2] = 2; }   // free leading flank
+
+  for(var i = 1; i <= n; i++){
+    var ro = i*w, po = (i-1)*w, ai = short[i-1];
+    for(var j = 1; j <= m; j++){
+      var d = po + j - 1, sc = b62(ai, long[j-1]);
+      var best = M[d], st = 0;
+      if(X[d] > best){ best = X[d]; st = 1; }
+      if(Y[d] > best){ best = Y[d]; st = 2; }
+      M[ro+j] = best + sc; pM[ro+j] = st;
+      var u = po + j;
+      var o0 = M[u]-go, o1 = X[u]-ge, o2 = Y[u]-go, bx = o0, sx = 0;
+      if(o1 > bx){ bx = o1; sx = 1; }
+      if(o2 > bx){ bx = o2; sx = 2; }
+      X[ro+j] = bx; pX[ro+j] = sx;
+      var l = ro + j - 1;
+      var q0 = M[l]-go, q1 = X[l]-go, q2 = Y[l]-ge, by = q0, sy = 0;
+      if(q1 > by){ by = q1; sy = 1; }
+      if(q2 > by){ by = q2; sy = 2; }
+      Y[ro+j] = by; pY[ro+j] = sy;
+    }
+  }
+  // best end anywhere along the last row: the trailing flank is free
+  var bj = m, cur = 0, bv = -Infinity;
+  for(var j3 = 0; j3 <= m; j3++){
+    var p3 = n*w + j3;
+    if(M[p3] > bv){ bv = M[p3]; bj = j3; cur = 0; }
+    if(X[p3] > bv){ bv = X[p3]; bj = j3; cur = 1; }
+    if(Y[p3] > bv){ bv = Y[p3]; bj = j3; cur = 2; }
+  }
+  var A = [], B = [], ii = n, jj = bj;
+  while(ii > 0){
+    var p = ii*w + jj, nxt;
+    if(cur === 0){ nxt = pM[p]; A.push(short[--ii]); B.push(long[--jj]); }
+    else if(cur === 1){ nxt = pX[p]; A.push(short[--ii]); B.push("-"); }
+    else { nxt = pY[p]; A.push("-"); B.push(long[--jj]); }
+    cur = nxt;
+  }
+  return { a:A.reverse().join(""), b:B.reverse().join(""), score:bv, start:jj + 1, end:bj };
+}
+
+/* Star alignment anchored on a sub-region of sequence 1. */
+function starAlignRegion(seqs, from, to, go, ge){
+  var ref = seqs[0].replace(/-/g, "").slice(from - 1, to);
+  var msa = [ref];
+  for(var i = 1; i < seqs.length; i++){
+    var pw = semiGlobal(ref, seqs[i].replace(/-/g, ""), go, ge);
+    var rows = [], fresh = "", p = 0, q = 0, r;
+    for(r = 0; r < msa.length; r++) rows.push("");
+    while(p < msa[0].length || q < pw.a.length){
+      if(p >= msa[0].length){
+        for(r = 0; r < msa.length; r++) rows[r] += "-";
+        fresh += pw.b[q]; q++; continue;
+      }
+      if(q >= pw.a.length){
+        for(r = 0; r < msa.length; r++) rows[r] += msa[r][p];
+        fresh += "-"; p++; continue;
+      }
+      var inBlock = msa[0][p] === "-", inPair = pw.a[q] === "-";
+      if(inBlock && !inPair){
+        for(r = 0; r < msa.length; r++) rows[r] += msa[r][p];
+        fresh += "-"; p++;
+      } else if(!inBlock && inPair){
+        for(r = 0; r < msa.length; r++) rows[r] += "-";
+        fresh += pw.b[q]; q++;
+      } else {
+        for(r = 0; r < msa.length; r++) rows[r] += msa[r][p];
+        fresh += pw.b[q]; p++; q++;
+      }
+    }
+    msa = rows.concat([fresh]);
+  }
+  return msa;
+}
+
+/* ---------- conservation statistics ---------- */
+
+/* Henikoff position-based weights: a sequence in a crowded clade counts for
+   less, so ten mammals do not outvote one sponge. */
+function henikoffWeights(rows){
+  var N = rows.length, L = rows[0].seq.length, w = new Array(N).fill(0), i, c;
+  for(c = 0; c < L; c++){
+    var counts = {}, distinct = 0;
+    for(i = 0; i < N; i++){
+      var a = rows[i].seq[c];
+      if(a === "-") continue;
+      if(!counts[a]){ counts[a] = 0; distinct++; }
+      counts[a]++;
+    }
+    if(!distinct) continue;
+    for(i = 0; i < N; i++){
+      var b = rows[i].seq[c];
+      if(b === "-") continue;
+      w[i] += 1 / (distinct * counts[b]);
+    }
+  }
+  var tot = w.reduce(function(x, y){ return x + y; }, 0) || 1;
+  return w.map(function(x){ return x / tot * N; });   // mean weight 1
+}
+
+/* Weighted share of sequences carrying the commonest residue, per column. */
+function columnConservation(rows, weights){
+  var N = rows.length, L = rows[0].seq.length, out = new Array(L);
+  for(var c = 0; c < L; c++){
+    var byRes = {}, tot = 0;
+    for(var i = 0; i < N; i++){
+      var a = rows[i].seq[c];
+      if(a === "-") continue;
+      byRes[a] = (byRes[a] || 0) + weights[i];
+      tot += weights[i];
+    }
+    if(!tot){ out[c] = null; continue; }        // all-gap column: no information
+    var best = 0;
+    for(var k in byRes) if(byRes[k] > best) best = byRes[k];
+    out[c] = best / tot;
+  }
+  return out;
+}
+
+function normCdf(x){
+  var t = 1 / (1 + 0.2316419 * x), d = 0.3989422804014327 * Math.exp(-x*x/2);
+  return 1 - d*t*(0.319381530 + t*(-0.356563782 + t*(1.781477937 +
+                  t*(-1.821255978 + t*1.330274429))));
+}
+
+/* Mann-Whitney U with a tie correction, which matters: conservation values
+   are heavily tied at 1. */
+function mannWhitney(a, b){
+  var n1 = a.length, n2 = b.length, n = n1 + n2;
+  if(!n1 || !n2) return null;
+  var all = a.map(function(v){ return {v:v, g:0}; })
+             .concat(b.map(function(v){ return {v:v, g:1}; }));
+  all.sort(function(x, y){ return x.v - y.v; });
+  var ranks = new Array(n), tieTerm = 0, i = 0;
+  while(i < n){
+    var j = i;
+    while(j + 1 < n && all[j+1].v === all[i].v) j++;
+    var r = (i + j) / 2 + 1, t = j - i + 1;
+    for(var k = i; k <= j; k++) ranks[k] = r;
+    tieTerm += t*t*t - t;
+    i = j + 1;
+  }
+  var R1 = 0;
+  for(k = 0; k < n; k++) if(all[k].g === 0) R1 += ranks[k];
+  var U = R1 - n1*(n1+1)/2;
+  var mu = n1*n2/2;
+  var sd = Math.sqrt((n1*n2/12) * ((n + 1) - tieTerm/(n*(n-1))));
+  if(!sd) return null;
+  var z = (U - mu) / sd;
+  return { U:U, z:z, p:2 * (1 - normCdf(Math.abs(z))), n1:n1, n2:n2 };
+}
+
+function mean(a){ return a.length ? a.reduce(function(x, y){ return x + y; }, 0) / a.length : 0; }
+function sd(a){
+  if(a.length < 2) return 0;
+  var m = mean(a);
+  return Math.sqrt(a.reduce(function(s, v){ return s + (v-m)*(v-m); }, 0) / (a.length - 1));
+}
+
+function renderConservation(recs, reg){
+  var box = $("consPanel");
+  if(recs.length < 3){ box.hidden = true; return; }
+  box.hidden = false;
+
+  var weights = henikoffWeights(recs);
+  var cons = columnConservation(recs, weights);
+  var inReg = [], outReg = [];
+  for(var c = 0; c < cons.length; c++){
+    if(cons[c] === null) continue;
+    if(reg && c >= reg.c0 && c <= reg.c1) inReg.push(cons[c]);
+    else outReg.push(cons[c]);
+  }
+
+  var rows = [];
+  if(reg && inReg.length && outReg.length){
+    var mw = mannWhitney(inReg, outReg);
+    var pTxt = mw ? (mw.p < 1e-4 ? "p < 0.0001" : "p = " + mw.p.toFixed(4)) : "n/a";
+    rows.push(["Region " + reg.from + "-" + reg.to,
+               (100*mean(inReg)).toFixed(1) + "%", "± " + (100*sd(inReg)).toFixed(1) + ", n = " + inReg.length]);
+    rows.push(["Rest of the protein",
+               (100*mean(outReg)).toFixed(1) + "%", "± " + (100*sd(outReg)).toFixed(1) + ", n = " + outReg.length]);
+    rows.push(["Difference",
+               ((100*(mean(inReg) - mean(outReg))) >= 0 ? "+" : "") +
+               (100*(mean(inReg) - mean(outReg))).toFixed(1) + " pts",
+               mw ? pTxt + " (Mann-Whitney)" : ""]);
+  } else {
+    rows.push(["Whole alignment", (100*mean(inReg.concat(outReg))).toFixed(1) + "%",
+               "± " + (100*sd(inReg.concat(outReg))).toFixed(1) +
+               ", n = " + (inReg.length + outReg.length)]);
+    rows.push(["", "", "select a region to test it against the rest"]);
+  }
+
+  var wr = weights.map(function(x, i){ return { n:recs[i].name, w:x }; })
+                  .sort(function(x, y){ return y.w - x.w; });
+  var wTxt = wr.slice(0, 3).map(function(x){ return esc(x.n) + " " + x.w.toFixed(2); }).join(", ") +
+             " … " + wr.slice(-1).map(function(x){ return esc(x.n) + " " + x.w.toFixed(2); }).join("");
+
+  $("consTable").innerHTML = rows.map(function(r){
+    return '<div class="crow"><span class="ck">' + esc(r[0]) + '</span>' +
+           '<span class="cv">' + esc(r[1]) + '</span>' +
+           '<span class="cd">' + esc(r[2]) + "</span></div>";
+  }).join("");
+  $("consNote").innerHTML =
+    "Conservation is the Henikoff-weighted share of sequences carrying the commonest residue, " +
+    "so a crowded clade does not outvote a lone outgroup. Weights: " + wTxt + ".";
+}
+
 /* ---------- finding a protein, and resolving its accession ---------- */
 
 var hits = [];
@@ -1412,6 +1649,21 @@ function loadFeatures(acc){
       if(g.dbs.indexOf(f.db) < 0) g.dbs.push(f.db);
       if(rank < g.rank){ g.rank = rank; g.name = f.name; g.type = f.type; }
     });
+    // the databases also disagree slightly on boundaries; fold together anything
+    // of the same type that overlaps another by 80% both ways
+    var kept = [];
+    order.map(function(k){ return byRange[k]; })
+         .sort(function(a, b){ return (b.end-b.start) - (a.end-a.start); })
+         .forEach(function(f){
+      var dup = kept.some(function(g){
+        if(g.type !== f.type) return false;
+        var ov = Math.min(g.end, f.end) - Math.max(g.start, f.start) + 1;
+        if(ov <= 0) return false;
+        return ov / (f.end-f.start+1) > 0.8 && ov / (g.end-g.start+1) > 0.8;
+      });
+      if(!dup) kept.push(f);
+    });
+    order = kept.map(function(f){ var k = f.start + ":" + f.end; byRange[k] = f; return k; });
     features = order.map(function(k){
       var g = byRange[k];
       g.db = g.dbs.length > 2 ? g.dbs.slice(0, 2).join(", ") + " +" + (g.dbs.length - 2) : g.dbs.join(", ");
@@ -1420,6 +1672,7 @@ function loadFeatures(acc){
     featAccLoaded = acc;
     annotationsFromFeatures();
     renderDomainChips();
+  renderConservation(recs, reg);
     render();
     setFeatStatus(features.length ? features.length + " features for " + acc
                                   : "no annotated features for " + acc);
@@ -1501,7 +1754,7 @@ function render(){
   setExports(true);
 
   var mode = document.querySelector('input[name=mode]:checked').value;
-  var score = null, aligned = false;
+  var score = null, aligned = false, regionAligned = false;
 
   if(mode === "align"){
     var go = Math.max(0, +$("gapOpen").value || 0), ge = Math.max(0, +$("gapExt").value || 0);
@@ -1520,6 +1773,12 @@ function render(){
       recs = recs.map(function(r, i){ return { name:r.name, full:r.full, seq:rows[i] }; });
     }
     aligned = true;
+    var rf = parseInt($("regFrom").value, 10), rt = parseInt($("regTo").value, 10);
+    if($("regAlign").checked && isFinite(rf) && isFinite(rt) && recs.length > 1){
+      var rr = starAlignRegion(recs.map(function(r){ return r.seq; }), rf, rt, go, ge);
+      recs = recs.map(function(r, i){ return { name:r.name, full:r.full, seq:rr[i] }; });
+      regionAligned = true;
+    }
   } else {
     var L = recs[0].seq.length, bad = recs.filter(function(r){ return r.seq.length !== L; });
     if(bad.length) return fail("Sequences are not the same length (" + recs.map(function(r){return r.seq.length;}).join(", ") + "). Switch to “Align now”, or paste an aligned FASTA.");
@@ -1534,7 +1793,7 @@ function render(){
   var colourMode = $("colourBy").value;
   var cls = classify(recs, thr, colourMode);
   var colCls = columnMax(cls);
-  var reg = regionCols();
+  var reg = regionAligned ? null : regionCols();
   var c0 = reg ? reg.c0 : 0, c1 = reg ? reg.c1 : cls[0].length - 1;
 
   C_IDENT = $("cIdent").value;
@@ -1726,6 +1985,7 @@ $("featFetch").addEventListener("click", function(){
   });
 });
 $("regApply").addEventListener("click", applyRegion);
+$("regAlign").addEventListener("change", applyRegion);
 $("regClear").addEventListener("click", function(){ clearRegion(); renderDomainChips(); });
 ["regFrom","regTo"].forEach(function(id){
   $(id).addEventListener("change", applyRegion);
