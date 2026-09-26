@@ -340,6 +340,24 @@ button.ghost.sm{padding:5px 11px;font-size:12px}
     </fieldset>
 
     <fieldset>
+      <legend>Region</legend>
+      <div class="btn-row">
+        <input type="text" id="featAcc" placeholder="Accession of sequence 1">
+        <button class="ghost" id="featFetch" type="button">Get domains</button>
+      </div>
+      <select id="featList" size="6" style="font-size:11px"></select>
+      <div class="row2">
+        <div class="f"><span class="lbl">From residue</span><input type="number" id="regFrom" min="1" placeholder="1"></div>
+        <div class="f"><span class="lbl">To residue</span><input type="number" id="regTo" min="1" placeholder="end"></div>
+      </div>
+      <button class="ghost" id="regClear" type="button">Whole protein</button>
+      <p class="hint" id="featStatus"></p>
+      <p class="hint">Numbering follows sequence&nbsp;1. Restricting the region trims the figure,
+         both overviews, the structure view and the superposition &mdash; which is what makes an
+         RMSD for a multi-domain protein mean anything.</p>
+    </fieldset>
+
+    <fieldset>
       <legend>Gaps</legend>
       <div class="seg" role="radiogroup" aria-label="Alignment mode">
         <label><input type="radio" name="mode" value="keep" checked><span>Keep as pasted</span></label>
@@ -545,7 +563,7 @@ button.ghost.sm{padding:5px 11px;font-size:12px}
 </div>
 
 <footer class="colophon">
-  <span class="ver"><svg class="mark-sm" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><rect x="1" y="1" width="62" height="62" rx="13" fill="#FFFFFF" stroke="#C9C9D2" stroke-width="1.5"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#DC0806" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(0 32 32)"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#FE6B00" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(60 32 32)"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#DC0806" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(120 32 32)"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#FE6B00" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(180 32 32)"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#DC0806" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(240 32 32)"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#FE6B00" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(300 32 32)"/><circle cx="32" cy="32" r="4.4" fill="#FFFFFF"/><text x="32.00" y="18.40" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">B</text><text x="43.78" y="25.20" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">L</text><text x="43.78" y="38.80" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">O</text><text x="32.00" y="45.60" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">S</text><text x="20.22" y="38.80" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">U</text><text x="20.22" y="25.20" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">M</text></svg>BLOSUM Alignment Painter v2.4.0</span>
+  <span class="ver"><svg class="mark-sm" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><rect x="1" y="1" width="62" height="62" rx="13" fill="#FFFFFF" stroke="#C9C9D2" stroke-width="1.5"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#DC0806" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(0 32 32)"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#FE6B00" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(60 32 32)"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#DC0806" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(120 32 32)"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#FE6B00" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(180 32 32)"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#DC0806" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(240 32 32)"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#FE6B00" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(300 32 32)"/><circle cx="32" cy="32" r="4.4" fill="#FFFFFF"/><text x="32.00" y="18.40" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">B</text><text x="43.78" y="25.20" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">L</text><text x="43.78" y="38.80" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">O</text><text x="32.00" y="45.60" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">S</text><text x="20.22" y="38.80" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">U</text><text x="20.22" y="25.20" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">M</text></svg>BLOSUM Alignment Painter v2.5.0</span>
   <span>The mark is a blossom whose six petals spell the matrix in amino acid codes &mdash;
     B (Asx), L (Leu), O (pyrrolysine), S (Ser), U (selenocysteine), M (Met).</span>
   <span>Colour scheme after McQuarrie DWJ, Bian W &amp; Soller M (2024).
@@ -870,16 +888,22 @@ function buildOps(rows, cls, opt){
   var ops=[], perLine=opt.perLine, cw=opt.cellW, rh=Math.round(cw*1.65),
       labelW=opt.labelW, numW=opt.showNums?38:6, L=rows[0].seq.length,
       fs=Math.max(6, cw*1.18), N=rows.length;
+  var C0 = opt.c0 || 0, C1 = (opt.c1 == null ? L-1 : opt.c1);
   var gridW = perLine*cw, width = labelW + gridW + numW, y = 0;
 
   if(opt.title){
     ops.push({t:"text", x:0, y:12, s:opt.title, fill:C_INK, size:12, weight:700});
     y = 30;
   }
-  var counts = new Array(N).fill(0);
+  // residue numbering must continue from whatever precedes the region
+  var counts = rows.map(function(r){
+    var n = 0;
+    for(var c = 0; c < C0; c++) if(r.seq[c] !== "-") n++;
+    return n;
+  });
 
-  for(var start=0; start<L; start+=perLine){
-    var end = Math.min(start+perLine, L), span = end-start;
+  for(var start=C0; start<=C1; start+=perLine){
+    var end = Math.min(start+perLine, C1+1), span = end-start;
 
     // every annotation overlapping this block, packed onto as few rows as fit
     var here = [];
@@ -988,6 +1012,128 @@ function toCanvas(d, pad, scale){
   return cv;
 }
 
+/* ---------- annotated features and region selection ---------- */
+
+/* Regions are held in sequence 1's own residue numbering, because that is what
+   a domain annotation is expressed in. Alignment columns are derived. */
+var features = [], featAccLoaded = "";
+
+function featRank(f){
+  var order = { domain:0, repeat:1, motif:2, "binding site":3, "active site":4,
+                "zinc finger":5, "coiled coil":6, family:7, homologous_superfamily:8, region:9 };
+  var k = String(f.type).toLowerCase();
+  return (k in order) ? order[k] : 10;
+}
+
+function renderFeatureList(){
+  var sel = $("featList");
+  if(!features.length){
+    sel.innerHTML = '<option disabled>no annotated features loaded</option>';
+    return;
+  }
+  sel.innerHTML = features.map(function(f, i){
+    var len = f.end - f.start + 1;
+    return '<option value="' + i + '">' +
+      esc(f.start + "-" + f.end) + "  " + esc(f.name) +
+      "  (" + esc(f.type) + ", " + len + " aa" + (f.db ? ", " + esc(f.db) : "") + ")" +
+      '</option>';
+  }).join("");
+}
+
+function loadFeatures(acc){
+  acc = (acc || "").trim();
+  if(!acc) return setFeatStatus("enter an accession, or identify sequence 1 on the Structure tab");
+  setFeatStatus("fetching annotations...");
+  features = [];
+
+  var uni = fetch("https://rest.uniprot.org/uniprotkb/" + encodeURIComponent(acc) +
+                  ".json?fields=ft_domain,ft_region,ft_motif,ft_binding,ft_act_site,ft_coiled,ft_zn_fing")
+    .then(function(r){ return r.ok ? r.json() : null; })
+    .then(function(d){
+      if(!d) return;
+      (d.features || []).forEach(function(f){
+        var L = f.location;
+        if(!L || !L.start || !L.end || L.start.value == null || L.end.value == null) return;
+        features.push({ start:L.start.value, end:L.end.value, type:String(f.type).toLowerCase(),
+                        name:f.description || f.type, db:"UniProt" });
+      });
+    })
+    .catch(function(){});
+
+  var ipr = fetch("https://www.ebi.ac.uk/interpro/api/entry/all/protein/uniprot/" +
+                  encodeURIComponent(acc) + "/?page_size=100")
+    .then(function(r){ return r.ok ? r.json() : null; })
+    .then(function(d){
+      if(!d) return;
+      (d.results || []).forEach(function(res){
+        var md = res.metadata || {};
+        if(["family", "homologous_superfamily"].indexOf(md.type) > -1) return;  // too coarse to align on
+        (res.proteins || []).forEach(function(p){
+          (p.entry_protein_locations || []).forEach(function(loc){
+            (loc.fragments || []).forEach(function(fr){
+              features.push({ start:fr.start, end:fr.end, type:md.type || "domain",
+                              name:md.name || md.accession || "domain",
+                              db:md.source_database || "InterPro" });
+            });
+          });
+        });
+      });
+    })
+    .catch(function(){});
+
+  return Promise.all([uni, ipr]).then(function(){
+    // drop duplicates that differ only by source
+    var seen = {}, out = [];
+    features.sort(function(a, b){ return featRank(a) - featRank(b) || a.start - b.start; });
+    features.forEach(function(f){
+      var k = f.start + ":" + f.end + ":" + f.name.toLowerCase();
+      if(seen[k]) return;
+      seen[k] = 1; out.push(f);
+    });
+    features = out;
+    featAccLoaded = acc;
+    renderFeatureList();
+    setFeatStatus(features.length ? features.length + " features for " + acc
+                                  : "no annotated features for " + acc);
+  });
+}
+
+function setFeatStatus(m){ $("featStatus").textContent = m || ""; }
+
+/* reference residue range -> inclusive alignment column bounds */
+function regionCols(){
+  var rows = state.rows || [];
+  if(!rows.length) return null;
+  var from = parseInt($("regFrom").value, 10), to = parseInt($("regTo").value, 10);
+  if(!isFinite(from) || !isFinite(to)) return null;
+  if(from > to){ var t = from; from = to; to = t; }
+  var seq = rows[0].seq, n = 0, c0 = null, c1 = null;
+  for(var c = 0; c < seq.length; c++){
+    if(seq[c] === "-") continue;
+    n++;
+    if(n === from) c0 = c;
+    if(n === to){ c1 = c; break; }
+  }
+  if(c0 === null) return null;
+  if(c1 === null) c1 = seq.length - 1;
+  return { c0:c0, c1:c1, from:from, to:to };
+}
+
+function applyFeatureSelection(){
+  var i = +$("featList").value;
+  var f = features[i];
+  if(!f) return;
+  $("regFrom").value = f.start;
+  $("regTo").value = f.end;
+  if(!$("figTitle").value.trim()) $("figTitle").value = f.name;
+  render();
+}
+
+function clearRegion(){
+  $("regFrom").value = ""; $("regTo").value = "";
+  render();
+}
+
 /* ---------- state + render ---------- */
 var $ = function(id){ return document.getElementById(id); };
 var colourByTouched = false;   // once the user picks a mode, stop choosing for them
@@ -1062,6 +1208,8 @@ function render(){
   var colourMode = $("colourBy").value;
   var cls = classify(recs, thr, colourMode);
   var colCls = columnMax(cls);
+  var reg = regionCols();
+  var c0 = reg ? reg.c0 : 0, c1 = reg ? reg.c1 : cls[0].length - 1;
 
   C_IDENT = $("cIdent").value;
   C_SIM   = $("cSim").value;
@@ -1073,7 +1221,7 @@ function render(){
   // Courier is for the residues only; labels, numbers and annotations stay proportional
   var labelFont = (pick === "courier") ? FONTS.arial : font;
   var draw = buildOps(recs, cls, {
-    font: font, labelFont: labelFont, bold: $("boldRes").checked,
+    font: font, labelFont: labelFont, bold: $("boldRes").checked, c0: c0, c1: c1,
     whiteText: $("whiteText").checked,
     ruler: $("showRuler").checked,
     rulerStep: Math.max(5, Math.min(100, +$("rulerStep").value || 10)),
@@ -1086,16 +1234,22 @@ function render(){
   });
 
   var stripW = Math.max(200, Math.min(2000, +$("stripW").value || 600));
-  var stripAnnots = parseAnnots($("annots").value, recs[0].seq);
+  var stripAnnots = parseAnnots($("annots").value, recs[0].seq)
+    .map(function(a){ return { start:a.start - c0, end:a.end - c0, label:a.label }; })
+    .filter(function(a){ return a.end >= 0 && a.start <= c1 - c0; })
+    .map(function(a){ return { start:Math.max(0, a.start), end:Math.min(c1 - c0, a.end), label:a.label }; });
+  var clsSlice = cls.map(function(r){ return r.slice(c0, c1 + 1); });
+  var colSlice = colCls.slice(c0, c1 + 1);
   var rowStrip = null;
   if($("showRows").checked && recs.length > 2){
-    rowStrip = buildRowStripOps(recs, cls, { labelFont: labelFont, stripW: stripW, annots: stripAnnots });
+    rowStrip = buildRowStripOps(recs, clsSlice, { labelFont: labelFont, stripW: stripW, annots: stripAnnots });
   }
   var strip = null;
   if($("showStrip").checked){
-    strip = buildStripOps(colCls, { labelFont: labelFont, stripW: stripW, annots: stripAnnots });
+    strip = buildStripOps(colSlice, { labelFont: labelFont, stripW: stripW, annots: stripAnnots });
   }
-  state = { rows:recs, cls:cls, draw:draw, strip:strip, rowStrip:rowStrip, score:score, aligned:aligned };
+  state = { rows:recs, cls:cls, draw:draw, strip:strip, rowStrip:rowStrip, score:score,
+            aligned:aligned, region:reg };
   $("sheetwrap").innerHTML = toSVG(draw, 6, false);
   $("stripPanel").hidden = !strip;
   $("stripwrap").innerHTML = strip ? toSVG(strip, 6, false) : "";
@@ -1105,29 +1259,29 @@ function render(){
   ["expRowsSvg","expRowsPng"].forEach(function(id){ $(id).disabled = !rowStrip; });
 
   /* stats */
-  var L2 = cls[0].length, perCell = (colourMode !== "column");
+  var L2 = clsSlice[0].length, perCell = (colourMode !== "column");
   var nI=0, nS=0, nN=0, nG=0, total;
-  for(var c=0;c<L2;c++){
+  for(var c=c0;c<=c1;c++){
     if(recs.some(function(r){ return r.seq[c] === "-"; })) nG++;
   }
   if(perCell){
     total = L2 * recs.length;
     for(var r2=0;r2<recs.length;r2++)
       for(var c2=0;c2<L2;c2++){
-        var v2 = cls[r2][c2];
+        var v2 = clsSlice[r2][c2];
         if(v2===2) nI++; else if(v2===1) nS++; else nN++;
       }
   } else {
     total = L2;
     for(var c3=0;c3<L2;c3++){
-      var v3 = cls[0][c3];
+      var v3 = clsSlice[0][c3];
       if(v3===2) nI++; else if(v3===1) nS++; else nN++;
     }
   }
   var unit = perCell ? " cells" : " columns";
   var pct = function(x){ return (100*x/total).toFixed(1) + "%"; };
   var cells = [
-    ["Columns", String(L2), recs.length + " sequences"],
+    ["Columns", String(L2), recs.length + " sequences" + (reg ? " \u00B7 " + reg.from + "-" + reg.to : "")],
     ["Identical", pct(nI), nI + unit, C_IDENT],
     ["Similar", pct(nS), nS + unit, C_SIM],
     ["Identical + similar", pct(nI+nS), (nI+nS) + unit],
@@ -1227,6 +1381,10 @@ function clearAll(){ $("fasta").value = ""; $("figTitle").value = ""; $("annots"
 $("loadEx").addEventListener("click", loadExample);
 $("loadExSide").addEventListener("click", loadExample);
 $("clearAll").addEventListener("click", clearAll);
+$("featFetch").addEventListener("click", function(){ loadFeatures($("featAcc").value); });
+$("featList").addEventListener("change", applyFeatureSelection);
+$("regClear").addEventListener("click", clearRegion);
+["regFrom","regTo"].forEach(function(id){ $(id).addEventListener("change", render); });
 $("render").addEventListener("click", render);
 document.querySelectorAll('input[name=mode]').forEach(function(r){
   r.addEventListener("change", function(){
@@ -1459,18 +1617,31 @@ function colourFor(i, resi, b){
   return vv === 2 ? C_IDENT : (vv === 1 ? C_SIM : C_NONE3D);
 }
 
+/* residues of structure i that fall inside the selected region, or null for all */
+function regionResis(i){
+  var reg = state.region; if(!reg) return null;
+  var st = structs[i], out = [];
+  st.ca.forEach(function(r){
+    var c = st.colByResi[r.resi];
+    if(c !== undefined && c >= reg.c0 && c <= reg.c1) out.push(r.resi);
+  });
+  return out;
+}
+
 function applyStructStyles(){
   var v = ensureViewer(); if(!v) return;
   applyOutline(v);
   var style = $("sStyle").value;
   structs.forEach(function(st, i){
     if(!st.model) return;
-    if(!st.show){ st.model.setStyle({}, {}); return; }
+    st.model.setStyle({}, {});
+    if(!st.show) return;
     var spec = {}, fn = function(atom){ return colourFor(i, atom.resi, atom.b); };
     if(style === "cartoon") spec.cartoon = { colorfunc: fn, arrows: true };
     else if(style === "stick") spec.stick = { colorfunc: fn, radius: 0.16 };
     else spec.sphere = { colorfunc: fn, radius: 0.9 };
-    st.model.setStyle({}, spec);
+    var resis = regionResis(i);
+    st.model.setStyle(resis ? { resi: resis } : {}, spec);
   });
   v.render();
   var shown = structs.filter(function(s){ return s.loaded && s.show; }).length;
@@ -1536,6 +1707,7 @@ function crc64Hex(str){
 
 function setAcc(i, acc){
   structs[i].acc = acc;
+  if(i === 0 && !$("featAcc").value) $("featAcc").value = acc;
   var el = document.querySelector('[data-acc="' + i + '"]');
   if(el) el.value = acc;
 }
@@ -1751,7 +1923,8 @@ function superpose(){
     var mob = idx[j], P = [], Q = [];
     structs[mob].ca.forEach(function(r){
       var c = structs[mob].colByResi[r.resi];
-      if(c !== undefined && refByCol[c] && ok(r) && ok(refByCol[c])){ P.push(r); Q.push(refByCol[c]); }
+      var inReg = !state.region || (c !== undefined && c >= state.region.c0 && c <= state.region.c1);
+      if(c !== undefined && refByCol[c] && inReg && ok(r) && ok(refByCol[c])){ P.push(r); Q.push(refByCol[c]); }
     });
     if(P.length < 3){
       lines.push(state.rows[mob].name + ": too few paired residues" +
