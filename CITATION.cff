@@ -19,28 +19,28 @@ keywords:
   - bioinformatics
   - figure generation
 license: MIT
-version: 3.0.2
-preferred-citation:
-  type: article
-  title: >-
-    LARP1-DM15/Sgt is a reader for cap-adjacent 2'-O-ribose methylation in TOP
-    ribosomal protein mRNAs required for localization to synapses
-  authors:
-    - {given-names: "Yuan W.", family-names: Tian}
-    - {given-names: Yavor, family-names: Hadzhiev}
-    - {given-names: Giancarlo, family-names: Abis}
-    - {given-names: Martin, family-names: Dodel}
-    - {given-names: "Emilie L.", family-names: Alard}
-    - {given-names: "David W. J.", family-names: McQuarrie}
-    - {given-names: "Faraz K.", family-names: Mardakheh}
-    - {given-names: "Maria R.", family-names: Conte}
-    - {given-names: Ferenc, family-names: "Müller"}
-    - {given-names: Matthias, family-names: Soller}
-  year: 2026
-  journal: bioRxiv
-  doi: 10.64898/2026.09.17.752351
-
+version: 3.0.3
 references:
+  - type: article
+    title: >-
+      LARP1-DM15/Sgt is a reader for cap-adjacent 2'-O-ribose methylation in TOP
+      ribosomal protein mRNAs required for localization to synapses
+    authors:
+      - {given-names: "Yuan W.", family-names: Tian}
+      - {given-names: Yavor, family-names: Hadzhiev}
+      - {given-names: Giancarlo, family-names: Abis}
+      - {given-names: Martin, family-names: Dodel}
+      - {given-names: "Emilie L.", family-names: Alard}
+      - {given-names: "David W. J.", family-names: McQuarrie}
+      - {given-names: "Faraz K.", family-names: Mardakheh}
+      - {given-names: "Maria R.", family-names: Conte}
+      - {given-names: Ferenc, family-names: "Müller"}
+      - {given-names: Matthias, family-names: Soller}
+    year: 2026
+    journal: bioRxiv
+    doi: 10.64898/2026.09.17.752351
+    notes: The paper this tool is described in.
+
   - type: article
     title: >-
       DOA/CLK2 phosphorylates Fl(2)d/WTAP to enhance m6A mRNA methyltransferase

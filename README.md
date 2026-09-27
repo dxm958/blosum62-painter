@@ -50,7 +50,7 @@ You can also download and open `index.html`.
 
 Cite the software itself:
 
-> McQuarrie DWJ (2026). *BLOSUM Alignment Painter* (v3.0.2).
+> McQuarrie DWJ (2026). *BLOSUM Alignment Painter* (v3.0.3).
 > https://github.com/dxm958/blosum62-painter
 
 and the paper it is described in:
