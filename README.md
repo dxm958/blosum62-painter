@@ -48,14 +48,20 @@ You can also download and open `index.html`.
 
 ## How to cite
 
-If you use this tool in published work, please cite the paper it is described in:
+Cite the software itself:
+
+> McQuarrie DWJ (2026). *BLOSUM Alignment Painter* (v3.0.2).
+> https://github.com/dxm958/blosum62-painter
+
+and the paper it is described in:
 
 > Tian YW, Hadzhiev Y, Abis G, Dodel M, Alard EL, McQuarrie DWJ, Mardakheh FK, Conte MR,
 > Müller F, Soller M (2026). *LARP1-DM15/Sgt is a reader for cap-adjacent
 > 2’-O-ribose methylation in TOP ribosomal protein mRNAs required for localization to
 > synapses.* bioRxiv 2026.09.17.752351. <https://doi.org/10.64898/2026.09.17.752351>
 
-GitHub's **Cite this repository** button renders that from `CITATION.cff`.
+GitHub's **Cite this repository** button renders both from `CITATION.cff`: the software
+entry, with the paper as its preferred citation.
 
 Whichever you cite, **state the similarity threshold you used** — `> 0` or `≥ 0`. It is
 the one setting that materially changes the figure, and it is rarely reported.
