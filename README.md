@@ -60,12 +60,6 @@ and the paper it is described in:
 > 2’-O-ribose methylation in TOP ribosomal protein mRNAs required for localization to
 > synapses.* bioRxiv 2026.09.17.752351. <https://doi.org/10.64898/2026.09.17.752351>
 
-GitHub's **Cite this repository** button renders both from `CITATION.cff`: the software
-entry, with the paper as its preferred citation.
-
-Whichever you cite, **state the similarity threshold you used** — `> 0` or `≥ 0`. It is
-the one setting that materially changes the figure, and it is rarely reported.
-
 ## References
 
 Substitution scores are BLOSUM-62:
