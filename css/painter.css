@@ -1,0 +1,80 @@
+/* Shared chrome for the landing page and the tool, in the idiom of LIVIA's
+   css/livia.css: a white header, a centred container, and white cards with a
+   numbered step header. Colours follow the figures this tool produces. */
+
+:root{
+  --pa-bg:#f5f7fa;
+  --pa-card:#ffffff;
+  --pa-ink:#2b2b30;
+  --pa-head:#8E1B10;
+  --pa-accent:#DC0806;
+  --pa-accent-2:#FE6B00;
+  --pa-line:#e8e8e8;
+  --pa-muted:#6B6B6B;
+  --pa-soft:#f8f9fa;
+}
+
+.pa-header{background:#fff;color:var(--pa-head);padding:.8rem 2rem;border-bottom:1px solid var(--pa-line)}
+.pa-header h1{font-size:1.8rem;font-weight:700;margin-bottom:.15rem;letter-spacing:-.02em;color:var(--pa-head)}
+.pa-header .subtitle{font-size:.92rem;color:var(--pa-muted);margin-bottom:.8rem;font-weight:400}
+.pa-links{display:flex;gap:.5rem .25rem;flex-wrap:wrap}
+.pa-links a{
+  color:#555;text-decoration:none;font-size:.72rem;padding:.22rem .4rem;
+  border:1px solid #ddd;border-radius:6px;background:var(--pa-soft);transition:all .2s;
+}
+.pa-links a:hover{background:var(--pa-accent);color:#fff;border-color:var(--pa-accent)}
+
+.pa-container{max-width:1100px;margin:0 auto;padding:1.5rem}
+
+.pa-card{
+  background:var(--pa-card);border-radius:12px;padding:1.5rem;
+  box-shadow:0 1px 3px rgba(0,0,0,.08);margin-bottom:1.5rem;
+}
+.pa-step-num{
+  display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;
+  border-radius:50%;background:var(--pa-accent);color:#fff;font-weight:700;font-size:.85rem;
+  margin-right:.5rem;flex-shrink:0;
+}
+.pa-step-header{display:flex;align-items:center;margin-bottom:.8rem;font-weight:600;font-size:1rem}
+.pa-step-desc{font-size:.88rem;color:#666;margin-bottom:.8rem;padding-left:2.3rem}
+
+.pa-banner{
+  display:flex;align-items:center;gap:.7rem;background:#fdeceb;border:1px solid #f6cdca;
+  border-radius:10px;padding:.7rem 1.1rem;margin-bottom:1rem;text-decoration:none;
+  color:var(--pa-head);transition:all .2s;
+}
+.pa-banner:hover{background:#f9d9d6;border-color:var(--pa-accent)}
+.pa-banner .pa-label{
+  font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;
+  color:var(--pa-accent);flex:none;
+}
+.pa-banner .pa-cite{font-size:.88rem;flex:1}
+.pa-banner .pa-cite em{color:#555}
+
+.pa-hero{
+  display:flex;align-items:center;gap:1rem;background:#fff;border:1px solid var(--pa-line);
+  border-radius:12px;padding:1.2rem 1.4rem;margin-bottom:1rem;text-decoration:none;
+  color:var(--pa-ink);box-shadow:0 1px 3px rgba(0,0,0,.08);transition:all .2s;
+}
+.pa-hero:hover{border-color:var(--pa-accent);box-shadow:0 2px 10px rgba(220,8,6,.12)}
+.pa-hero h2{font-size:1.1rem;color:var(--pa-head);margin-bottom:.2rem}
+.pa-hero p{font-size:.86rem;color:#666;line-height:1.5}
+.pa-hero .pa-go{margin-left:auto;color:var(--pa-accent);font-size:1.3rem;flex:none}
+.pa-hint{font-size:.76rem;color:var(--pa-muted);margin-top:.35rem}
+
+.pa-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1rem}
+.pa-small{
+  background:#fff;border:1px solid var(--pa-line);border-radius:10px;padding:1rem 1.1rem;
+  text-decoration:none;color:var(--pa-ink);transition:all .2s;
+}
+.pa-small:hover{border-color:var(--pa-accent)}
+.pa-small h3{font-size:.95rem;color:var(--pa-head);margin-bottom:.25rem}
+.pa-small p{font-size:.8rem;color:#666;line-height:1.45}
+
+.pa-divider{height:1px;background:var(--pa-line);margin:1.6rem 0 1.2rem}
+
+.pa-footer{
+  text-align:center;padding:1.4rem;font-size:.8rem;color:var(--pa-muted);
+  border-top:1px solid var(--pa-line);background:#fff;line-height:1.7;
+}
+.pa-footer a{color:#555}

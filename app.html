@@ -1,0 +1,2973 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Align amino acid sequences and shade every column by identity or BLOSUM-62 substitution similarity. Exports publication-ready SVG and PNG.">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#DC0806">
+<link rel="stylesheet" href="css/painter.css">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/3Dmol/2.5.5/3Dmol-min.js"></script>
+<title>BLOSUM Alignment Painter</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --ground:#F2F2F4;
+  --panel:#FFFFFF;
+  --panel-2:#F7F7F9;
+  --ink:#17171B;
+  --ink-2:#43434C;
+  --muted:#70707B;
+  --rule:#E0E0E6;
+  --rule-strong:#C9C9D2;
+  --field:#FFFFFF;
+  --field-rule:#D3D3DC;
+  --focus:#1F5FD0;
+  --ident:#DC0806;
+  --similar:#FE6B00;
+  --sheet:#FFFFFF;
+  --sheet-ink:#231F20;
+  --sheet-rule:#DDDDE3;
+  --shadow:0 1px 2px rgba(20,20,30,.06), 0 8px 24px rgba(20,20,30,.06);
+  --mono:"IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --sans:"IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ground:#131317;
+    --panel:#1C1C21;
+    --panel-2:#232329;
+    --ink:#ECECF1;
+    --ink-2:#C2C2CC;
+    --muted:#8E8E9A;
+    --rule:#2E2E37;
+    --rule-strong:#3E3E49;
+    --field:#141418;
+    --field-rule:#3A3A45;
+    --focus:#6FA0FF;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 30px rgba(0,0,0,.35);
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#131317;
+  --panel:#1C1C21;
+  --panel-2:#232329;
+  --ink:#ECECF1;
+  --ink-2:#C2C2CC;
+  --muted:#8E8E9A;
+  --rule:#2E2E37;
+  --rule-strong:#3E3E49;
+  --field:#141418;
+  --field-rule:#3A3A45;
+  --focus:#6FA0FF;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 30px rgba(0,0,0,.35);
+}
+
+html{color-scheme:light dark}
+body{margin:0}
+img{max-width:100%}
+[hidden]{display:none !important}
+*{box-sizing:border-box}
+body{
+  background:var(--ground);
+  color:var(--ink);
+  font-family:var(--sans);
+  font-size:14px;
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3{margin:0;text-wrap:balance}
+p{margin:0}
+
+.mhead{display:flex;align-items:center;gap:8px 16px;flex-wrap:wrap;width:100%}
+.mtitle{display:flex;flex-direction:column;gap:3px;min-width:0}
+.plinks{display:flex;gap:5px;flex-wrap:wrap;margin-top:3px}
+.plinks a{
+  font-size:11px;color:var(--ink-2);text-decoration:none;padding:3px 8px;
+  border:1px solid var(--rule);border-radius:6px;background:var(--panel-2);transition:background .15s,color .15s;
+}
+.plinks a:hover{background:var(--ident);border-color:var(--ident);color:#fff}
+.paper-banner{
+  display:flex;align-items:center;gap:12px;text-decoration:none;
+  background:var(--panel-2);border:1px solid var(--rule);border-left:3px solid var(--ident);
+  padding:10px 16px;margin:0;color:var(--ink-2);font-size:12.5px;line-height:1.45;
+}
+.paper-banner:hover{background:var(--panel)}
+.paper-banner .pb-label{
+  font-size:10px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--ident);flex:none;
+}
+.paper-banner .pb-go{margin-left:auto;color:var(--muted);flex:none;font-size:15px}
+.colophon{text-align:center;justify-content:center}
+.masthead{
+  display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 16px;
+  padding:22px 26px 18px;
+  border-bottom:1px solid var(--rule);
+  background:var(--panel);
+}
+.mark,.mark-sm{user-select:none;-webkit-user-select:none;pointer-events:none}
+.masthead .mark{width:38px;height:38px;flex:none;align-self:center;border-radius:8px}
+.colophon .mark-sm{width:19px;height:19px;vertical-align:-4px;margin-right:5px;border-radius:4px}
+.masthead h1{
+  font-size:19px;font-weight:600;letter-spacing:-.015em;
+}
+.masthead .sub{
+  color:var(--muted);font-size:13px;max-width:62ch;
+}
+.masthead .rule-chip{
+  margin-left:auto;
+  display:flex;align-items:center;gap:10px;
+  font-family:var(--mono);font-size:11.5px;color:var(--ink-2);
+  border:1px solid var(--rule);border-radius:2px;
+  padding:6px 10px;background:var(--panel-2);
+  white-space:nowrap;
+}
+.themebtn{
+  font-family:var(--mono);font-size:11px;letter-spacing:.04em;
+  border:1px solid var(--rule);border-radius:2px;background:var(--panel-2);
+  color:var(--ink-2);padding:6px 10px;cursor:pointer;white-space:nowrap;
+}
+.themebtn:hover{border-color:var(--rule-strong);color:var(--ink)}
+.colophon{
+  border-top:1px solid var(--rule);background:var(--panel);
+  padding:18px 26px 28px;display:flex;flex-wrap:wrap;gap:6px 22px;
+  align-items:baseline;font-size:12px;color:var(--muted);
+}
+.colophon a{color:var(--ink-2);text-decoration:underline;text-underline-offset:2px}
+.colophon a:hover{color:var(--ink)}
+.colophon .ver{font-family:var(--mono);font-size:11px}
+.swatch{width:10px;height:10px;border-radius:1px;display:inline-block;vertical-align:-1px}
+.swatch.i{background:var(--ident)}
+.swatch.s{background:var(--similar)}
+.swatch.n{background:transparent;border:1px solid var(--rule-strong)}
+
+.shell{
+  display:grid;
+  grid-template-columns:352px minmax(0,1fr);
+  gap:0;
+  align-items:start;
+  min-height:calc(100vh - 74px);
+}
+@media (max-width:1040px){
+  .shell{grid-template-columns:minmax(0,1fr)}
+  .rail{border-right:none;border-bottom:1px solid var(--rule)}
+}
+
+.rail{
+  background:var(--panel);
+  border-right:1px solid var(--rule);
+  padding:20px 22px 40px;
+  display:flex;flex-direction:column;gap:22px;
+  position:sticky;top:0;max-height:100vh;overflow-y:auto;
+}
+@media (max-width:1040px){.rail{position:static;max-height:none}}
+
+fieldset{border:0;margin:0;padding:0;display:flex;flex-direction:column;gap:9px}
+legend,.lbl{
+  font-size:10.5px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--muted);padding:0;
+}
+.hint{font-size:11.5px;color:var(--muted);line-height:1.45}
+
+input[type=color]{
+  height:32px;padding:2px;width:100%;cursor:pointer;
+  background:var(--field);border:1px solid var(--field-rule);border-radius:3px;
+}
+textarea,input[type=text],input[type=number],select{
+  font-family:var(--mono);font-size:12px;
+  background:var(--field);color:var(--ink);
+  border:1px solid var(--field-rule);border-radius:3px;
+  padding:8px 9px;width:100%;
+}
+textarea{resize:vertical;line-height:1.5}
+#fasta{min-height:150px;white-space:pre;overflow-wrap:normal;overflow-x:auto}
+#annots{min-height:52px}
+input:focus-visible,textarea:focus-visible,select:focus-visible,button:focus-visible,.seg label:focus-within{
+  outline:2px solid var(--focus);outline-offset:1px;
+}
+
+.seg{display:flex;border:1px solid var(--field-rule);border-radius:3px;overflow:hidden}
+.seg label{
+  flex:1;text-align:center;padding:7px 6px;font-size:12px;cursor:pointer;
+  background:var(--field);color:var(--ink-2);
+  border-right:1px solid var(--field-rule);
+  transition:background .12s ease,color .12s ease;
+}
+.seg label:last-child{border-right:0}
+.seg input{position:absolute;opacity:0;pointer-events:none}
+.seg input:checked + span{color:var(--panel)}
+.seg label:has(input:checked){background:var(--ink);color:var(--panel);font-weight:500}
+
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.row2 .f{display:flex;flex-direction:column;gap:4px}
+.f .lbl{font-size:10px;letter-spacing:.07em}
+
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{
+  font-family:var(--mono);font-size:11px;
+  padding:4px 8px;border:1px solid var(--field-rule);border-radius:2px;
+  background:var(--panel-2);color:var(--ink-2);cursor:pointer;
+}
+.chip:hover{border-color:var(--rule-strong);color:var(--ink)}
+.chip[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--panel)}
+
+.actions{display:flex;flex-direction:column;gap:8px}
+button.primary,button.ghost{
+  font-family:var(--sans);font-size:13px;font-weight:500;
+  padding:9px 12px;border-radius:3px;cursor:pointer;border:1px solid transparent;
+}
+button.primary{background:var(--ink);color:var(--panel);border-color:var(--ink)}
+button.primary:hover{opacity:.88}
+button.ghost{background:var(--panel-2);color:var(--ink);border-color:var(--field-rule)}
+button.ghost:hover{border-color:var(--rule-strong)}
+button:disabled{opacity:.45;cursor:not-allowed}
+.btn-row{display:flex;gap:8px}
+.btn-row button{flex:1}
+
+.stage{padding:20px 26px 48px;display:flex;flex-direction:column;gap:16px;min-width:0}
+
+.stats{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(132px,1fr));
+  border:1px solid var(--rule);border-radius:3px;background:var(--panel);
+  overflow:hidden;
+}
+.stat{
+  padding:11px 16px;
+  box-shadow:inset -1px 0 0 var(--rule);
+  display:flex;flex-direction:column;gap:2px;min-width:0;
+}
+.stat:last-child{box-shadow:none}
+.stat .k{font-size:10px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);font-weight:600;display:flex;align-items:center;gap:5px}
+.stat .v{font-family:var(--mono);font-size:17px;font-weight:500;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.stat .v small{font-size:11.5px;color:var(--muted);font-weight:400;margin-left:3px}
+
+.sheetwrap{
+  background:var(--sheet);
+  border:1px solid var(--sheet-rule);
+  border-radius:3px;
+  box-shadow:var(--shadow);
+  overflow-x:auto;
+  padding:20px 18px;
+}
+.sheetwrap svg{display:block}
+.panelhead{display:flex;align-items:center;gap:12px;margin:0 0 8px}
+.panelhead h2{font-size:11px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.panelhead .sp{flex:1}
+button.ghost.sm{padding:5px 11px;font-size:12px}
+.panel{display:flex;flex-direction:column}
+.tabs{display:flex;gap:2px;border-bottom:1px solid var(--rule);margin-bottom:16px}
+.tab{
+  font-family:var(--sans);font-size:13px;font-weight:500;
+  padding:9px 16px;border:0;background:none;color:var(--muted);cursor:pointer;
+  border-bottom:2px solid transparent;margin-bottom:-1px;
+}
+.tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--ident)}
+.tab:hover{color:var(--ink)}
+.structopts{
+  display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;
+  padding:12px 14px;border:1px solid var(--rule);border-radius:3px;background:var(--panel);
+}
+.structopts label{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--ink-2)}
+.structopts select{width:auto;min-width:120px}
+.rmsd{font-family:var(--mono);font-size:12px;color:var(--ink-2);margin-left:auto}
+.structlist{display:flex;flex-direction:column;gap:6px}
+.srow{
+  display:flex;flex-wrap:wrap;align-items:center;gap:8px;
+  padding:8px 12px;border:1px solid var(--rule);border-radius:3px;background:var(--panel);
+}
+.srow .nm{font-size:12.5px;font-weight:500;min-width:96px}
+.srow .acc{width:150px;flex:none}
+.srow .st{font-family:var(--mono);font-size:11px;color:var(--muted);margin-left:auto;text-align:right}
+.srow .swatch3{width:11px;height:11px;border-radius:2px;flex:none}
+#hitList{max-height:200px;overflow-y:auto;border:1px solid var(--field-rule);border-radius:3px}
+.hrow{display:grid;grid-template-columns:auto auto 1fr auto;gap:2px 8px;width:100%;
+  padding:6px 9px;border-bottom:1px solid var(--rule);cursor:pointer;font-family:var(--sans);align-items:baseline}
+.hrow input{width:auto;grid-row:1}
+.hrow:last-child{border-bottom:0}
+.hrow:hover{background:var(--panel-2)}
+.hrow .hid{font-family:var(--mono);font-size:11px;font-weight:600;color:var(--ink)}
+.hrow .hn{font-size:11.5px;color:var(--ink-2)}
+.hrow .hx{font-family:var(--mono);font-size:10px;color:var(--muted);grid-column:4;grid-row:1}
+.hrow .ho{font-size:10.5px;color:var(--muted);font-style:italic;grid-column:2/5}
+.constable{border:1px solid var(--rule);border-radius:3px;background:var(--panel);overflow:hidden}
+.crow{display:grid;grid-template-columns:1fr auto auto;gap:14px;align-items:baseline;
+  padding:9px 14px;border-bottom:1px solid var(--rule)}
+.crow:last-child{border-bottom:0}
+.crow .ck{font-size:12.5px;color:var(--ink-2)}
+.crow .cv{font-family:var(--mono);font-size:15px;font-weight:500;font-variant-numeric:tabular-nums}
+.crow .cd{font-family:var(--mono);font-size:11px;color:var(--muted);min-width:180px;text-align:right}
+.sqchips{display:flex;flex-wrap:wrap;gap:5px;margin-top:2px}
+.sqchip{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-family:var(--mono);
+  background:var(--panel-2);border:1px solid var(--rule);border-radius:2px;padding:2px 4px 2px 7px}
+.sqchip button{border:0;background:none;cursor:pointer;color:var(--muted);font-size:13px;line-height:1;padding:0 2px}
+.sqchip button:hover{color:var(--ident)}
+.dchips{display:flex;flex-wrap:wrap;gap:5px}
+.dchip .rng{font-family:var(--mono);font-size:9.5px;opacity:.65;margin-left:3px}
+#orthList{max-height:210px;overflow-y:auto;border:1px solid var(--field-rule);border-radius:3px;padding:4px}
+.orow{display:flex;align-items:center;gap:7px;padding:3px 5px;font-size:11.5px;cursor:pointer;border-radius:2px}
+.orow:hover{background:var(--panel-2)}
+.orow input{width:auto;flex:none}
+.orow .om{margin-left:auto;font-family:var(--mono);font-size:10px;color:var(--muted);white-space:nowrap}
+.filebtn{position:relative;overflow:hidden;display:inline-block}
+.filebtn input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%}
+.viewerwrap{
+  position:relative;height:520px;border:1px solid var(--rule);border-radius:3px;
+  background:#F7F7F9;overflow:hidden;
+}
+:root[data-theme="dark"] .viewerwrap{background:#0E0E12}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .viewerwrap{background:#0E0E12}}
+#viewer{position:relative;width:100%;height:100%}
+
+.note{
+  font-size:12px;color:var(--muted);line-height:1.55;max-width:78ch;
+}
+.empty{
+  background:var(--panel);border:1px solid var(--rule);border-radius:3px;
+  padding:34px 30px;display:flex;flex-direction:column;align-items:flex-start;gap:14px;
+  max-width:72ch;
+}
+.empty h2{font-size:17px;font-weight:600;letter-spacing:-.01em}
+.empty p{font-size:13px;color:var(--muted);max-width:60ch;line-height:1.6}
+.empty .cite{font-size:11.5px;line-height:1.6}
+.empty .cite a{color:var(--ink-2)}
+.empty a{text-decoration:underline;text-underline-offset:2px}
+.rulecard{
+  display:flex;flex-direction:column;gap:9px;
+  background:#FFFFFF;border:1px solid var(--sheet-rule);border-radius:3px;
+  padding:16px 18px;width:100%;
+}
+.rr{display:flex;align-items:center;gap:13px;font-size:12.5px;color:#231F20}
+.pair{display:inline-flex;flex-direction:column;flex:none}
+.pair .cell{
+  width:17px;height:15px;line-height:15px;text-align:center;
+  font-family:var(--sans);font-size:11px;color:#231F20;
+}
+.cell.i{background:var(--ident)}
+.cell.s{background:var(--similar)}
+.cell.n{background:#FFFFFF;box-shadow:inset 0 0 0 1px var(--sheet-rule)}
+.rr b{font-family:var(--mono);font-weight:500;font-size:11.5px}
+.note code{font-family:var(--mono);font-size:11.5px;background:var(--panel-2);border:1px solid var(--rule);border-radius:2px;padding:.5px 4px}
+.err{
+  font-family:var(--mono);font-size:12px;color:var(--ident);
+  border:1px solid var(--ident);border-radius:3px;padding:9px 11px;background:var(--panel);
+}
+.err[hidden]{display:none !important}
+.toast{
+  font-family:var(--mono);font-size:11.5px;color:var(--muted);min-height:16px;
+}
+@media (prefers-reduced-motion:reduce){*{transition:none !important;animation:none !important}}
+</style>
+</head>
+<body>
+<header class="masthead">
+  <div class="mhead">
+    <svg class="mark" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><rect x="1" y="1" width="62" height="62" rx="13" fill="#FFFFFF" stroke="#C9C9D2" stroke-width="1.5"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#DC0806" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(0 32 32)"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#FE6B00" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(60 32 32)"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#DC0806" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(120 32 32)"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#FE6B00" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(180 32 32)"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#DC0806" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(240 32 32)"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#FE6B00" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(300 32 32)"/><circle cx="32" cy="32" r="4.4" fill="#FFFFFF"/><text x="32.00" y="18.40" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">B</text><text x="43.78" y="25.20" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">L</text><text x="43.78" y="38.80" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">O</text><text x="32.00" y="45.60" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">S</text><text x="20.22" y="38.80" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">U</text><text x="20.22" y="25.20" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">M</text></svg>
+    <div class="mtitle">
+      <h1>BLOSUM Alignment Painter</h1>
+      <p class="sub">Comparative domain architecture, conservation and structure, in the browser.</p>
+      <div class="plinks">
+        <a href="https://github.com/dxm958/blosum62-painter">GitHub</a>
+        <a href="https://doi.org/10.64898/2026.09.17.752351">Paper</a>
+        <a href="https://github.com/dxm958/blosum62-painter#how-to-cite">How to cite</a>
+        <a href="https://alphafold.ebi.ac.uk/">AlphaFold DB</a>
+        <a href="https://omabrowser.org/">OMA</a>
+      </div>
+    </div>
+    <div class="rule-chip">
+      <span><span class="swatch i"></span> identical</span>
+      <span><span class="swatch s"></span> B62 <span id="legendThr">&gt; 0</span></span>
+      <span><span class="swatch n"></span> below</span>
+    </div>
+    <button class="themebtn" id="themeBtn" type="button" aria-label="Change colour theme">Theme: auto</button>
+  </div>
+</header>
+<a class="paper-banner" href="https://doi.org/10.64898/2026.09.17.752351">
+  <span class="pb-label">Paper</span>
+  <span>Tian YW, Hadzhiev Y, Abis G, Dodel M, Alard EL, McQuarrie DWJ, Mardakheh FK, Conte MR,
+    M&uuml;ller F &amp; Soller M (2026). <em>LARP1-DM15/Sgt is a reader for cap-adjacent
+    2&rsquo;-<em>O</em>-ribose methylation in TOP ribosomal protein mRNAs required for localization
+    to synapses.</em> bioRxiv 2026.09.17.752351</span>
+  <span class="pb-go">&rarr;</span>
+</a>
+
+<div class="shell">
+  <aside class="rail">
+    <fieldset>
+      <legend>Find a protein</legend>
+      <div class="btn-row">
+        <input type="text" id="searchQ" placeholder="LARP1, CLK2, Doa&hellip;">
+        <button class="ghost" id="searchGo" type="button">Search</button>
+      </div>
+      <div class="btn-row" style="margin-top:6px">
+        <button class="primary" id="searchLoad" type="button">Load ticked</button>
+        <button class="ghost" id="searchNone" type="button">Untick all</button>
+      </div>
+      <div id="hitList"><p class="hint">search UniProt by protein or gene name</p></div>
+      <p class="hint" id="searchStatus"></p>
+    </fieldset>
+
+    <fieldset>
+      <legend>Sequences &middot; FASTA</legend>
+      <textarea id="fasta" spellcheck="false" aria-label="Sequences in FASTA format" placeholder=">CLK2_HUMAN&#10;MPHPRRYHSSERGSRGSYREHYRSRKHKRRRSRSWSS...&#10;>DOA_DROME&#10;MPRTRRLHHSRDRSSAGTRDKRRRHDTADHSPPLAEA..."></textarea>
+      <div class="btn-row">
+        <button class="ghost" id="loadExSide" type="button">Load example</button>
+        <button class="ghost" id="clearAll" type="button">Clear</button>
+      </div>
+      <div class="sqchips" id="seqList"></div>
+      <p class="hint">Two sequences are aligned pairwise. Three or more must already be aligned (paste a Clustal/MUSCLE result) &mdash; a column is shaded only if <em>every</em> pair in it qualifies.</p>
+    </fieldset>
+
+    <fieldset>
+      <legend>Species</legend>
+      <div class="btn-row">
+        <button class="ghost" id="orthFind" type="button">Find orthologues</button>
+        <button class="ghost" id="orthAdd" type="button">Add ticked</button>
+      </div>
+      <div id="orthList"><p class="hint">no orthologues loaded</p></div>
+      <p class="hint" id="orthStatus"></p>
+      <p class="hint">From OMA, one entry per species, with a reference set of model organisms
+         pre-ticked so the sampling spans a phylogeny rather than forty mammals.</p>
+    </fieldset>
+
+    <fieldset>
+      <legend>Region</legend>
+      <div class="btn-row">
+        <input type="text" id="featAcc" placeholder="Accession of sequence 1">
+        <button class="ghost" id="featFetch" type="button">Get domains</button>
+      </div>
+      <div class="dchips" id="domChips"><span class="hint">no domains loaded yet</span></div>
+      <div class="row2" style="margin-top:8px">
+        <div class="f"><span class="lbl">From residue</span><input type="number" id="regFrom" min="1" placeholder="1"></div>
+        <div class="f"><span class="lbl">To residue</span><input type="number" id="regTo" min="1" placeholder="end"></div>
+      </div>
+      <div class="btn-row">
+        <button class="primary" id="regApply" type="button">Apply range</button>
+        <button class="ghost" id="regClear" type="button">Whole protein</button>
+      </div>
+      <label style="display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--ink-2);cursor:pointer;margin-top:4px">
+        <input type="checkbox" id="regAlign" style="width:auto"> Align to the region itself
+      </label>
+      <p class="hint" id="featStatus"></p>
+      <p class="hint">Numbering follows sequence&nbsp;1. A region trims the figure, both overviews,
+         the statistics, the structure view and the superposition. Ticking the box above realigns
+         each sequence against the region alone, which holds up better than aligning full length
+         and cropping when the sequences diverge outside the domain.</p>
+    </fieldset>
+
+    <fieldset>
+      <legend>Gaps</legend>
+      <div class="seg" role="radiogroup" aria-label="Alignment mode">
+        <label><input type="radio" name="mode" value="keep" checked><span>Keep as pasted</span></label>
+        <label><input type="radio" name="mode" value="align"><span>Align now</span></label>
+      </div>
+      <div id="alignOpts" hidden>
+        <p class="lbl" style="margin:4px 0 6px">Needleman&ndash;Wunsch, affine</p>
+        <div class="row2">
+          <div class="f"><span class="lbl">Gap open</span><input type="number" id="gapOpen" value="12" min="0" max="60" step="1"></div>
+          <div class="f"><span class="lbl">Gap extend</span><input type="number" id="gapExt" value="2" min="0" max="20" step="0.5"></div>
+        </div>
+        <div class="chips" style="margin-top:8px">
+          <button class="chip" type="button" data-go="12" data-ge="2">12 / 2 &middot; Stryer</button>
+          <button class="chip" type="button" data-go="10" data-ge="0.5">10 / 0.5 &middot; EMBOSS</button>
+          <button class="chip" type="button" data-go="11" data-ge="1">11 / 1 &middot; BLAST</button>
+        </div>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Similarity threshold</legend>
+      <div class="chips">
+        <button class="chip" type="button" id="thr0" data-thr="0" aria-pressed="false">&ge; 0</button>
+        <button class="chip" type="button" id="thr1" data-thr="1" aria-pressed="true">&gt; 0</button>
+      </div>
+      <div class="f"><span class="lbl">Minimum BLOSUM-62 score</span><input type="number" id="thr" value="1" min="-4" max="11" step="1"></div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Colours</legend>
+      <div class="row2">
+        <div class="f"><span class="lbl">Identical</span>
+          <input type="color" id="cIdent" value="#DC0806"></div>
+        <div class="f"><span class="lbl">Similar</span>
+          <input type="color" id="cSim" value="#FE6B00"></div>
+      </div>
+      <div class="chips">
+        <button class="chip" type="button" data-ci="#DC0806" data-cs="#FE6B00" aria-pressed="true">Default</button>
+        <button class="chip" type="button" data-ci="#F50057" data-cs="#00B8D4">Vivid</button>
+        <button class="chip" type="button" data-ci="#0072B2" data-cs="#56B4E9">Colour-safe</button>
+        <button class="chip" type="button" data-ci="#3F3F46" data-cs="#A1A1AA">Greyscale</button>
+      </div>
+      <p class="hint">Red and orange sit close together for readers with red&ndash;green colour
+         vision deficiency. The colour-safe pair is from the Okabe&ndash;Ito palette and stays
+         distinguishable under all common types.</p>
+    </fieldset>
+
+    <fieldset>
+      <legend>Colour by</legend>
+      <select id="colourBy">
+        <option value="column" selected>Whole column &mdash; every pair must qualify</option>
+        <option value="ref">Each residue vs sequence 1</option>
+      </select>
+      <p class="hint">With three or more sequences, per-residue shading marks cells
+         individually, so one outlier no longer blanks its column. A column where sequence&nbsp;1
+         has a gap stays unmarked. Both modes give the pairwise rule for two sequences.</p>
+    </fieldset>
+
+    <fieldset>
+      <legend>Figure</legend>
+      <div class="f"><span class="lbl">Title</span><input type="text" id="figTitle" value="" placeholder="Figure title"></div>
+      <div class="row2">
+        <div class="f"><span class="lbl">Residues per line</span><input type="number" id="perLine" value="100" min="10" max="240" step="5"></div>
+        <div class="f"><span class="lbl">Cell width (px)</span><input type="number" id="cellW" value="8.5" min="5" max="20" step="0.5"></div>
+      </div>
+      <div class="row2">
+        <div class="f"><span class="lbl">Typeface</span>
+          <select id="fontSel">
+            <option value="arial" selected>Arial</option>
+            <option value="courier">Courier New</option>
+          </select></div>
+        <div class="f"><span class="lbl">Strip width (px)</span>
+          <input type="number" id="stripW" value="600" min="200" max="2000" step="20"></div>
+        <div class="f"><span class="lbl">Ruler interval</span>
+          <input type="number" id="rulerStep" value="10" min="5" max="100" step="5"></div>
+        <div class="f"><span class="lbl">Architecture width</span>
+          <input type="number" id="archW" value="760" min="400" max="1600" step="20"></div>
+      </div>
+      <label style="display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--ink-2);cursor:pointer">
+        <input type="checkbox" id="showNums" checked style="width:auto"> Show residue numbering
+      </label>
+      <label style="display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--ink-2);cursor:pointer">
+        <input type="checkbox" id="showRuler" checked style="width:auto"> Position ruler
+      </label>
+      <label style="display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--ink-2);cursor:pointer">
+        <input type="checkbox" id="boldRes" style="width:auto"> Bold residues
+      </label>
+      <label style="display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--ink-2);cursor:pointer">
+        <input type="checkbox" id="whiteText" checked style="width:auto"> White letters on shaded cells
+      </label>
+      <label style="display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--ink-2);cursor:pointer">
+        <input type="checkbox" id="showStrip" checked style="width:auto"> Overview strip
+      </label>
+      <label style="display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--ink-2);cursor:pointer">
+        <input type="checkbox" id="showArch" checked style="width:auto"> Domain architecture
+        <span style="color:var(--muted);font-size:11px">(fetches per species)</span>
+      </label>
+      <label style="display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--ink-2);cursor:pointer">
+        <input type="checkbox" id="showRows" checked style="width:auto"> Per-sequence overview
+        <span style="color:var(--muted);font-size:11px">(3+ sequences)</span>
+      </label>
+    </fieldset>
+
+    <fieldset>
+      <legend>Annotations</legend>
+      <textarea id="annots" spellcheck="false" aria-label="Domain annotations" placeholder="163-479 Kinase domain"></textarea>
+      <p class="hint">One per line: <code>start-end Label</code>, numbered along the first sequence.</p>
+    </fieldset>
+
+    <div class="actions">
+      <button class="primary" id="render" type="button">Redraw</button>
+      <div class="btn-row">
+        <button class="ghost" id="expSvg" type="button">SVG</button>
+        <button class="ghost" id="expPng" type="button">PNG</button>
+        <button class="ghost" id="copyAln" type="button">Copy&nbsp;FASTA</button>
+      </div>
+      <p class="toast" id="toast"></p>
+    </div>
+  </aside>
+
+  <main class="stage">
+    <nav class="tabs" role="tablist">
+      <button class="tab" id="tabAlign" type="button" role="tab" aria-selected="true">Alignment</button>
+      <button class="tab" id="tabStruct" type="button" role="tab" aria-selected="false">Structure</button>
+    </nav>
+
+    <div id="paneStruct" hidden>
+      <div class="err" id="sErr" hidden></div>
+      <div class="structopts">
+        <label>Colour by
+          <select id="sColour">
+            <option value="cons" selected>Conservation</option>
+            <option value="plddt">Model confidence (pLDDT)</option>
+            <option value="seq">Sequence</option>
+          </select></label>
+        <label>Style
+          <select id="sStyle">
+            <option value="cartoon" selected>Cartoon</option>
+            <option value="stick">Stick</option>
+            <option value="sphere">Sphere</option>
+          </select></label>
+        <label>Fit over
+          <select id="sFit">
+            <option value="70" selected>Confident residues (pLDDT &ge; 70)</option>
+            <option value="90">High confidence (pLDDT &ge; 90)</option>
+            <option value="50">pLDDT &ge; 50</option>
+            <option value="0">All aligned residues</option>
+          </select></label>
+        <label style="display:flex;align-items:center;gap:6px">
+          <input type="checkbox" id="sOutline" checked style="width:auto"> Silhouette</label>
+        <label style="display:flex;align-items:center;gap:6px">
+          <input type="checkbox" id="sAuto" checked style="width:auto"> Identify and load automatically</label>
+        <button class="ghost sm" id="sIdentAll" type="button">Identify all</button>
+        <button class="ghost sm" id="sSuperpose" type="button">Superpose</button>
+        <button class="ghost sm" id="sReset" type="button">Reset view</button>
+        <button class="ghost sm" id="sPng" type="button">PNG</button>
+        <span class="rmsd" id="sRmsd"></span>
+      </div>
+      <p class="hint" style="margin:10px 0 0">
+        <strong>Identify</strong> looks the sequence up by exact checksum in UniParc &mdash; instant,
+        and it needs nothing from you. <strong>BLAST</strong> is the fallback for a sequence that is
+        not an exact UniProt entry; the EBI requires an email address for BLAST jobs and it is sent
+        to them, so type it in yourself:
+        <input type="email" id="sEmail" placeholder="you@institute.edu"
+               style="width:200px;display:inline-block;vertical-align:middle;margin-left:4px">
+      </p>
+      <div class="dchips" id="domChips2" style="margin:14px 0 0"></div>
+      <div class="structlist" id="structList" style="margin:14px 0"></div>
+      <div class="viewerwrap"><div id="viewer"></div></div>
+      <p class="note" id="sNote" style="margin-top:12px"></p>
+    </div>
+
+    <div id="paneAlign">
+    <div class="err" id="err" hidden></div>
+    <section class="empty" id="empty" hidden>
+      <h2>Paste sequences to begin</h2>
+      <p>FASTA goes in the panel on the left. Two sequences are aligned for you with
+         Needleman&ndash;Wunsch; three or more must already be aligned.</p>
+      <div class="rulecard">
+        <div class="rr"><span class="pair"><span class="cell i">W</span><span class="cell i">W</span></span>
+          <span>Identical &mdash; shaded red.</span></div>
+        <div class="rr"><span class="pair"><span class="cell s">I</span><span class="cell s">V</span></span>
+          <span>Substitution scoring <b>+3</b>, at or above the threshold &mdash; shaded orange.</span></div>
+        <div class="rr"><span class="pair"><span class="cell n">P</span><span class="cell n">Q</span></span>
+          <span>Substitution scoring <b>&minus;1</b>, below the threshold &mdash; left unmarked, as are gaps.</span></div>
+      </div>
+      <button class="primary" id="loadEx" type="button">Load the DOA/CLK2 example</button>
+      <p class="cite">Cite <a href="https://github.com/dxm958/blosum62-painter">McQuarrie DWJ (2026), <em>BLOSUM Alignment Painter</em></a>, and the paper it is described in, Tian YW <em>et al.</em> (2026) <a href="https://doi.org/10.64898/2026.09.17.752351">bioRxiv 2026.09.17.752351</a>. The built-in example is a DOA/CLK2 alignment from <a href="https://doi.org/10.1101/2024.11.25.625202">McQuarrie, Bian &amp; Soller (2024)</a>, one application of the colour scheme.</p>
+    </section>
+    <section class="stats" id="stats"></section>
+    <div class="sheetwrap" id="sheetwrap"></div>
+    <section class="panel" id="stripPanel" hidden>
+      <div class="panelhead"><h2>Overview strip</h2><span class="sp"></span>
+        <button class="ghost sm" id="expStripSvg" type="button">SVG</button>
+        <button class="ghost sm" id="expStripPng" type="button">PNG</button>
+      </div>
+      <div class="sheetwrap" id="stripwrap"></div>
+    </section>
+    <section class="panel" id="consPanel" hidden style="margin-bottom:16px">
+      <div class="panelhead"><h2>Conservation</h2></div>
+      <div id="consTable" class="constable"></div>
+      <p class="note" id="consNote" style="margin-top:8px"></p>
+    </section>
+    <section class="panel" id="archPanel" hidden style="margin-bottom:16px">
+      <div class="panelhead"><h2>Domain architecture</h2><span class="sp"></span>
+        <button class="ghost sm" id="archGo" type="button">Build</button>
+        <button class="ghost sm" id="expArchSvg" type="button" disabled>SVG</button>
+        <button class="ghost sm" id="expArchPng" type="button" disabled>PNG</button>
+      </div>
+      <div class="sheetwrap" id="archwrap"></div>
+      <p class="note" id="archStatus" style="margin-top:8px"></p>
+    </section>
+    <section class="panel" id="rowsPanel" hidden>
+      <div class="panelhead"><h2>Per-sequence overview</h2><span class="sp"></span>
+        <button class="ghost sm" id="expRowsSvg" type="button">SVG</button>
+        <button class="ghost sm" id="expRowsPng" type="button">PNG</button>
+      </div>
+      <div class="sheetwrap" id="rowswrap"></div>
+    </section>
+    <p class="note" id="note"></p>
+    </div>
+  </main>
+</div>
+
+<footer class="colophon">
+  <span class="ver"><svg class="mark-sm" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><rect x="1" y="1" width="62" height="62" rx="13" fill="#FFFFFF" stroke="#C9C9D2" stroke-width="1.5"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#DC0806" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(0 32 32)"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#FE6B00" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(60 32 32)"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#DC0806" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(120 32 32)"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#FE6B00" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(180 32 32)"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#DC0806" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(240 32 32)"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#FE6B00" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(300 32 32)"/><circle cx="32" cy="32" r="4.4" fill="#FFFFFF"/><text x="32.00" y="18.40" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">B</text><text x="43.78" y="25.20" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">L</text><text x="43.78" y="38.80" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">O</text><text x="32.00" y="45.60" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">S</text><text x="20.22" y="38.80" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">U</text><text x="20.22" y="25.20" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">M</text></svg>BLOSUM Alignment Painter v3.3.0</span>
+  <span>The mark is a blossom whose six petals spell the matrix in amino acid codes &mdash;
+    B (Asx), L (Leu), O (pyrrolysine), S (Ser), U (selenocysteine), M (Met).</span>
+  <span>Cite: McQuarrie DWJ (2026). <em>BLOSUM Alignment Painter</em>, <a href="https://github.com/dxm958/blosum62-painter">github.com/dxm958/blosum62-painter</a></span>
+  <span>Described in: Tian YW, Hadzhiev Y, Abis G, Dodel M, Alard EL, McQuarrie DWJ, Mardakheh FK, Conte MR, M&uuml;ller F &amp; Soller M (2026). <em>LARP1-DM15/Sgt is a reader for cap-adjacent 2&rsquo;-<em>O</em>-ribose methylation in TOP ribosomal protein mRNAs required for localization to synapses.</em> bioRxiv 2026.09.17.752351. <a href="https://doi.org/10.64898/2026.09.17.752351">doi.org/10.64898/2026.09.17.752351</a></span>
+  <span>Substitution scores: Henikoff S &amp; Henikoff JG (1992) <em>PNAS</em> 89:10915&ndash;10919.</span>
+  <span><strong>Using this for a figure?</strong> Please cite it &mdash;
+    <a href="https://github.com/dxm958/blosum62-painter#how-to-cite">how to cite</a>.</span>
+  <span><a href="https://github.com/dxm958/blosum62-painter">Source &amp; issues</a></span>
+  <span style="width:100%;color:var(--muted)">David W. J. McQuarrie &middot; Weill Cornell Medicine</span>
+</footer>
+
+<script>
+(function(){
+"use strict";
+
+/* ---------- BLOSUM-62 ---------- */
+var ORDER = "ARNDCQEGHILKMFPSTWYVBZX*";
+var RAW = [
+" 4 -1 -2 -2  0 -1 -1  0 -2 -1 -1 -1 -1 -2 -1  1  0 -3 -2  0 -2 -1  0 -4",
+"-1  5  0 -2 -3  1  0 -2  0 -3 -2  2 -1 -3 -2 -1 -1 -3 -2 -3 -1  0 -1 -4",
+"-2  0  6  1 -3  0  0  0  1 -3 -3  0 -2 -3 -2  1  0 -4 -2 -3  3  0 -1 -4",
+"-2 -2  1  6 -3  0  2 -1 -1 -3 -4 -1 -3 -3 -1  0 -1 -4 -3 -3  4  1 -1 -4",
+" 0 -3 -3 -3  9 -3 -4 -3 -3 -1 -1 -3 -1 -2 -3 -1 -1 -2 -2 -1 -3 -3 -2 -4",
+"-1  1  0  0 -3  5  2 -2  0 -3 -2  1  0 -3 -1  0 -1 -2 -1 -2  0  3 -1 -4",
+"-1  0  0  2 -4  2  5 -2  0 -3 -3  1 -2 -3 -1  0 -1 -3 -2 -2  1  4 -1 -4",
+" 0 -2  0 -1 -3 -2 -2  6 -2 -4 -4 -2 -3 -3 -2  0 -2 -2 -3 -3 -1 -2 -1 -4",
+"-2  0  1 -1 -3  0  0 -2  8 -3 -3 -1 -2 -1 -2 -1 -2 -2  2 -3  0  0 -1 -4",
+"-1 -3 -3 -3 -1 -3 -3 -4 -3  4  2 -3  1  0 -3 -2 -1 -3 -1  3 -3 -3 -1 -4",
+"-1 -2 -3 -4 -1 -2 -3 -4 -3  2  4 -2  2  0 -3 -2 -1 -2 -1  1 -4 -3 -1 -4",
+"-1  2  0 -1 -3  1  1 -2 -1 -3 -2  5 -1 -3 -1  0 -1 -3 -2 -2  0  1 -1 -4",
+"-1 -1 -2 -3 -1  0 -2 -3 -2  1  2 -1  5  0 -2 -1 -1 -1 -1  1 -3 -1 -1 -4",
+"-2 -3 -3 -3 -2 -3 -3 -3 -1  0  0 -3  0  6 -4 -2 -2  1  3 -1 -3 -3 -1 -4",
+"-1 -2 -2 -1 -3 -1 -1 -2 -2 -3 -3 -1 -2 -4  7 -1 -1 -4 -3 -2 -2 -1 -2 -4",
+" 1 -1  1  0 -1  0  0  0 -1 -2 -2  0 -1 -2 -1  4  1 -3 -2 -2  0  0  0 -4",
+" 0 -1  0 -1 -1 -1 -1 -2 -2 -1 -1 -1 -1 -2 -1  1  5 -2 -2  0 -1 -1  0 -4",
+"-3 -3 -4 -4 -2 -2 -3 -2 -2 -3 -2 -3 -1  1 -4 -3 -2 11  2 -3 -4 -3 -2 -4",
+"-2 -2 -2 -3 -2 -1 -2 -3  2 -1 -1 -2 -1  3 -3 -2 -2  2  7 -1 -3 -2 -1 -4",
+" 0 -3 -3 -3 -1 -2 -2 -3 -3  3  1 -2  1 -1 -2 -2  0 -3 -1  4 -3 -2 -1 -4",
+"-2 -1  3  4 -3  0  1 -1  0 -3 -4  0 -3 -3 -2  0 -1 -4 -3 -3  4  1 -1 -4",
+"-1  0  0  1 -3  3  4 -2  0 -3 -3  1 -1 -3 -1  0 -1 -3 -2 -2  1  4 -1 -4",
+" 0 -1 -1 -1 -2 -1 -1 -1 -1 -1 -1 -1 -1 -1 -2  0  0 -2 -1 -1 -1 -1 -1 -4",
+"-4 -4 -4 -4 -4 -4 -4 -4 -4 -4 -4 -4 -4 -4 -4 -4 -4 -4 -4 -4 -4 -4 -4  1"
+];
+var IDX = {}, i, j;
+for(i=0;i<ORDER.length;i++) IDX[ORDER[i]] = i;
+var MAT = RAW.map(function(r){ return r.trim().split(/\s+/).map(Number); });
+function b62(a,b){
+  var x = IDX[a], y = IDX[b];
+  if(x===undefined) x = IDX["X"];
+  if(y===undefined) y = IDX["X"];
+  return MAT[x][y];
+}
+
+/* ---------- input ---------- */
+var DEFAULT_H = "MPHPRRYHSS-ERGSRGSYREHYRSRKHKRRRSRSWSSSSDRTRRRRREDSYHVRSRSSYDDRS---SDRRVYDRRYCGSYRRNDYSRDRGDAYYDTDYRHSYEYQRENSSYRSQRSSRRKHRRRRRRSRTFSRSSSQHSSRRAK-SVEDDAEGHLIYHVGDWLQERYEIVSTLGEGTFGRVVQCVDHRRGGARVALKIIKNVEKYKEAARLEINVLEKINEKDPDNKNLCVQMFDWFDYHGHMCISFELLGLSTFDFLKDNNYLPYPIHQVRHMAFQLCQAVKFLHDNKLTHTDLKPENILFVNSDYELTYNLEKKRDERSVKSTAVRVVDFGSATFDHEHHSTIVSTRHYRAPEVILELGWSQPCDVWSIGCIIFEYYVGFTLFQTHDNREHLAMMERILGPIPSRMIRKTRKQKYFYRGRLDWDENTSAGRYVRENCKPLRRYLTSEAEEHHQLFDLIESMLEYEPAKRLTLGEALQHPFFARLR-----AEPPNK----LWDSSRD----ISR";
+var DEFAULT_D = "MPRTRRLHHSRDRSSAGTRDKRRRHDTADHSPPLAEAPSPPRITNTHHTRSAAKRRRHELDAKKAQISKEPTFDDSISTRRRKERSKRSHRKSPAASRRQHKYRY-RDETS---HSSSRRRHRDRAKDERDSGRNNRQSQAKTAKPVIQDDADGHLIYHTGDILHHRYKIMATLGEGTFGRVVKVKDMER-DYCMALKIIKNVEKYREAAKLEINALEKIAQKDPHCDHLCVKMIDWFDYHGHMCIVFEMLGLSVFDFLRENNYEPYPLDQVRHMAYQLCYSVKFLHDNRLTHTDLKPENILFVDSDYTSHYNHKINREVRRVKNTDVRLIDFGSATFDHEHHSTIVSTRHYRAPEVILELGWSQPCDVWSIGCILFELYLGITLFQTHDNREHLAMMERILGQIPYRMARKT-KTKYFYHGKLDWDEKSSAGRYVRDHCKPLFLCQLSDSEDHCELFSLIKKMLEYEPSSRITLGEALHHPFFDRLPPHHRVGEVSNKQPLSSGSSSRERSHSLSR";
+
+function wrap(s,n){ var out=[]; for(var k=0;k<s.length;k+=n) out.push(s.slice(k,k+n)); return out.join("\n"); }
+var EXAMPLE = ">H. sap\n" + wrap(DEFAULT_H,60) + "\n>D. mel\n" + wrap(DEFAULT_D,60);
+
+/* FASTA headers can be a whole sentence; keep something a figure can carry. */
+function displayName(h){
+  h = h.trim();
+  var up = h.match(/^[a-z]{2}\|[^|]+\|(\S+)/i);      // sp|P49760|CLK2_HUMAN ...
+  if(up) return up[1];
+  var bin = h.match(/^([A-Z]\.\s*[a-z]+)/);          // "M. musculus ACC" -> "M. musculus"
+  if(bin) return bin[1];
+  if(h.length > 24) return h.split(/\s+/)[0].slice(0, 24);
+  return h;
+}
+
+function parseFasta(text){
+  var lines = text.split(/\r?\n/), recs = [], cur = null, anon = 0;
+  for(var k=0;k<lines.length;k++){
+    var ln = lines[k];
+    if(/^\s*>/.test(ln)){
+      var raw = ln.replace(/^\s*>\s*/,"").trim();
+      cur = { name: displayName(raw) || ("Seq " + (recs.length+1)), full: raw, seq: "" };
+      recs.push(cur);
+    } else if(ln.trim()){
+      if(!cur){ anon++; cur = { name: "Seq " + anon, seq: "" }; recs.push(cur); }
+      cur.seq += ln.replace(/[^A-Za-z\-.*]/g,"").toUpperCase().replace(/[.]/g,"-");
+    } else { cur = null; }
+  }
+  return recs.filter(function(r){ return r.seq.length; });
+}
+
+/* ---------- Needleman-Wunsch, affine (Gotoh) ---------- */
+function align(a, b, go, ge){
+  var n=a.length, m=b.length, NEG=-1e9;
+  var w=m+1;
+  var M=new Float64Array((n+1)*w), X=new Float64Array((n+1)*w), Y=new Float64Array((n+1)*w);
+  var pM=new Uint8Array((n+1)*w), pX=new Uint8Array((n+1)*w), pY=new Uint8Array((n+1)*w);
+  M.fill(NEG); X.fill(NEG); Y.fill(NEG);
+  M[0]=0;
+  for(var i2=1;i2<=n;i2++){ X[i2*w] = -go-(i2-1)*ge; pX[i2*w]=1; }
+  for(var j2=1;j2<=m;j2++){ Y[j2] = -go-(j2-1)*ge; pY[j2]=2; }
+  for(var i=1;i<=n;i++){
+    var ro=i*w, po=(i-1)*w, ai=a[i-1];
+    for(var j=1;j<=m;j++){
+      var d=po+j-1, s=b62(ai,b[j-1]);
+      var mM=M[d], mX=X[d], mY=Y[d], best=mM, st=0;
+      if(mX>best){best=mX;st=1;}
+      if(mY>best){best=mY;st=2;}
+      M[ro+j]=best+s; pM[ro+j]=st;
+      var u=po+j;
+      var o0=M[u]-go, o1=X[u]-ge, o2=Y[u]-go, bx=o0, sx=0;
+      if(o1>bx){bx=o1;sx=1;}
+      if(o2>bx){bx=o2;sx=2;}
+      X[ro+j]=bx; pX[ro+j]=sx;
+      var l=ro+j-1;
+      var q0=M[l]-go, q1=X[l]-go, q2=Y[l]-ge, by=q0, sy=0;
+      if(q1>by){by=q1;sy=1;}
+      if(q2>by){by=q2;sy=2;}
+      Y[ro+j]=by; pY[ro+j]=sy;
+    }
+  }
+  var ii=n, jj=m, e=n*w+m, cur=0, sc=M[e];
+  if(X[e]>sc){sc=X[e];cur=1;}
+  if(Y[e]>sc){sc=Y[e];cur=2;}
+  var A=[], B=[];
+  while(ii>0 || jj>0){
+    if(ii===0) cur=2; else if(jj===0) cur=1;
+    var p=ii*w+jj, nxt;
+    if(cur===0){ nxt=pM[p]; A.push(a[--ii]); B.push(b[--jj]); }
+    else if(cur===1){ nxt=pX[p]; A.push(a[--ii]); B.push("-"); }
+    else { nxt=pY[p]; A.push("-"); B.push(b[--jj]); }
+    cur=nxt;
+  }
+  return { a:A.reverse().join(""), b:B.reverse().join(""), score:sc };
+}
+
+/* ---------- classification: the published rule ---------- */
+function classify(rows, thr, mode){
+  var L = rows[0].seq.length, N = rows.length, out = [], r, c;
+  for(r=0;r<N;r++) out.push(new Array(L).fill(0));
+
+  for(c=0;c<L;c++){
+    if(mode === "column"){
+      // one verdict for the whole column: every pair must qualify
+      var col = [], gap = false;
+      for(r=0;r<N;r++){
+        var ch = rows[r].seq[c];
+        if(ch === "-"){ gap = true; break; }
+        col.push(ch);
+      }
+      if(gap) continue;                                   // gap anywhere -> unmarked
+      var same = true;
+      for(var k=1;k<col.length;k++) if(col[k] !== col[0]){ same = false; break; }
+      var v;
+      if(same) v = 2;
+      else {
+        var ok = true;
+        outer: for(var x=0;x<col.length;x++)
+          for(var y=x+1;y<col.length;y++)
+            if(b62(col[x],col[y]) < thr){ ok = false; break outer; }
+        v = ok ? 1 : 0;
+      }
+      for(r=0;r<N;r++) out[r][c] = v;
+      continue;
+    }
+
+    // per-residue mode: every cell is judged against sequence 1
+    var target = rows[0].seq[c];
+    if(target === "-") continue;                           // nothing to compare against
+
+    var bestSeen = 0;
+    for(r=0;r<N;r++){
+      var res = rows[r].seq[c];
+      if(res === "-") continue;
+      if(r === 0) continue;                               // reference row scored below
+      var val = (res === target) ? 2 : (b62(res, target) >= thr ? 1 : 0);
+      out[r][c] = val;
+      if(val > bestSeen) bestSeen = val;
+    }
+    out[0][c] = bestSeen;                                 // reference takes its column's best
+  }
+  return out;
+}
+
+/* Per-column summary of a per-cell classification, for the strip. */
+function columnMax(cls){
+  var L = cls[0].length, out = new Array(L).fill(0);
+  for(var c=0;c<L;c++)
+    for(var r=0;r<cls.length;r++)
+      if(cls[r][c] > out[c]) out[c] = cls[r][c];
+  return out;
+}
+
+/* ---------- layout -> drawing ops ---------- */
+var C_IDENT="#DC0806", C_SIM="#FE6B00", C_INK="#231F20", C_ANN="#2E3192";
+var FONTS = {
+  arial:     'Arial, Helvetica, sans-serif',
+  courier:   "'Courier New', Courier, monospace"
+};
+
+/* Rough advance width; good enough to decide whether two labels collide. */
+function textW(str, size, bold){ return String(str).length * size * (bold ? 0.60 : 0.55); }
+
+/* Greedy row packing: each item keeps .row, sharing a row where they don't touch. */
+function packRows(items, gap){
+  var rowEnd = [];
+  items.forEach(function(it){
+    for(var i=0;i<rowEnd.length;i++){
+      if(it.x0 >= rowEnd[i] + gap){ it.row = i; rowEnd[i] = it.x1; return; }
+    }
+    it.row = rowEnd.length; rowEnd.push(it.x1);
+  });
+  return rowEnd.length;
+}
+
+/* Tick interval that lands roughly every `targetPx` across the drawing. */
+function niceStep(L, W, targetPx){
+  var raw = targetPx * L / W, nice = [1,2,5,10,20,25,50,100,200,250,500,1000,2000,2500,5000];
+  for(var i=0;i<nice.length;i++) if(nice[i] >= raw) return nice[i];
+  return nice[nice.length-1];
+}
+
+/* Condensed whole-alignment bar: one thin stripe per column. */
+function buildStripOps(cls, opt){
+  var W = opt.stripW, H = 28, L = cls.length, cw = W / L, ops = [], y = 0;
+
+  [[C_IDENT, "Identical amino acids"], [C_SIM, "Complementary amino acid substitutions"]]
+    .forEach(function(row){
+      ops.push({t:"rect", x:0, y:y, w:11, h:11, fill:row[0]});
+      ops.push({t:"text", x:16, y:y+5.5, s:row[1], fill:C_INK, size:11});
+      y += 15;
+    });
+  y += 8;
+
+  if(opt.annots.length){
+    var items = opt.annots.map(function(an){
+      var bx0 = an.start*cw, bx1 = (an.end+1)*cw, mid = (bx0+bx1)/2,
+          lw = textW(an.label, 11, true);
+      return { bx0:bx0, bx1:bx1, mid:mid, label:an.label,
+               x0:Math.min(bx0, mid-lw/2), x1:Math.max(bx1, mid+lw/2) };
+    }).sort(function(a,b){ return a.x0 - b.x0; });
+    var nRows = packRows(items, 10);
+    items.forEach(function(it){
+      var ay = y + it.row*21;
+      ops.push({t:"text", x:it.mid, y:ay+6, s:it.label, fill:C_INK, size:11, weight:700, anchor:"middle"});
+      ops.push({t:"line", x1:it.bx0, y1:ay+15, x2:it.bx1, y2:ay+15, stroke:C_ANN, w:2.2});
+    });
+    y += nRows*21;
+  }
+
+  ops.push({t:"rect", x:0, y:y, w:W, h:H, fill:"#FFFFFF"});
+  for(var c=0;c<L;c++){
+    if(!cls[c]) continue;
+    ops.push({t:"rect", x:c*cw, y:y, w:Math.max(cw,0.55), h:H, fill: cls[c]===2?C_IDENT:C_SIM});
+  }
+  ops.push({t:"rect", x:0, y:y, w:W, h:H, fill:"none", stroke:C_INK, sw:1.2});
+
+  // residue scale beneath the bar
+  var step = niceStep(L, W, 58), sy = y + H;
+  for(var pos=step; pos<=L; pos+=step){
+    var px = (pos-0.5)*cw;
+    ops.push({t:"line", x1:px, y1:sy, x2:px, y2:sy+4, stroke:C_INK, w:1});
+    ops.push({t:"text", x:px, y:sy+11.5, s:String(pos), fill:C_INK, size:9.5, anchor:"middle"});
+  }
+  y = sy + 17;
+
+  return { ops:ops, width:Math.ceil(W)+12, height:Math.ceil(y), labelFont:opt.labelFont };
+}
+
+/* Condensed overview with one bar per sequence, sharing a scale and annotations. */
+function buildRowStripOps(rows, cls, opt){
+  var W = opt.stripW, L = cls[0].length, cw = W / L, N = rows.length;
+  var labelW = 10 + Math.max.apply(null, rows.map(function(r){ return r.name.length; })) * 5.4;
+  var ops = [], y = 0, rowH = 16, gap = 3;
+
+  [[C_IDENT, "Identical amino acids"], [C_SIM, "Complementary amino acid substitutions"]]
+    .forEach(function(row){
+      ops.push({t:"rect", x:labelW, y:y, w:11, h:11, fill:row[0]});
+      ops.push({t:"text", x:labelW+16, y:y+5.5, s:row[1], fill:C_INK, size:11});
+      y += 15;
+    });
+  y += 8;
+
+  if(opt.annots.length){
+    var items = opt.annots.map(function(an){
+      var bx0 = labelW + an.start*cw, bx1 = labelW + (an.end+1)*cw, mid = (bx0+bx1)/2,
+          lw = textW(an.label, 11, true);
+      return { bx0:bx0, bx1:bx1, mid:mid, label:an.label,
+               x0:Math.min(bx0, mid-lw/2), x1:Math.max(bx1, mid+lw/2) };
+    }).sort(function(a,b){ return a.x0 - b.x0; });
+    var nRows = packRows(items, 10);
+    items.forEach(function(it){
+      var ay = y + it.row*21;
+      ops.push({t:"text", x:it.mid, y:ay+6, s:it.label, fill:C_INK, size:11, weight:700, anchor:"middle"});
+      ops.push({t:"line", x1:it.bx0, y1:ay+15, x2:it.bx1, y2:ay+15, stroke:C_ANN, w:2.2});
+    });
+    y += nRows*21;
+  }
+
+  for(var r=0;r<N;r++){
+    var by = y + r*(rowH+gap);
+    ops.push({t:"text", x:labelW-6, y:by+rowH/2, s:rows[r].name, fill:C_INK,
+              size:9.5, anchor:"end", italic:true});
+    ops.push({t:"rect", x:labelW, y:by, w:W, h:rowH, fill:"#FFFFFF"});
+    for(var c=0;c<L;c++){
+      var k = cls[r][c];
+      if(!k) continue;
+      ops.push({t:"rect", x:labelW+c*cw, y:by, w:Math.max(cw,0.55), h:rowH,
+                fill: k===2 ? C_IDENT : C_SIM});
+    }
+    ops.push({t:"rect", x:labelW, y:by, w:W, h:rowH, fill:"none", stroke:C_INK, sw:1});
+  }
+  y += N*(rowH+gap) - gap;
+
+  var step = niceStep(L, W, 58), sy = y;
+  for(var pos=step; pos<=L; pos+=step){
+    var px = labelW + (pos-0.5)*cw;
+    ops.push({t:"line", x1:px, y1:sy, x2:px, y2:sy+4, stroke:C_INK, w:1});
+    ops.push({t:"text", x:px, y:sy+11.5, s:String(pos), fill:C_INK, size:9.5, anchor:"middle"});
+  }
+  y = sy + 17;
+
+  return { ops:ops, width:Math.ceil(labelW+W)+12, height:Math.ceil(y), labelFont:opt.labelFont };
+}
+
+function buildOps(rows, cls, opt){
+  var ops=[], perLine=opt.perLine, cw=opt.cellW, rh=Math.round(cw*1.65),
+      labelW=opt.labelW, numW=opt.showNums?38:6, L=rows[0].seq.length,
+      fs=Math.max(6, cw*1.18), N=rows.length;
+  var C0 = opt.c0 || 0, C1 = (opt.c1 == null ? L-1 : opt.c1);
+  var gridW = perLine*cw, width = labelW + gridW + numW, y = 0;
+
+  if(opt.title){
+    ops.push({t:"text", x:0, y:12, s:opt.title, fill:C_INK, size:12, weight:700});
+    y = 30;
+  }
+  // residue numbering must continue from whatever precedes the region
+  var counts = rows.map(function(r){
+    var n = 0;
+    for(var c = 0; c < C0; c++) if(r.seq[c] !== "-") n++;
+    return n;
+  });
+
+  for(var start=C0; start<=C1; start+=perLine){
+    var end = Math.min(start+perLine, C1+1), span = end-start;
+
+    // every annotation overlapping this block, packed onto as few rows as fit
+    var here = [];
+    for(var ai=0; ai<opt.annots.length; ai++){
+      var an = opt.annots[ai];
+      if(an.end < start || an.start >= end) continue;
+      var s0 = Math.max(an.start, start), s1 = Math.min(an.end, end-1);
+      var bx0 = labelW + (s0-start)*cw, bx1 = labelW + (s1-start+1)*cw;
+      here.push({ bx0:bx0, bx1:bx1, label:an.label,
+                  x0:bx0, x1:Math.max(bx1, bx0 + textW(an.label, 9.5, true)) });
+    }
+    if(here.length){
+      here.sort(function(a,b){ return a.x0 - b.x0; });
+      var aRows = packRows(here, 8);
+      here.forEach(function(it){
+        var ay = y + it.row*20;
+        ops.push({t:"text", x:it.bx0, y:ay+8, s:it.label, fill:C_INK, size:9.5, weight:600});
+        ops.push({t:"line", x1:it.bx0, y1:ay+13, x2:it.bx1, y2:ay+13, stroke:C_INK, w:1.1});
+      });
+      y += aRows*20;
+    }
+
+    // position ruler: alignment-column numbers every `opt.rulerStep`
+    if(opt.ruler){
+      var step = opt.rulerStep, ts = Math.max(6, fs*0.82);
+      for(var pos = Math.ceil((start+1)/step)*step; pos <= end; pos += step){
+        var px = labelW + (pos-1-start)*cw + cw/2;
+        ops.push({t:"text", x:px, y:y+5, s:String(pos), fill:C_INK, size:ts, anchor:"middle"});
+        ops.push({t:"line", x1:px, y1:y+11, x2:px, y2:y+16, stroke:C_INK, w:1});
+      }
+      ops.push({t:"line", x1:labelW, y1:y+16, x2:labelW+span*cw, y2:y+16, stroke:C_INK, w:1});
+      y += 20;
+    }
+
+    for(var r=0;r<N;r++){
+      var seq = rows[r].seq, ry = y + r*rh;
+      ops.push({t:"text", x:labelW-6, y:ry+rh/2, s:rows[r].name, fill:C_INK,
+                size:Math.max(6,fs*0.82), anchor:"end", italic:true});
+      for(var c=start;c<end;c++){
+        var k = cls[r][c], cx = labelW + (c-start)*cw;
+        if(k) ops.push({t:"rect", x:cx, y:ry, w:cw, h:rh, fill: k===2?C_IDENT:C_SIM});
+        var ch = seq[c];
+        if(ch !== "-") counts[r]++;
+        ops.push({t:"text", x:cx+cw/2, y:ry+rh/2, s:ch,
+                fill: (k && opt.whiteText) ? "#FFFFFF" : C_INK,
+                size:fs, anchor:"middle",
+                font: opt.font, weight: opt.bold ? 700 : undefined});
+      }
+      if(opt.showNums)
+        ops.push({t:"text", x:labelW+span*cw+8, y:ry+rh/2, s:String(counts[r]),
+                  fill:C_INK, size:Math.max(6,fs*0.82)});
+    }
+    y += N*rh + Math.round(rh*1.7);
+  }
+  return { ops:ops, width:Math.ceil(width), height:Math.ceil(y),
+           font:opt.font, labelFont:opt.labelFont };
+}
+
+function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+
+function toSVG(d, pad, withBg){
+  var W = d.width + pad*2, H = d.height + pad*2, p = [];
+  p.push('<svg xmlns="http://www.w3.org/2000/svg" width="'+W+'" height="'+H+'" viewBox="0 0 '+W+' '+H+'" font-family="'+(d.labelFont||FONTS.arial)+'">');
+  if(withBg) p.push('<rect x="0" y="0" width="'+W+'" height="'+H+'" fill="#FFFFFF"/>');
+  p.push('<g transform="translate('+pad+','+pad+')" shape-rendering="crispEdges">');
+  d.ops.forEach(function(o){
+    if(o.t==="rect")
+      p.push('<rect x="'+o.x.toFixed(2)+'" y="'+o.y.toFixed(2)+'" width="'+o.w.toFixed(2)+'" height="'+o.h.toFixed(2)+'" fill="'+o.fill+'"'
+        + (o.stroke?' stroke="'+o.stroke+'" stroke-width="'+(o.sw||1)+'"':'') + '/>');
+    else if(o.t==="line")
+      p.push('<line x1="'+o.x1.toFixed(2)+'" y1="'+o.y1.toFixed(2)+'" x2="'+o.x2.toFixed(2)+'" y2="'+o.y2.toFixed(2)+'" stroke="'+o.stroke+'" stroke-width="'+o.w+'"/>');
+    else
+      p.push('<text x="'+o.x.toFixed(2)+'" y="'+o.y.toFixed(2)+'" fill="'+o.fill+'" font-size="'+o.size+'"'
+        + (o.font?' font-family="'+o.font+'"':'')
+        + (o.weight?' font-weight="'+o.weight+'"':'')
+        + (o.italic?' font-style="italic"':'')
+        + (o.anchor?' text-anchor="'+o.anchor+'"':'')
+        + ' dominant-baseline="central" shape-rendering="auto" xml:space="preserve">'+esc(o.s)+'</text>');
+  });
+  p.push('</g></svg>');
+  return p.join("");
+}
+
+function toCanvas(d, pad, scale){
+  var cv = document.createElement("canvas");
+  cv.width = Math.ceil((d.width+pad*2)*scale);
+  cv.height = Math.ceil((d.height+pad*2)*scale);
+  var g = cv.getContext("2d");
+  g.fillStyle = "#FFFFFF"; g.fillRect(0,0,cv.width,cv.height);
+  g.scale(scale, scale); g.translate(pad, pad);
+  g.textBaseline = "middle";
+  d.ops.forEach(function(o){
+    if(o.t==="rect"){
+      if(o.fill && o.fill!=="none"){ g.fillStyle=o.fill; g.fillRect(o.x,o.y,o.w,o.h); }
+      if(o.stroke){ g.strokeStyle=o.stroke; g.lineWidth=o.sw||1; g.strokeRect(o.x,o.y,o.w,o.h); }
+    }
+    else if(o.t==="line"){ g.strokeStyle=o.stroke; g.lineWidth=o.w;
+      g.beginPath(); g.moveTo(o.x1,o.y1); g.lineTo(o.x2,o.y2); g.stroke(); }
+    else {
+      g.fillStyle=o.fill;
+      g.font = (o.italic?"italic ":"") + (o.weight||400) + " " + o.size + "px " + (o.font||d.labelFont||FONTS.arial);
+      g.textAlign = o.anchor==="end" ? "right" : (o.anchor==="middle" ? "center" : "left");
+      g.fillText(o.s, o.x, o.y);
+    }
+  });
+  return cv;
+}
+
+/* ---------- aligning a region rather than trimming to it ---------- */
+
+/* Semi-global: every residue of `short` must be placed, but the flanks of
+   `long` are free. Used to find where a domain sits in each orthologue,
+   which is more reliable than aligning full length and cropping when the
+   sequences diverge outside the domain. */
+function semiGlobal(short, long, go, ge){
+  var n = short.length, m = long.length, NEG = -1e9, w = m + 1;
+  var M = new Float64Array((n+1)*w), X = new Float64Array((n+1)*w), Y = new Float64Array((n+1)*w);
+  var pM = new Uint8Array((n+1)*w), pX = new Uint8Array((n+1)*w), pY = new Uint8Array((n+1)*w);
+  M.fill(NEG); X.fill(NEG); Y.fill(NEG);
+  M[0] = 0;
+  for(var i2 = 1; i2 <= n; i2++){ X[i2*w] = -go - (i2-1)*ge; pX[i2*w] = 1; }
+  for(var j2 = 1; j2 <= m; j2++){ Y[j2] = 0; pY[j2] = 2; }   // free leading flank
+
+  for(var i = 1; i <= n; i++){
+    var ro = i*w, po = (i-1)*w, ai = short[i-1];
+    for(var j = 1; j <= m; j++){
+      var d = po + j - 1, sc = b62(ai, long[j-1]);
+      var best = M[d], st = 0;
+      if(X[d] > best){ best = X[d]; st = 1; }
+      if(Y[d] > best){ best = Y[d]; st = 2; }
+      M[ro+j] = best + sc; pM[ro+j] = st;
+      var u = po + j;
+      var o0 = M[u]-go, o1 = X[u]-ge, o2 = Y[u]-go, bx = o0, sx = 0;
+      if(o1 > bx){ bx = o1; sx = 1; }
+      if(o2 > bx){ bx = o2; sx = 2; }
+      X[ro+j] = bx; pX[ro+j] = sx;
+      var l = ro + j - 1;
+      var q0 = M[l]-go, q1 = X[l]-go, q2 = Y[l]-ge, by = q0, sy = 0;
+      if(q1 > by){ by = q1; sy = 1; }
+      if(q2 > by){ by = q2; sy = 2; }
+      Y[ro+j] = by; pY[ro+j] = sy;
+    }
+  }
+  // best end anywhere along the last row: the trailing flank is free
+  var bj = m, cur = 0, bv = -Infinity;
+  for(var j3 = 0; j3 <= m; j3++){
+    var p3 = n*w + j3;
+    if(M[p3] > bv){ bv = M[p3]; bj = j3; cur = 0; }
+    if(X[p3] > bv){ bv = X[p3]; bj = j3; cur = 1; }
+    if(Y[p3] > bv){ bv = Y[p3]; bj = j3; cur = 2; }
+  }
+  var A = [], B = [], ii = n, jj = bj;
+  while(ii > 0){
+    var p = ii*w + jj, nxt;
+    if(cur === 0){ nxt = pM[p]; A.push(short[--ii]); B.push(long[--jj]); }
+    else if(cur === 1){ nxt = pX[p]; A.push(short[--ii]); B.push("-"); }
+    else { nxt = pY[p]; A.push("-"); B.push(long[--jj]); }
+    cur = nxt;
+  }
+  return { a:A.reverse().join(""), b:B.reverse().join(""), score:bv, start:jj + 1, end:bj };
+}
+
+/* Star alignment anchored on a sub-region of sequence 1. */
+function starAlignRegion(seqs, from, to, go, ge){
+  var ref = seqs[0].replace(/-/g, "").slice(from - 1, to);
+  var msa = [ref];
+  for(var i = 1; i < seqs.length; i++){
+    var pw = semiGlobal(ref, seqs[i].replace(/-/g, ""), go, ge);
+    var rows = [], fresh = "", p = 0, q = 0, r;
+    for(r = 0; r < msa.length; r++) rows.push("");
+    while(p < msa[0].length || q < pw.a.length){
+      if(p >= msa[0].length){
+        for(r = 0; r < msa.length; r++) rows[r] += "-";
+        fresh += pw.b[q]; q++; continue;
+      }
+      if(q >= pw.a.length){
+        for(r = 0; r < msa.length; r++) rows[r] += msa[r][p];
+        fresh += "-"; p++; continue;
+      }
+      var inBlock = msa[0][p] === "-", inPair = pw.a[q] === "-";
+      if(inBlock && !inPair){
+        for(r = 0; r < msa.length; r++) rows[r] += msa[r][p];
+        fresh += "-"; p++;
+      } else if(!inBlock && inPair){
+        for(r = 0; r < msa.length; r++) rows[r] += "-";
+        fresh += pw.b[q]; q++;
+      } else {
+        for(r = 0; r < msa.length; r++) rows[r] += msa[r][p];
+        fresh += pw.b[q]; p++; q++;
+      }
+    }
+    msa = rows.concat([fresh]);
+  }
+  return msa;
+}
+
+/* ---------- conservation statistics ---------- */
+
+/* Henikoff position-based weights: a sequence in a crowded clade counts for
+   less, so ten mammals do not outvote one sponge. */
+function henikoffWeights(rows){
+  var N = rows.length, L = rows[0].seq.length, w = new Array(N).fill(0), i, c;
+  for(c = 0; c < L; c++){
+    var counts = {}, distinct = 0;
+    for(i = 0; i < N; i++){
+      var a = rows[i].seq[c];
+      if(a === "-") continue;
+      if(!counts[a]){ counts[a] = 0; distinct++; }
+      counts[a]++;
+    }
+    if(!distinct) continue;
+    for(i = 0; i < N; i++){
+      var b = rows[i].seq[c];
+      if(b === "-") continue;
+      w[i] += 1 / (distinct * counts[b]);
+    }
+  }
+  var tot = w.reduce(function(x, y){ return x + y; }, 0) || 1;
+  return w.map(function(x){ return x / tot * N; });   // mean weight 1
+}
+
+/* Weighted share of sequences carrying the commonest residue, per column. */
+function columnConservation(rows, weights){
+  var N = rows.length, L = rows[0].seq.length, out = new Array(L);
+  for(var c = 0; c < L; c++){
+    var byRes = {}, tot = 0;
+    for(var i = 0; i < N; i++){
+      var a = rows[i].seq[c];
+      if(a === "-") continue;
+      byRes[a] = (byRes[a] || 0) + weights[i];
+      tot += weights[i];
+    }
+    if(!tot){ out[c] = null; continue; }        // all-gap column: no information
+    var best = 0;
+    for(var k in byRes) if(byRes[k] > best) best = byRes[k];
+    out[c] = best / tot;
+  }
+  return out;
+}
+
+function normCdf(x){
+  var t = 1 / (1 + 0.2316419 * x), d = 0.3989422804014327 * Math.exp(-x*x/2);
+  return 1 - d*t*(0.319381530 + t*(-0.356563782 + t*(1.781477937 +
+                  t*(-1.821255978 + t*1.330274429))));
+}
+
+/* Mann-Whitney U with a tie correction, which matters: conservation values
+   are heavily tied at 1. */
+function mannWhitney(a, b){
+  var n1 = a.length, n2 = b.length, n = n1 + n2;
+  if(!n1 || !n2) return null;
+  var all = a.map(function(v){ return {v:v, g:0}; })
+             .concat(b.map(function(v){ return {v:v, g:1}; }));
+  all.sort(function(x, y){ return x.v - y.v; });
+  var ranks = new Array(n), tieTerm = 0, i = 0;
+  while(i < n){
+    var j = i;
+    while(j + 1 < n && all[j+1].v === all[i].v) j++;
+    var r = (i + j) / 2 + 1, t = j - i + 1;
+    for(var k = i; k <= j; k++) ranks[k] = r;
+    tieTerm += t*t*t - t;
+    i = j + 1;
+  }
+  var R1 = 0;
+  for(k = 0; k < n; k++) if(all[k].g === 0) R1 += ranks[k];
+  var U = R1 - n1*(n1+1)/2;
+  var mu = n1*n2/2;
+  var sd = Math.sqrt((n1*n2/12) * ((n + 1) - tieTerm/(n*(n-1))));
+  if(!sd) return null;
+  var z = (U - mu) / sd;
+  return { U:U, z:z, p:2 * (1 - normCdf(Math.abs(z))), n1:n1, n2:n2 };
+}
+
+function mean(a){ return a.length ? a.reduce(function(x, y){ return x + y; }, 0) / a.length : 0; }
+function sd(a){
+  if(a.length < 2) return 0;
+  var m = mean(a);
+  return Math.sqrt(a.reduce(function(s, v){ return s + (v-m)*(v-m); }, 0) / (a.length - 1));
+}
+
+function renderConservation(recs, reg){
+  var box = $("consPanel");
+  if(recs.length < 3){ box.hidden = true; return; }
+  box.hidden = false;
+
+  var weights = henikoffWeights(recs);
+  var cons = columnConservation(recs, weights);
+  var inReg = [], outReg = [];
+  for(var c = 0; c < cons.length; c++){
+    if(cons[c] === null) continue;
+    if(reg && c >= reg.c0 && c <= reg.c1) inReg.push(cons[c]);
+    else outReg.push(cons[c]);
+  }
+
+  var rows = [];
+  if(reg && inReg.length && outReg.length){
+    var mw = mannWhitney(inReg, outReg);
+    var pTxt = mw ? (mw.p < 1e-4 ? "p < 0.0001" : "p = " + mw.p.toFixed(4)) : "n/a";
+    rows.push(["Region " + reg.from + "-" + reg.to,
+               (100*mean(inReg)).toFixed(1) + "%", "± " + (100*sd(inReg)).toFixed(1) + ", n = " + inReg.length]);
+    rows.push(["Rest of the protein",
+               (100*mean(outReg)).toFixed(1) + "%", "± " + (100*sd(outReg)).toFixed(1) + ", n = " + outReg.length]);
+    rows.push(["Difference",
+               ((100*(mean(inReg) - mean(outReg))) >= 0 ? "+" : "") +
+               (100*(mean(inReg) - mean(outReg))).toFixed(1) + " pts",
+               mw ? pTxt + " (Mann-Whitney)" : ""]);
+  } else {
+    rows.push(["Whole alignment", (100*mean(inReg.concat(outReg))).toFixed(1) + "%",
+               "± " + (100*sd(inReg.concat(outReg))).toFixed(1) +
+               ", n = " + (inReg.length + outReg.length)]);
+    rows.push(["", "", "select a region to test it against the rest"]);
+  }
+
+  var wr = weights.map(function(x, i){ return { n:recs[i].name, w:x }; })
+                  .sort(function(x, y){ return y.w - x.w; });
+  var wTxt = wr.slice(0, 3).map(function(x){ return esc(x.n) + " " + x.w.toFixed(2); }).join(", ") +
+             " … " + wr.slice(-1).map(function(x){ return esc(x.n) + " " + x.w.toFixed(2); }).join("");
+
+  $("consTable").innerHTML = rows.map(function(r){
+    return '<div class="crow"><span class="ck">' + esc(r[0]) + '</span>' +
+           '<span class="cv">' + esc(r[1]) + '</span>' +
+           '<span class="cd">' + esc(r[2]) + "</span></div>";
+  }).join("");
+  $("consNote").innerHTML =
+    "Conservation is the Henikoff-weighted share of sequences carrying the commonest residue, " +
+    "so a crowded clade does not outvote a lone outgroup. Weights: " + wTxt + ".";
+}
+
+/* ---------- finding a protein, and resolving its accession ---------- */
+
+var hits = [];
+
+function setSearchStatus(m){ $("searchStatus").textContent = m || ""; }
+
+function searchProtein(q){
+  q = (q || "").trim();
+  if(!q) return setSearchStatus("type a protein or gene name");
+  setSearchStatus("searching UniProt...");
+  hits = [];
+  fetch("https://rest.uniprot.org/uniprotkb/search?query=" + encodeURIComponent(q) +
+        "&fields=accession,id,protein_name,organism_name,length,reviewed&format=json&size=25")
+    .then(function(r){ return r.json(); })
+    .then(function(d){
+      hits = (d.results || []).map(function(e){
+        var pd = e.proteinDescription || {};
+        var nm = ((pd.recommendedName || {}).fullName || {}).value;
+        if(!nm && (pd.submissionNames || []).length) nm = pd.submissionNames[0].fullName.value;
+        return { acc:e.primaryAccession, id:e.uniProtkbId || "",
+                 name:nm || "", org:(e.organism || {}).scientificName || "",
+                 len:(e.sequence || {}).length || "",
+                 reviewed:String(e.entryType || "").indexOf("Swiss") > -1 };
+      });
+      hits.sort(function(a, b){ return (b.reviewed ? 1 : 0) - (a.reviewed ? 1 : 0); });
+      renderHits();
+      setSearchStatus(hits.length ? hits.length + " entries" : "nothing found for " + q);
+    })
+    .catch(function(){ setSearchStatus("search failed"); });
+}
+
+function renderHits(){
+  var box = $("hitList");
+  if(!hits.length){ box.innerHTML = '<p class="hint">no results</p>'; return; }
+  box.innerHTML = hits.map(function(h, i){
+    return '<label class="hrow">' +
+      '<input type="checkbox" data-hit="' + i + '"' + (i === 0 ? " checked" : "") + ">" +
+      '<span class="hid">' + esc(h.id || h.acc) + "</span>" +
+      '<span class="hn">' + esc(h.name.slice(0, 40)) + "</span>" +
+      '<span class="ho">' + esc(h.org.slice(0, 26)) + "</span>" +
+      '<span class="hx">' + (h.reviewed ? "SP" : "TR") + " \u00B7 " + h.len + " aa</span>" +
+    "</label>";
+  }).join("");
+}
+
+/* Records currently in the box, so duplicates can be refused and single
+   sequences removed without editing FASTA by hand. */
+function currentRecords(){
+  return parseFasta($("fasta").value).map(function(r, i){
+    return { i:i, name:r.name, acc:guessAcc(r.full || r.name), key:r.seq.replace(/-/g, "").toUpperCase() };
+  });
+}
+
+function writeRecords(recs){
+  $("fasta").value = recs.map(function(r){
+    return ">" + (r.full || r.name) + "\n" + wrap(r.seq, 60);
+  }).join("\n");
+}
+
+function removeSequence(i){
+  var recs = parseFasta($("fasta").value);
+  recs.splice(i, 1);
+  writeRecords(recs);
+  render();
+}
+
+function renderSeqList(){
+  var box = $("seqList"); if(!box) return;
+  var recs = parseFasta($("fasta").value);   // the box, not the last good render
+  if(!recs.length){ box.innerHTML = ""; return; }
+  box.innerHTML = recs.map(function(r, i){
+    return '<span class="sqchip">' + esc(r.name) +
+      '<button type="button" data-rm="' + i + '" title="remove">\u00D7</button></span>';
+  }).join("");
+  box.querySelectorAll("[data-rm]").forEach(function(b){
+    b.addEventListener("click", function(){ removeSequence(+b.dataset.rm); });
+  });
+}
+
+function loadTickedProteins(){
+  var picked = [];
+  document.querySelectorAll("#hitList [data-hit]").forEach(function(cb){
+    if(cb.checked) picked.push(hits[+cb.dataset.hit]);
+  });
+  if(!picked.length) return setSearchStatus("tick at least one entry");
+  setSearchStatus("loading " + picked.length + "...");
+  var wasEmpty = !$("fasta").value.trim();
+  Promise.all(picked.map(function(h){
+    return fetch("https://rest.uniprot.org/uniprotkb/" + h.acc + ".fasta")
+      .then(function(r){ return r.ok ? r.text() : ""; })
+      .catch(function(){ return ""; });
+  })).then(function(texts){
+    var have = {};
+    currentRecords().forEach(function(r){ have[r.key] = 1; if(r.acc) have[r.acc] = 1; });
+    var dup = 0;
+    var got = texts.filter(function(t){ return t.trim(); }).map(function(t){ return t.trim(); })
+      .filter(function(t){
+        var seq = t.split(/\r?\n/).slice(1).join("").replace(/[^A-Za-z]/g, "").toUpperCase();
+        if(have[seq]){ dup++; return false; }
+        have[seq] = 1; return true;
+      });
+    var cur = $("fasta").value.trim();
+    $("fasta").value = (cur ? cur + "\n" : "") + got.join("\n");
+    window.__dupSkipped = dup;
+    if(wasEmpty){
+      var first = picked[0];
+      $("featAcc").value = first.acc;
+      $("figTitle").value = first.name ? first.name.split(/[,(]/)[0].trim() : (first.id || first.acc);
+    }
+    if(($("fasta").value.match(/^>/gm) || []).length > 1)
+      document.querySelector('input[name=mode][value=align]').checked = true;
+    setSearchStatus("loaded " + got.length + " of " + picked.length +
+      (window.__dupSkipped ? " (" + window.__dupSkipped + " already present)" : ""));
+    render();
+    if(wasEmpty) loadFeatures(picked[0].acc);
+  });
+}
+
+function pickProtein(h){
+  setSearchStatus("loading " + h.acc + "...");
+  fetch("https://rest.uniprot.org/uniprotkb/" + h.acc + ".fasta")
+    .then(function(r){ return r.text(); })
+    .then(function(t){
+      $("fasta").value = t.trim();
+      $("featAcc").value = h.acc;
+      $("figTitle").value = h.name ? h.name.split(/[,(]/)[0].trim() : (h.id || h.acc);
+      $("regFrom").value = ""; $("regTo").value = "";
+      setSearchStatus("loaded " + (h.id || h.acc));
+      render();
+      loadFeatures(h.acc);
+    })
+    .catch(function(){ setSearchStatus("could not load " + h.acc); });
+}
+
+/* An accession for sequence 1, from the box, the structure tab, the FASTA
+   header, or failing all of those the sequence's own checksum. */
+function refAccession(){
+  var typed = ($("featAcc").value || "").trim();
+  if(typed) return Promise.resolve(typed);
+
+  if(typeof structs !== "undefined" && structs[0] && structs[0].acc){
+    $("featAcc").value = structs[0].acc;
+    return Promise.resolve(structs[0].acc);
+  }
+  var rows = parseFasta($("fasta").value);   // the box: a lone sequence never reaches state.rows
+  if(!rows.length) return Promise.resolve("");
+
+  var fromHeader = guessAcc(rows[0].full || rows[0].name);
+  if(fromHeader){ $("featAcc").value = fromHeader; return Promise.resolve(fromHeader); }
+
+  var seq = rows[0].seq.replace(/-/g, "").toUpperCase();
+  if(!seq) return Promise.resolve("");
+  return fetch("https://rest.uniprot.org/uniparc/search?query=checksum:" + crc64Hex(seq) +
+               "&format=json&size=1")
+    .then(function(r){ return r.json(); })
+    .then(function(j){
+      var res = j && j.results && j.results[0];
+      var acc = res ? bestAccession(res.uniProtKBAccessions) : "";
+      if(acc) $("featAcc").value = acc;
+      return acc;
+    })
+    .catch(function(){ return ""; });
+}
+
+/* ---------- domains as buttons, and drawn on the figure ---------- */
+
+function pickableFeatures(){
+  return features.filter(function(f){
+    if(["domain", "repeat", "motif", "zinc finger", "coiled coil"].indexOf(f.type) < 0) return false;
+    return (f.end - f.start) >= 15;
+  });
+}
+
+function shortFeatureName(f){
+  var n = f.name.replace(/\s*(domain|profile|region)\s*$/i, "");
+  return n.length > 26 ? n.slice(0, 26) + "…" : n;
+}
+
+function renderDomainChips(){
+  var list = pickableFeatures();
+  var from = parseInt($("regFrom").value, 10), to = parseInt($("regTo").value, 10);
+  var html = '<button class="chip dchip" type="button" data-s="" data-e=""' +
+             (isFinite(from) ? "" : ' aria-pressed="true"') + ">Whole protein</button>" +
+    list.map(function(f){
+      var on = (f.start === from && f.end === to);
+      return '<button class="chip dchip" type="button" data-s="' + f.start + '" data-e="' + f.end + '"' +
+        (on ? ' aria-pressed="true"' : "") + ">" + esc(shortFeatureName(f)) +
+        ' <span class="rng">' + f.start + "-" + f.end + "</span></button>";
+    }).join("");
+  if(!list.length) html += '<span class="hint">no domains loaded yet</span>';
+
+  ["domChips", "domChips2"].forEach(function(id){
+    var el = $(id); if(!el) return;
+    el.innerHTML = html;
+    el.querySelectorAll(".dchip").forEach(function(b){
+      b.addEventListener("click", function(){
+        $("regFrom").value = b.dataset.s;
+        $("regTo").value = b.dataset.e;
+        render();
+        if(!$("paneStruct").hidden) applyStructStyles();
+      });
+    });
+  });
+}
+
+/* Write the fetched domains into the annotation box so they draw on the figure. */
+function annotationsFromFeatures(){
+  var list = pickableFeatures();
+  if(!list.length) return;
+  annotsAuto = true;
+  var lines = list.slice(0, 8).map(function(f){
+    return f.start + "-" + f.end + " " + shortFeatureName(f);
+  });
+  $("annots").value = lines.join("\n");
+}
+
+function applyRegion(){ render(); if(!$("paneStruct").hidden) applyStructStyles(); }
+
+/* ---------- domain architecture across species ---------- */
+
+var archRows = [], archKey = "";   // one per sequence: {name, acc, len, doms:[{s,e,name,key}]}
+var archBusy = false;
+
+var ARCH_PALETTE = ["#DC0806","#0072B2","#009E73","#E69F00","#CC79A7","#56B4E9",
+                    "#7B2D8E","#D55E00","#1B7F5E","#8C6D1F","#4A5568","#B23A6F"];
+var archColours = {};
+function archColour(key){
+  if(!(key in archColours)){
+    archColours[key] = ARCH_PALETTE[Object.keys(archColours).length % ARCH_PALETTE.length];
+  }
+  return archColours[key];
+}
+
+function setArchStatus(m){ $("archStatus").textContent = m || ""; }
+
+/* A UniProt accession for every row: header first, then the sequence checksum. */
+function accessionsForRows(rows){
+  return Promise.all(rows.map(function(r){
+    var h = guessAcc(r.full || r.name);
+    if(h) return Promise.resolve(h);
+    var seq = r.seq.replace(/-/g, "").toUpperCase();
+    if(!seq) return Promise.resolve("");
+    return fetch("https://rest.uniprot.org/uniparc/search?query=checksum:" + crc64Hex(seq) +
+                 "&format=json&size=1")
+      .then(function(x){ return x.json(); })
+      .then(function(j){
+        var res = j && j.results && j.results[0];
+        return res ? bestAccession(res.uniProtKBAccessions) : "";
+      })
+      .catch(function(){ return ""; });
+  }));
+}
+
+function domainsFor(acc){
+  if(!acc) return Promise.resolve([]);
+  return fetch("https://www.ebi.ac.uk/interpro/api/entry/all/protein/uniprot/" +
+               encodeURIComponent(acc) + "/?page_size=100")
+    .then(function(r){ return r.ok ? r.json() : null; })
+    .then(function(d){
+      if(!d) return [];
+      var out = [];
+      (d.results || []).forEach(function(res){
+        var md = res.metadata || {};
+        if(["domain", "repeat"].indexOf(md.type) < 0) return;
+        if(md.source_database !== "interpro") return;        // one call per family
+        (res.proteins || []).forEach(function(p){
+          (p.entry_protein_locations || []).forEach(function(loc){
+            (loc.fragments || []).forEach(function(fr){
+              out.push({ s:fr.start, e:fr.end, name:md.name || md.accession,
+                         key:md.accession || md.name });
+            });
+          });
+        });
+      });
+      return out.sort(function(a, b){ return a.s - b.s; });
+    })
+    .catch(function(){ return []; });
+}
+
+function buildArchitecture(){
+  var rows = state.rows || [];
+  if(rows.length < 2) return setArchStatus("load at least two sequences");
+  if(archBusy) return;
+  archBusy = true;
+  setArchStatus("resolving " + rows.length + " accessions...");
+  accessionsForRows(rows).then(function(accs){
+    setArchStatus("fetching domains...");
+    return Promise.all(accs.map(domainsFor)).then(function(all){
+      archKey = rows.map(function(r){ return r.name; }).join("");
+      archRows = rows.map(function(r, i){
+        return { name:r.name, acc:accs[i], resolved:!!accs[i],
+                 len:r.seq.replace(/-/g, "").length, doms:all[i] };
+      });
+      archBusy = false;
+      var withDoms = archRows.filter(function(a){ return a.doms.length; }).length;
+      var unres = archRows.filter(function(a){ return !a.resolved; }).length;
+      setArchStatus(withDoms + " of " + rows.length + " with annotated domains" +
+        (unres ? "; " + unres + " could not be resolved to a UniProt accession, so their domains " +
+                 "are unknown rather than absent" : ""));
+      drawArchitecture();
+    });
+  }).catch(function(){ archBusy = false; setArchStatus("architecture lookup failed"); });
+}
+
+function buildArchOps(opt){
+  var ops = [], y = 0;
+  var W = opt.width, labelW = 10 + Math.max.apply(null,
+            archRows.map(function(a){ return a.name.length; })) * 5.4;
+  var maxLen = Math.max.apply(null, archRows.map(function(a){ return a.len; })) || 1;
+  var rowH = 17, gap = 9, barH = 11;
+
+  // legend: one entry per distinct domain family, in order of first appearance
+  var seen = {}, legend = [];
+  archRows.forEach(function(a){
+    a.doms.forEach(function(d){ if(!seen[d.key]){ seen[d.key] = 1; legend.push(d); } });
+  });
+  legend.forEach(function(d, i){
+    var cx = (i % 3) * (W / 3), cy = y + Math.floor(i / 3) * 15;
+    ops.push({t:"rect", x:cx, y:cy, w:11, h:11, fill:archColour(d.key)});
+    ops.push({t:"text", x:cx + 16, y:cy + 5.5, s:d.name.slice(0, 34), fill:C_INK, size:10.5});
+  });
+  if(legend.length) y += Math.ceil(legend.length / 3) * 15 + 10;
+
+  archRows.forEach(function(a){
+    var bw = (a.len / maxLen) * (W - labelW);
+    ops.push({t:"text", x:labelW - 6, y:y + barH/2, s:a.name, fill:C_INK,
+              size:10, anchor:"end", italic:true});
+    if(a.resolved){
+      ops.push({t:"rect", x:labelW, y:y + barH/2 - 1.5, w:bw, h:3, fill:"#C9C9D2"});
+      a.doms.forEach(function(d){
+        var dx = labelW + (d.s / maxLen) * (W - labelW);
+        var dw = Math.max(2, ((d.e - d.s + 1) / maxLen) * (W - labelW));
+        ops.push({t:"rect", x:dx, y:y, w:dw, h:barH, fill:archColour(d.key)});
+      });
+    } else {
+      // hatched, so an unknown annotation never reads as a confirmed absence
+      for(var hx = 0; hx < bw; hx += 6)
+        ops.push({t:"rect", x:labelW + hx, y:y + barH/2 - 1.5, w:3, h:3, fill:"#C9C9D2"});
+      ops.push({t:"text", x:labelW + 4, y:y + barH/2, s:"not resolved", fill:"#9A9AA4", size:8.5});
+    }
+    var tail = String(a.len) + (a.acc ? "  " + a.acc : "");
+    ops.push({t:"text", x:labelW + bw + 7, y:y + barH/2, s:tail, fill:C_INK, size:9});
+    y += rowH + gap;
+  });
+
+  // scale beneath
+  var step = niceStep(maxLen, W - labelW, 70), sy = y + 2;
+  for(var pos = step; pos <= maxLen; pos += step){
+    var px = labelW + (pos / maxLen) * (W - labelW);
+    ops.push({t:"line", x1:px, y1:sy, x2:px, y2:sy + 4, stroke:C_INK, w:1});
+    ops.push({t:"text", x:px, y:sy + 11.5, s:String(pos), fill:C_INK, size:9.5, anchor:"middle"});
+  }
+  y = sy + 17;
+
+  return { ops:ops, width:Math.ceil(W) + 96, height:Math.ceil(y), labelFont:opt.labelFont };
+}
+
+function drawArchitecture(){
+  if(!archRows.length){ $("archPanel").hidden = true; return; }
+  $("archPanel").hidden = false;
+  var font = FONTS[$("fontSel").value] || FONTS.arial;
+  var labelFont = ($("fontSel").value === "courier") ? FONTS.arial : font;
+  var d = buildArchOps({ width: Math.max(400, Math.min(1600, +$("archW").value || 760)),
+                         labelFont: labelFont });
+  state.arch = d;
+  $("archwrap").innerHTML = toSVG(d, 6, false);
+  ["expArchSvg", "expArchPng"].forEach(function(id){ $(id).disabled = false; });
+}
+
+/* ---------- orthologues and multiple alignment ---------- */
+
+/* A phylogenetic ladder rather than the forty mammals that would otherwise
+   dominate. Conservation means little if the sampling is all one clade. */
+var LADDER = [
+  [9606,"Human"], [10090,"Mouse"], [9913,"Cow"], [13616,"Opossum"], [9031,"Chicken"],
+  [28377,"Anole lizard"], [8364,"Frog"], [7955,"Zebrafish"], [7757,"Lamprey"],
+  [7719,"Ciona"], [7668,"Sea urchin"], [7227,"Drosophila"], [7165,"Anopheles"],
+  [6239,"C. elegans"], [6183,"Schistosoma"], [45351,"Nematostella"], [10228,"Trichoplax"],
+  [400682,"Amphimedon"], [44689,"Dictyostelium"], [4932,"Budding yeast"],
+  [559292,"Budding yeast"], [4896,"Fission yeast"], [3702,"Arabidopsis"],
+  [3055,"Chlamydomonas"]
+];
+var LADDER_IDX = {};
+LADDER.forEach(function(e, i){ LADDER_IDX[e[0]] = { rank:i, label:e[1] }; });
+
+var orthologs = [];
+
+function setOrthStatus(m){ $("orthStatus").textContent = m || ""; }
+
+function findOrthologs(acc){
+  acc = (acc || "").trim();
+  if(!acc) return setOrthStatus("need an accession for sequence 1 first");
+  setOrthStatus("querying OMA...");
+  orthologs = [];
+  fetch("https://omabrowser.org/api/protein/" + encodeURIComponent(acc) + "/orthologs/")
+    .then(function(r){ if(!r.ok) throw new Error("OMA has no entry for " + acc); return r.json(); })
+    .then(function(d){
+      orthologs = (d || []).map(function(e){
+        var sp = e.species || {};
+        var lad = LADDER_IDX[sp.taxon_id];
+        return { acc:e.canonicalid, omaid:e.omaid, species:sp.species || "?", taxon:sp.taxon_id,
+                 rel:e.rel_type, len:e.sequence_length,
+                 rank: lad ? lad.rank : 999, label: lad ? lad.label : null };
+      }).filter(function(o){ return o.acc; });
+
+      // one per species, best relationship first, ladder species to the top
+      var best = {}, order = [];
+      orthologs.sort(function(a, b){
+        var ra = a.rel === "1:1" ? 0 : 1, rb = b.rel === "1:1" ? 0 : 1;
+        return a.rank - b.rank || ra - rb;
+      });
+      orthologs.forEach(function(o){
+        if(best[o.taxon]) return;
+        best[o.taxon] = 1; order.push(o);
+      });
+      orthologs = order;
+      renderOrthList();
+      var nLad = orthologs.filter(function(o){ return o.rank < 999; }).length;
+      setOrthStatus(orthologs.length + " species (" + nLad + " on the reference ladder)");
+    })
+    .catch(function(e){ setOrthStatus(e.message || "OMA lookup failed"); });
+}
+
+function renderOrthList(){
+  var box = $("orthList");
+  if(!orthologs.length){ box.innerHTML = '<p class="hint">no orthologues loaded</p>'; return; }
+  box.innerHTML = orthologs.slice(0, 60).map(function(o, i){
+    var tag = o.label ? '<strong>' + esc(o.label) + '</strong> ' : "";
+    return '<label class="orow">' +
+      '<input type="checkbox" data-orth="' + i + '"' + (o.rank < 999 ? " checked" : "") + '>' +
+      '<span>' + tag + esc(o.species.slice(0, 40)) + "</span>" +
+      '<span class="om">' + esc(o.acc) + " · " + esc(o.rel) + "</span>" +
+    "</label>";
+  }).join("");
+}
+
+function abbrevSpecies(name){
+  var m = String(name).match(/^([A-Z])[a-z]+\s+([a-z]+)/);
+  return m ? m[1] + ". " + m[2] : String(name).split(/\s+/).slice(0, 2).join(" ");
+}
+
+function addSelectedOrthologs(){
+  var picked = [];
+  document.querySelectorAll("[data-orth]").forEach(function(cb){
+    if(cb.checked) picked.push(orthologs[+cb.dataset.orth]);
+  });
+  if(!picked.length) return setOrthStatus("tick at least one species");
+  setOrthStatus("fetching " + picked.length + " sequences...");
+  // fetch from OMA, since canonical ids may be RefSeq or Ensembl rather than UniProt
+  Promise.all(picked.map(function(o){
+    return fetch("https://omabrowser.org/api/protein/" + encodeURIComponent(o.omaid) + "/")
+      .then(function(r){ return r.ok ? r.json() : null; })
+      .then(function(d){
+        if(!d || !d.sequence) return "";
+        return ">" + abbrevSpecies(o.species) + " " + (d.canonicalid || o.omaid) + "\n" + d.sequence;
+      })
+      .catch(function(){ return ""; });
+  })).then(function(texts){
+    var have = {};
+    currentRecords().forEach(function(r){ have[r.key] = 1; });
+    var dup = 0;
+    var got = texts.filter(function(t){ return t.trim(); }).filter(function(t){
+      var seq = t.split(/\r?\n/).slice(1).join("").replace(/[^A-Za-z]/g, "").toUpperCase();
+      if(have[seq]){ dup++; return false; }
+      have[seq] = 1; return true;
+    });
+    var cur = $("fasta").value.trim();
+    $("fasta").value = (cur ? cur + "\n" : "") + got.join("\n");
+    setOrthStatus("added " + got.length + " of " + picked.length +
+      (dup ? " (" + dup + " already present)" : ""));
+    if(got.length && document.querySelector('input[name=mode][value=align]'))
+      document.querySelector('input[name=mode][value=align]').checked = true;
+    render();
+  });
+}
+
+/* ---------- multiple alignment ----------
+   Star alignment on sequence 1. Every sequence is aligned pairwise to the
+   reference and the results merged into one set of columns. It is not as
+   accurate as a progressive aligner, but it anchors every column on the
+   reference — which is what the region selection, the numbering and the
+   "score against sequence 1" colouring all assume anyway. */
+function starAlign(seqs, go, ge){
+  var centre = seqs[0].replace(/-/g, "");
+  var msa = [centre];
+
+  for(var i = 1; i < seqs.length; i++){
+    var pw = align(centre, seqs[i].replace(/-/g, ""), go, ge);
+    var rows = [], fresh = "", p = 0, q = 0, r;
+    for(r = 0; r < msa.length; r++) rows.push("");
+
+    while(p < msa[0].length || q < pw.a.length){
+      if(p >= msa[0].length){                     // trailing insertion in the new pair
+        for(r = 0; r < msa.length; r++) rows[r] += "-";
+        fresh += pw.b[q]; q++; continue;
+      }
+      if(q >= pw.a.length){                       // trailing gap already in the block
+        for(r = 0; r < msa.length; r++) rows[r] += msa[r][p];
+        fresh += "-"; p++; continue;
+      }
+      var inBlock = msa[0][p] === "-", inPair = pw.a[q] === "-";
+      if(inBlock && !inPair){                     // block has a gap the pair does not
+        for(r = 0; r < msa.length; r++) rows[r] += msa[r][p];
+        fresh += "-"; p++;
+      } else if(!inBlock && inPair){              // pair inserts relative to the reference
+        for(r = 0; r < msa.length; r++) rows[r] += "-";
+        fresh += pw.b[q]; q++;
+      } else {                                    // both gaps, or both reference residues
+        for(r = 0; r < msa.length; r++) rows[r] += msa[r][p];
+        fresh += pw.b[q]; p++; q++;
+      }
+    }
+    msa = rows.concat([fresh]);
+  }
+  return msa;
+}
+
+/* ---------- annotated features and region selection ---------- */
+
+/* Regions are held in sequence 1's own residue numbering, because that is what
+   a domain annotation is expressed in. Alignment columns are derived. */
+var features = [], featAccLoaded = "", featSeqKey = "", annotsAuto = false;
+
+/* Anything fetched for the previous protein has to go when sequence 1 changes. */
+function resetFeaturesIfRefChanged(rows){
+  var key = rows.length ? rows[0].seq.replace(/-/g, "") : "";
+  if(key === featSeqKey) return;
+  featSeqKey = key;
+  if(!features.length && !featAccLoaded) return;
+  features = []; featAccLoaded = "";
+  $("featAcc").value = "";
+  $("regFrom").value = ""; $("regTo").value = "";
+  if(annotsAuto){ $("annots").value = ""; annotsAuto = false; }
+  setFeatStatus("sequence 1 changed - fetch its domains again");
+}
+
+function featRank(f){
+  var order = { domain:0, repeat:1, motif:2, "binding site":3, "active site":4,
+                "zinc finger":5, "coiled coil":6, family:7, homologous_superfamily:8, region:9 };
+  var k = String(f.type).toLowerCase();
+  return (k in order) ? order[k] : 10;
+}
+
+
+
+function loadFeatures(acc){
+  acc = (acc || "").trim();
+  if(!acc) return setFeatStatus("enter an accession, or identify sequence 1 on the Structure tab");
+  setFeatStatus("fetching annotations...");
+  features = [];
+
+  var uni = fetch("https://rest.uniprot.org/uniprotkb/" + encodeURIComponent(acc) +
+                  ".json?fields=ft_domain,ft_region,ft_motif,ft_binding,ft_act_site,ft_coiled,ft_zn_fing")
+    .then(function(r){ return r.ok ? r.json() : null; })
+    .then(function(d){
+      if(!d) return;
+      (d.features || []).forEach(function(f){
+        var L = f.location;
+        if(!L || !L.start || !L.end || L.start.value == null || L.end.value == null) return;
+        features.push({ start:L.start.value, end:L.end.value, type:String(f.type).toLowerCase(),
+                        name:f.description || f.type, db:"UniProt" });
+      });
+    })
+    .catch(function(){});
+
+  var ipr = fetch("https://www.ebi.ac.uk/interpro/api/entry/all/protein/uniprot/" +
+                  encodeURIComponent(acc) + "/?page_size=100")
+    .then(function(r){ return r.ok ? r.json() : null; })
+    .then(function(d){
+      if(!d) return;
+      (d.results || []).forEach(function(res){
+        var md = res.metadata || {};
+        if(["family", "homologous_superfamily"].indexOf(md.type) > -1) return;  // too coarse to align on
+        (res.proteins || []).forEach(function(p){
+          (p.entry_protein_locations || []).forEach(function(loc){
+            (loc.fragments || []).forEach(function(fr){
+              features.push({ start:fr.start, end:fr.end, type:md.type || "domain",
+                              name:md.name || md.accession || "domain",
+                              db:md.source_database || "InterPro" });
+            });
+          });
+        });
+      });
+    })
+    .catch(function(){});
+
+  return Promise.all([uni, ipr]).then(function(){
+    // one entry per range: the databases name the same domain differently, and
+    // for choosing a region only the coordinates matter
+    var PREF = { UniProt:0, interpro:1, pfam:2, smart:3, cdd:4, profile:5, prosite:6 };
+    var byRange = {}, order = [];
+    features.forEach(function(f){
+      var k = f.start + ":" + f.end, rank = (PREF[f.db] == null ? 9 : PREF[f.db]);
+      if(!byRange[k]){
+        byRange[k] = { start:f.start, end:f.end, type:f.type, name:f.name, dbs:[f.db], rank:rank };
+        order.push(k); return;
+      }
+      var g = byRange[k];
+      if(g.dbs.indexOf(f.db) < 0) g.dbs.push(f.db);
+      if(rank < g.rank){ g.rank = rank; g.name = f.name; g.type = f.type; }
+    });
+    // the databases also disagree slightly on boundaries; fold together anything
+    // of the same type that overlaps another by 80% both ways
+    var kept = [];
+    order.map(function(k){ return byRange[k]; })
+         .sort(function(a, b){ return (b.end-b.start) - (a.end-a.start); })
+         .forEach(function(f){
+      var dup = kept.some(function(g){
+        if(g.type !== f.type) return false;
+        var ov = Math.min(g.end, f.end) - Math.max(g.start, f.start) + 1;
+        if(ov <= 0) return false;
+        return ov / (f.end-f.start+1) > 0.8 && ov / (g.end-g.start+1) > 0.8;
+      });
+      if(!dup) kept.push(f);
+    });
+    order = kept.map(function(f){ var k = f.start + ":" + f.end; byRange[k] = f; return k; });
+    features = order.map(function(k){
+      var g = byRange[k];
+      g.db = g.dbs.length > 2 ? g.dbs.slice(0, 2).join(", ") + " +" + (g.dbs.length - 2) : g.dbs.join(", ");
+      return g;
+    }).sort(function(a, b){ return featRank(a) - featRank(b) || a.start - b.start; });
+    featAccLoaded = acc;
+    annotationsFromFeatures();
+    renderDomainChips();
+    render();
+    setFeatStatus(features.length ? features.length + " features for " + acc
+                                  : "no annotated features for " + acc);
+  });
+}
+
+function setFeatStatus(m){ $("featStatus").textContent = m || ""; }
+
+/* reference residue range -> inclusive alignment column bounds */
+function regionCols(){
+  var rows = state.rows || [];
+  if(!rows.length) return null;
+  var from = parseInt($("regFrom").value, 10), to = parseInt($("regTo").value, 10);
+  if(!isFinite(from) || !isFinite(to)) return null;
+  if(from > to){ var t = from; from = to; to = t; }
+  var seq = rows[0].seq, n = 0, c0 = null, c1 = null;
+  for(var c = 0; c < seq.length; c++){
+    if(seq[c] === "-") continue;
+    n++;
+    if(n === from) c0 = c;
+    if(n === to){ c1 = c; break; }
+  }
+  if(c0 === null) return null;
+  if(c1 === null) c1 = seq.length - 1;
+  return { c0:c0, c1:c1, from:from, to:to };
+}
+
+function clearRegion(){
+  $("regFrom").value = ""; $("regTo").value = "";
+  render();
+}
+
+/* ---------- state + render ---------- */
+var $ = function(id){ return document.getElementById(id); };
+var colourByTouched = false;   // once the user picks a mode, stop choosing for them
+var state = { rows:[], cls:[], draw:null, strip:null, rowStrip:null, score:null, aligned:false };
+
+function parseAnnots(text, refSeq){
+  // map reference-sequence residue numbers to alignment columns
+  var col = [], n = 0, c;
+  for(c=0;c<refSeq.length;c++){ if(refSeq[c] !== "-"){ n++; col[n] = c; } }
+  var out = [];
+  text.split(/\r?\n/).forEach(function(ln){
+    var m = ln.match(/^\s*(\d+)\s*[-–]\s*(\d+)\s+(.+?)\s*$/);
+    if(!m) return;
+    var s = col[Math.max(1, Math.min(n, +m[1]))], e = col[Math.max(1, Math.min(n, +m[2]))];
+    if(s === undefined || e === undefined) return;
+    out.push({ start:Math.min(s,e), end:Math.max(s,e), label:m[3] });
+  });
+  return out;
+}
+
+function setExports(on){
+  ["expSvg","expPng","copyAln","expStripSvg","expStripPng","expRowsSvg","expRowsPng"]
+    .forEach(function(id){ $(id).disabled = !on; });
+}
+function blank(){
+  $("sheetwrap").innerHTML = ""; $("stats").innerHTML = "";
+  $("stripwrap").innerHTML = ""; $("rowswrap").innerHTML = ""; $("archwrap").innerHTML = "";
+  archRows = []; archKey = "";
+  ["stats","sheetwrap","note","stripPanel","rowsPanel","archPanel"].forEach(function(id){ $(id).hidden = true; });
+  state = { rows:[], cls:[], draw:null, strip:null, rowStrip:null, score:null, aligned:false };
+  setExports(false);
+}
+function showEmpty(){ blank(); $("err").hidden = true; $("empty").hidden = false; }
+function fail(msg){
+  blank(); $("empty").hidden = true;
+  var e = $("err"); e.textContent = msg; e.hidden = false;
+}
+
+function render(){
+  $("err").hidden = true;
+  renderSeqList();                            // before any early return
+  var raw = $("fasta").value;
+  if(!raw.trim()) return showEmpty();
+  var recs = parseFasta(raw);
+  if(recs.length < 2) return fail("Need at least two sequences in FASTA format — " +
+    (recs.length ? "only one was found." : "none were found."));
+  $("empty").hidden = true;
+  ["stats","sheetwrap","note"].forEach(function(id){ $(id).hidden = false; });
+  setExports(true);
+
+  var mode = document.querySelector('input[name=mode]:checked').value;
+  var score = null, aligned = false, regionAligned = false;
+
+  if(mode === "align"){
+    var go = Math.max(0, +$("gapOpen").value || 0), ge = Math.max(0, +$("gapExt").value || 0);
+    var ref = recs[0].seq.replace(/-/g,"");
+    var longest = Math.max.apply(null, recs.map(function(r){ return r.seq.replace(/-/g,"").length; }));
+    if(ref.length * longest > 6.5e6)
+      return fail("Sequences are too long to align in the browser (" + ref.length + " \u00D7 " +
+                  longest + " cells). Align externally and paste the result.");
+    if(recs.length === 2){
+      var res = align(ref, recs[1].seq.replace(/-/g,""), go, ge);
+      recs = [{name:recs[0].name, full:recs[0].full, seq:res.a},
+              {name:recs[1].name, full:recs[1].full, seq:res.b}];
+      score = res.score;
+    } else {
+      var rows = starAlign(recs.map(function(r){ return r.seq; }), go, ge);
+      recs = recs.map(function(r, i){ return { name:r.name, full:r.full, seq:rows[i] }; });
+    }
+    aligned = true;
+    var rf = parseInt($("regFrom").value, 10), rt = parseInt($("regTo").value, 10);
+    if($("regAlign").checked && isFinite(rf) && isFinite(rt) && recs.length > 1){
+      var rr = starAlignRegion(recs.map(function(r){ return r.seq; }), rf, rt, go, ge);
+      recs = recs.map(function(r, i){ return { name:r.name, full:r.full, seq:rr[i] }; });
+      regionAligned = true;
+    }
+  } else {
+    var L = recs[0].seq.length, bad = recs.filter(function(r){ return r.seq.length !== L; });
+    if(bad.length) return fail("Sequences are not the same length (" + recs.map(function(r){return r.seq.length;}).join(", ") + "). Switch to “Align now”, or paste an aligned FASTA.");
+  }
+
+  var thr = +$("thr").value;
+  if(!isFinite(thr)) thr = 0;
+  if(!colourByTouched){
+    var want = recs.length > 2 ? "ref" : "column";
+    if($("colourBy").value !== want) $("colourBy").value = want;
+  }
+  var colourMode = $("colourBy").value;
+  var cls = classify(recs, thr, colourMode);
+  var colCls = columnMax(cls);
+  resetFeaturesIfRefChanged(recs);
+  var reg = regionAligned ? null : regionCols();
+  var c0 = reg ? reg.c0 : 0, c1 = reg ? reg.c1 : cls[0].length - 1;
+
+  C_IDENT = $("cIdent").value;
+  C_SIM   = $("cSim").value;
+  document.documentElement.style.setProperty("--ident", C_IDENT);
+  document.documentElement.style.setProperty("--similar", C_SIM);
+
+  var pick = $("fontSel").value;
+  var font = FONTS[pick] || FONTS.arial;
+  // Courier is for the residues only; labels, numbers and annotations stay proportional
+  var labelFont = (pick === "courier") ? FONTS.arial : font;
+  var draw = buildOps(recs, cls, {
+    font: font, labelFont: labelFont, bold: $("boldRes").checked, c0: c0, c1: c1,
+    whiteText: $("whiteText").checked,
+    ruler: $("showRuler").checked,
+    rulerStep: Math.max(5, Math.min(100, +$("rulerStep").value || 10)),
+    perLine: Math.max(10, Math.min(240, +$("perLine").value || 100)),
+    cellW: Math.max(5, Math.min(20, +$("cellW").value || 8.5)),
+    labelW: 8 + Math.max.apply(null, recs.map(function(r){ return r.name.length; })) * 5.4,
+    showNums: $("showNums").checked,
+    title: $("figTitle").value.trim(),
+    annots: parseAnnots($("annots").value, recs[0].seq)
+  });
+
+  var stripW = Math.max(200, Math.min(2000, +$("stripW").value || 600));
+  var stripAnnots = parseAnnots($("annots").value, recs[0].seq)
+    .map(function(a){ return { start:a.start - c0, end:a.end - c0, label:a.label }; })
+    .filter(function(a){ return a.end >= 0 && a.start <= c1 - c0; })
+    .map(function(a){ return { start:Math.max(0, a.start), end:Math.min(c1 - c0, a.end), label:a.label }; });
+  var clsSlice = cls.map(function(r){ return r.slice(c0, c1 + 1); });
+  var colSlice = colCls.slice(c0, c1 + 1);
+  var rowStrip = null;
+  if($("showRows").checked && recs.length > 2){
+    rowStrip = buildRowStripOps(recs, clsSlice, { labelFont: labelFont, stripW: stripW, annots: stripAnnots });
+  }
+  var strip = null;
+  if($("showStrip").checked){
+    strip = buildStripOps(colSlice, { labelFont: labelFont, stripW: stripW, annots: stripAnnots });
+  }
+  state = { rows:recs, cls:cls, draw:draw, strip:strip, rowStrip:rowStrip, score:score,
+            aligned:aligned, region:reg };
+  $("sheetwrap").innerHTML = toSVG(draw, 6, false);
+  $("stripPanel").hidden = !strip;
+  $("stripwrap").innerHTML = strip ? toSVG(strip, 6, false) : "";
+  ["expStripSvg","expStripPng"].forEach(function(id){ $(id).disabled = !strip; });
+  $("rowsPanel").hidden = !rowStrip;
+  $("rowswrap").innerHTML = rowStrip ? toSVG(rowStrip, 6, false) : "";
+  ["expRowsSvg","expRowsPng"].forEach(function(id){ $(id).disabled = !rowStrip; });
+
+  /* stats */
+  var L2 = clsSlice[0].length, perCell = (colourMode !== "column");
+  var nI=0, nS=0, nN=0, nG=0, total;
+  for(var c=c0;c<=c1;c++){
+    if(recs.some(function(r){ return r.seq[c] === "-"; })) nG++;
+  }
+  if(perCell){
+    total = L2 * recs.length;
+    for(var r2=0;r2<recs.length;r2++)
+      for(var c2=0;c2<L2;c2++){
+        var v2 = clsSlice[r2][c2];
+        if(v2===2) nI++; else if(v2===1) nS++; else nN++;
+      }
+  } else {
+    total = L2;
+    for(var c3=0;c3<L2;c3++){
+      var v3 = clsSlice[0][c3];
+      if(v3===2) nI++; else if(v3===1) nS++; else nN++;
+    }
+  }
+  var unit = perCell ? " cells" : " columns";
+  var pct = function(x){ return (100*x/total).toFixed(1) + "%"; };
+  var cells = [
+    ["Columns", String(L2), recs.length + " sequences" + (reg ? " \u00B7 " + reg.from + "-" + reg.to : "")],
+    ["Identical", pct(nI), nI + unit, C_IDENT],
+    ["Similar", pct(nS), nS + unit, C_SIM],
+    ["Identical + similar", pct(nI+nS), (nI+nS) + unit],
+    ["Unmarked", pct(nN), nN + unit],
+    ["Gapped", (100*nG/L2).toFixed(1)+"%", nG + " columns"]
+  ];
+  if(score !== null) cells.push(["Alignment score", String(score), "BLOSUM-62, affine"]);
+  $("stats").innerHTML = cells.map(function(c){
+    return '<div class="stat"><span class="k">' +
+      (c[3] ? '<span class="swatch" style="background:'+c[3]+'"></span>' : '') +
+      esc(c[0]) + '</span><span class="v">' + esc(c[1]) +
+      '<small>' + esc(c[2]) + '</small></span></div>';
+  }).join("");
+
+  var thrTxt = thr === 1 ? "> 0" : "≥ " + thr;
+  $("legendThr").textContent = thrTxt;
+  if(!$("paneStruct").hidden){ syncStructList(); applyStructStyles(); scheduleAuto(); }
+  renderDomainChips();
+  renderConservation(recs, reg);
+  if($("showArch").checked && recs.length > 1){
+    var k = recs.map(function(r){ return r.name; }).join("");
+    if(k !== archKey && !archBusy){ archKey = k; buildArchitecture(); }
+    else if(archRows.length) drawArchitecture();
+  }
+  $("note").innerHTML = "Identity is shaded red; a non-identical column whose every pair scores BLOSUM-62 " +
+    esc(thrTxt) + " is shaded orange; everything else, gaps included, is left unmarked. " +
+    (aligned ? "Aligned here with Needleman–Wunsch (gap open " + esc($("gapOpen").value) + ", extend " + esc($("gapExt").value) + ")."
+             : "Gaps are taken from the pasted alignment.");
+}
+
+/* ---------- exports ---------- */
+function toast(m){ $("toast").textContent = m; clearTimeout(toast._t); toast._t = setTimeout(function(){ $("toast").textContent = ""; }, 4000); }
+function slug(){ return ($("figTitle").value.trim() || "alignment").replace(/[^A-Za-z0-9]+/g,"-").replace(/^-|-$/g,"").toLowerCase(); }
+
+function save(filename, data, mime){
+  try{
+    var blob = (data instanceof Blob) ? data : new Blob([data], {type: mime || "application/octet-stream"});
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url; a.download = filename; a.style.display = "none";
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 10000);
+    return Promise.resolve({ status:"saved" });
+  }catch(e){ return Promise.reject({ code:"unavailable" }); }
+}
+function handle(){ toast("Couldn't save the file."); }
+
+$("expSvg").addEventListener("click", function(){
+  if(!state.draw) return;
+  var svg = toSVG(state.draw, 12, true);
+  save(slug() + ".svg", svg, "image/svg+xml").then(function(){ toast("SVG saved."); }, handle);
+});
+
+$("expPng").addEventListener("click", function(){
+  if(!state.draw) return;
+  var cv = toCanvas(state.draw, 12, 3);
+  cv.toBlob(function(blob){
+    if(!blob) return toast("Couldn't render the PNG.");
+    save(slug() + ".png", blob, "image/png").then(function(){ toast("PNG saved at 3×."); }, handle);
+  }, "image/png");
+});
+
+$("expStripSvg").addEventListener("click", function(){
+  if(!state.strip) return;
+  save(slug() + "-strip.svg", toSVG(state.strip, 12, true), "image/svg+xml")
+    .then(function(){ toast("Strip SVG saved."); }, handle);
+});
+
+$("expStripPng").addEventListener("click", function(){
+  if(!state.strip) return;
+  toCanvas(state.strip, 12, 4).toBlob(function(blob){
+    if(!blob) return toast("Couldn't render the PNG.");
+    save(slug() + "-strip.png", blob, "image/png").then(function(){ toast("Strip PNG saved at 4×."); }, handle);
+  }, "image/png");
+});
+
+$("archGo").addEventListener("click", buildArchitecture);
+$("showArch").addEventListener("change", function(){
+  if($("showArch").checked){ $("archPanel").hidden = false; if(!archRows.length) buildArchitecture(); }
+  else $("archPanel").hidden = true;
+});
+$("archW").addEventListener("change", function(){ if(archRows.length) drawArchitecture(); });
+$("expArchSvg").addEventListener("click", function(){
+  if(!state.arch) return;
+  save(slug() + "-architecture.svg", toSVG(state.arch, 12, true), "image/svg+xml")
+    .then(function(){ toast("Architecture SVG saved."); }, handle);
+});
+$("expArchPng").addEventListener("click", function(){
+  if(!state.arch) return;
+  toCanvas(state.arch, 12, 4).toBlob(function(b){
+    if(!b) return toast("Couldn't render the PNG.");
+    save(slug() + "-architecture.png", b, "image/png")
+      .then(function(){ toast("Architecture PNG saved."); }, handle);
+  }, "image/png");
+});
+
+$("expRowsSvg").addEventListener("click", function(){
+  if(!state.rowStrip) return;
+  save(slug() + "-per-sequence.svg", toSVG(state.rowStrip, 12, true), "image/svg+xml")
+    .then(function(){ toast("Per-sequence SVG saved."); }, handle);
+});
+
+$("expRowsPng").addEventListener("click", function(){
+  if(!state.rowStrip) return;
+  toCanvas(state.rowStrip, 12, 4).toBlob(function(blob){
+    if(!blob) return toast("Couldn't render the PNG.");
+    save(slug() + "-per-sequence.png", blob, "image/png")
+      .then(function(){ toast("Per-sequence PNG saved at 4\u00D7."); }, handle);
+  }, "image/png");
+});
+
+$("copyAln").addEventListener("click", function(){
+  if(!state.rows.length) return;
+  var txt = state.rows.map(function(r){ return ">" + r.name + "\n" + wrap(r.seq, 60); }).join("\n") + "\n";
+  navigator.clipboard.writeText(txt).then(function(){ toast("Aligned FASTA copied."); },
+    function(){ toast("Couldn't reach the clipboard."); });
+});
+
+/* ---------- wiring ---------- */
+function loadExample(){ $("fasta").value = EXAMPLE; $("figTitle").value = "DOA/CLK2";
+  $("annots").value = "163-479 Kinase domain"; render(); }
+function clearAll(){
+  $("fasta").value = ""; $("figTitle").value = ""; $("annots").value = "";
+  $("featAcc").value = ""; $("regFrom").value = ""; $("regTo").value = "";
+  features = []; featAccLoaded = ""; featSeqKey = ""; annotsAuto = false;
+  setFeatStatus(""); renderDomainChips();
+  orthologs = []; renderOrthList(); setOrthStatus("");
+  $("fasta").focus(); render();
+}
+$("loadEx").addEventListener("click", loadExample);
+$("loadExSide").addEventListener("click", loadExample);
+$("clearAll").addEventListener("click", clearAll);
+$("searchGo").addEventListener("click", function(){ searchProtein($("searchQ").value); });
+$("searchLoad").addEventListener("click", loadTickedProteins);
+$("searchNone").addEventListener("click", function(){
+  document.querySelectorAll("#hitList [data-hit]").forEach(function(cb){ cb.checked = false; });
+});
+$("searchQ").addEventListener("keydown", function(e){ if(e.key === "Enter") searchProtein($("searchQ").value); });
+$("orthFind").addEventListener("click", function(){
+  setOrthStatus("identifying sequence 1...");
+  refAccession().then(function(acc){
+    if(!acc) return setOrthStatus("could not identify sequence 1 - type an accession above");
+    findOrthologs(acc);
+  });
+});
+$("orthAdd").addEventListener("click", addSelectedOrthologs);
+$("featFetch").addEventListener("click", function(){
+  setFeatStatus("identifying sequence 1...");
+  refAccession().then(function(acc){
+    if(!acc) return setFeatStatus("could not identify sequence 1 - type an accession above");
+    loadFeatures(acc);
+  });
+});
+$("regApply").addEventListener("click", applyRegion);
+$("regAlign").addEventListener("change", applyRegion);
+$("regClear").addEventListener("click", function(){ clearRegion(); renderDomainChips(); });
+["regFrom","regTo"].forEach(function(id){
+  $(id).addEventListener("change", applyRegion);
+  var t; $(id).addEventListener("input", function(){
+    clearTimeout(t); t = setTimeout(function(){
+      if($("regFrom").value && $("regTo").value) applyRegion();
+    }, 700);
+  });
+});
+$("render").addEventListener("click", render);
+document.querySelectorAll('input[name=mode]').forEach(function(r){
+  r.addEventListener("change", function(){
+    $("alignOpts").hidden = document.querySelector('input[name=mode]:checked').value !== "align";
+    render();
+  });
+});
+document.querySelectorAll('.chip[data-go]').forEach(function(b){
+  b.addEventListener("click", function(){
+    $("gapOpen").value = b.dataset.go; $("gapExt").value = b.dataset.ge;
+    document.querySelectorAll('.chip[data-go]').forEach(function(o){ o.setAttribute("aria-pressed", String(o===b)); });
+    render();
+  });
+});
+document.querySelectorAll('.chip[data-ci]').forEach(function(b){
+  b.addEventListener("click", function(){
+    $("cIdent").value = b.dataset.ci; $("cSim").value = b.dataset.cs;
+    document.querySelectorAll('.chip[data-ci]').forEach(function(o){ o.setAttribute("aria-pressed", String(o===b)); });
+    render();
+  });
+});
+document.querySelectorAll('.chip[data-thr]').forEach(function(b){
+  b.addEventListener("click", function(){ $("thr").value = b.dataset.thr; syncThrChips(); render(); });
+});
+function syncThrChips(){
+  var v = +$("thr").value;
+  $("thr0").setAttribute("aria-pressed", String(v === 0));
+  $("thr1").setAttribute("aria-pressed", String(v === 1));
+}
+["thr","perLine","cellW","gapOpen","gapExt","figTitle","fontSel","stripW","rulerStep","cIdent","cSim"].forEach(function(id){
+  $(id).addEventListener("change", function(){ syncThrChips(); render(); });
+});
+["showNums","boldRes","showStrip","showRows","whiteText","colourBy","showRuler"].forEach(function(id){ $(id).addEventListener("change", render); });
+$("colourBy").addEventListener("change", function(){ colourByTouched = true; });
+["fasta","annots"].forEach(function(id){
+  var t;
+  $(id).addEventListener("input", function(){ clearTimeout(t); t = setTimeout(render, 400); });
+});
+
+render();
+
+/* ---------- structure view ---------- */
+var AA3 = {ALA:"A",ARG:"R",ASN:"N",ASP:"D",CYS:"C",GLN:"Q",GLU:"E",GLY:"G",HIS:"H",ILE:"I",
+  LEU:"L",LYS:"K",MET:"M",PHE:"F",PRO:"P",SER:"S",THR:"T",TRP:"W",TYR:"Y",VAL:"V",
+  MSE:"M",SEC:"U",PYL:"O"};
+var PLDDT = [[90,"#0053D6"],[70,"#65CBF3"],[50,"#FFDB13"],[-1,"#FF7D45"]];
+var SEQCOL = ["#DC0806","#0072B2","#009E73","#CC79A7","#E69F00","#56B4E9","#7B2D8E","#3F3F46"];
+var C_NONE3D = "#D9D9DF";
+
+var viewer = null, structs = [], structsRebuilt = false, autoTimer = null, superTimer = null;
+
+function sNote(m){ $("sNote").textContent = m || ""; }
+function sFail(m){ var e = $("sErr"); e.textContent = m || ""; e.hidden = !m; }
+
+function ensureViewer(){
+  if(viewer) return viewer;
+  if(!window.$3Dmol){ sFail("The 3D viewer library did not load. Check the network and reload."); return null; }
+  viewer = $3Dmol.createViewer(document.getElementById("viewer"), { backgroundColor:"white" });
+  return viewer;
+}
+
+/* UniProt accession inside a FASTA header, e.g. sp|P49760|CLK2_HUMAN */
+function guessAcc(name){
+  var m = String(name).match(/\b([OPQ][0-9][A-Z0-9]{3}[0-9]|[A-NR-Z][0-9](?:[A-Z][A-Z0-9]{2}[0-9]){1,2})\b/);
+  return m ? m[1] : "";
+}
+
+function syncStructList(){
+  var rows = state.rows || [];
+  var key = rows.map(function(r){ return r.name; }).join("");
+  if(structs._key !== key){
+    if(viewer) viewer.removeAllModels();
+    structs = rows.map(function(r){
+      return { show:true, loaded:false, model:null, ca:[], seq:"", colByResi:{},
+               source:"", plddt:null, status:"not loaded", acc:guessAcc(r.full || r.name) };
+    });
+    structs._key = key;
+    structs._superposed = false;
+    structsRebuilt = true;
+    $("sRmsd").textContent = "";
+  } else {
+    structs.forEach(function(st, i){ mapStruct(i); });
+  }
+
+  $("structList").innerHTML = rows.map(function(r, i){
+    var st = structs[i];
+    return '<div class="srow">' +
+      '<span class="swatch3" style="background:' + SEQCOL[i % SEQCOL.length] + '"></span>' +
+      '<label style="display:flex;align-items:center;gap:6px">' +
+        '<input type="checkbox" data-show="' + i + '"' + (st.show ? " checked" : "") + ' style="width:auto">' +
+        '<span class="nm">' + esc(r.name) + '</span></label>' +
+      '<input type="text" class="acc" data-acc="' + i + '" placeholder="UniProt accession" value="' + esc(st.acc) + '">' +
+      '<button class="chip" type="button" data-ident="' + i + '">Identify</button>' +
+      '<button class="chip" type="button" data-blast="' + i + '">BLAST</button>' +
+      '<button class="chip" type="button" data-fetch="' + i + '">Fetch AlphaFold</button>' +
+      '<label class="chip filebtn">Upload file<input type="file" accept=".pdb,.cif,.mmcif,.ent" data-file="' + i + '"></label>' +
+      '<span class="st" data-st="' + i + '">' + esc(st.status) + '</span>' +
+    '</div>';
+  }).join("");
+  wireStructRows();
+}
+
+function setStatus(i, msg){
+  structs[i].status = msg;
+  var el = document.querySelector('[data-st="' + i + '"]');
+  if(el) el.textContent = msg;
+}
+
+function wireStructRows(){
+  document.querySelectorAll("[data-show]").forEach(function(cb){
+    cb.addEventListener("change", function(){
+      structs[+cb.dataset.show].show = cb.checked;
+      applyStructStyles();
+    });
+  });
+  document.querySelectorAll("[data-acc]").forEach(function(inp){
+    inp.addEventListener("change", function(){ structs[+inp.dataset.acc].acc = inp.value.trim(); });
+  });
+  document.querySelectorAll("[data-fetch]").forEach(function(b){
+    b.addEventListener("click", function(){ fetchAF(+b.dataset.fetch); });
+  });
+  document.querySelectorAll("[data-ident]").forEach(function(b){
+    b.addEventListener("click", function(){ identifyByChecksum(+b.dataset.ident); });
+  });
+  document.querySelectorAll("[data-blast]").forEach(function(b){
+    b.addEventListener("click", function(){ blastIdentify(+b.dataset.blast); });
+  });
+  document.querySelectorAll("[data-file]").forEach(function(f){
+    f.addEventListener("change", function(){
+      var file = f.files && f.files[0]; if(!file) return;
+      var i = +f.dataset.file, fmt = /\.(cif|mmcif)$/i.test(file.name) ? "cif" : "pdb";
+      var rd = new FileReader();
+      rd.onload = function(){ loadStruct(i, String(rd.result), fmt, file.name); };
+      rd.onerror = function(){ setStatus(i, "could not read the file"); };
+      rd.readAsText(file);
+    });
+  });
+}
+
+function fetchAF(i){
+  var acc = (structs[i].acc || "").trim();
+  if(!acc) return setStatus(i, "enter an accession first");
+  sFail("");
+  setStatus(i, "fetching...");
+  fetch("https://alphafold.ebi.ac.uk/api/prediction/" + encodeURIComponent(acc))
+    .then(function(r){ if(!r.ok) throw new Error("no AlphaFold entry for " + acc); return r.json(); })
+    .then(function(j){
+      var e = j && j[0];
+      if(!e || !e.pdbUrl) throw new Error("no model for " + acc);
+      return fetch(e.pdbUrl).then(function(r){ return r.text(); }).then(function(t){
+        loadStruct(i, t, "pdb", "AlphaFold DB " + acc + " v" + e.latestVersion);
+      });
+    })
+    .catch(function(err){ setStatus(i, err.message || "fetch failed"); });
+}
+
+function loadStruct(i, text, format, source){
+  var v = ensureViewer(); if(!v) return;
+  var st = structs[i];
+  if(st.model){ try { v.removeModel(st.model); } catch(e){} st.model = null; }
+  var m;
+  try { m = v.addModel(text, format); }
+  catch(e){ return setStatus(i, "could not parse the " + format.toUpperCase()); }
+
+  var atoms = m.selectedAtoms({}), chain = null, ca = [];
+  atoms.forEach(function(a){
+    if(a.atom !== "CA") return;
+    if(chain === null) chain = a.chain;
+    if(a.chain !== chain) return;
+    ca.push({ resi:a.resi, one:AA3[String(a.resn).toUpperCase()] || "X", x:a.x, y:a.y, z:a.z, b:a.b });
+  });
+  if(!ca.length){ try { v.removeModel(m); } catch(e){} return setStatus(i, "no C-alpha atoms found"); }
+
+  st.model = m; st.ca = ca; st.chain = chain;
+  st.seq = ca.map(function(r){ return r.one; }).join("");
+  st.loaded = true; st.source = source;
+  var bs = ca.filter(function(r){ return typeof r.b === "number"; });
+  st.plddt = bs.length ? bs.reduce(function(t, r){ return t + r.b; }, 0) / bs.length : null;
+
+  mapStruct(i);
+  var n = Object.keys(st.colByResi).length;
+  setStatus(i, ca.length + " aa" +
+               (st.plddt !== null ? " · pLDDT " + st.plddt.toFixed(0) : "") +
+               " · " + n + " mapped");
+  applyStructStyles();
+  v.zoomTo(); v.render();
+  scheduleAutoSuperpose();
+}
+
+/* Fit as soon as a second structure arrives; the button re-runs it after a
+   change of cutoff or of which proteins are shown. */
+function scheduleAutoSuperpose(){
+  clearTimeout(superTimer);
+  superTimer = setTimeout(function(){
+    var n = structs.filter(function(st){ return st.loaded && st.show; }).length;
+    if(n >= 2 && !structs._superposed){ structs._superposed = true; superpose(); }
+  }, 700);
+}
+
+/* residue number in the model -> column in the alignment */
+function mapStruct(i){
+  var st = structs[i], row = (state.rows || [])[i];
+  if(!st) return;
+  st.colByResi = {};
+  if(!row || !st.loaded || !st.seq) return;
+  var ung = row.seq.replace(/-/g, ""), colOf = [], n = 0, c;
+  for(c = 0; c < row.seq.length; c++) if(row.seq[c] !== "-") colOf[n++] = c;
+  if(!ung) return;
+  var r = align(st.seq, ung, 12, 2), si = 0, ui = 0;
+  for(var k = 0; k < r.a.length; k++){
+    if(r.a[k] !== "-" && r.b[k] !== "-"){
+      var col = colOf[ui];
+      if(col !== undefined && st.ca[si]) st.colByResi[st.ca[si].resi] = col;
+    }
+    if(r.a[k] !== "-") si++;
+    if(r.b[k] !== "-") ui++;
+  }
+}
+
+function colourFor(i, resi, b){
+  var mode = $("sColour").value;
+  if(mode === "seq") return SEQCOL[i % SEQCOL.length];
+  if(mode === "plddt"){
+    for(var k = 0; k < PLDDT.length; k++) if(b >= PLDDT[k][0]) return PLDDT[k][1];
+    return C_NONE3D;
+  }
+  var col = structs[i].colByResi[resi];
+  if(col === undefined || !state.cls || !state.cls[i]) return C_NONE3D;
+  var vv = state.cls[i][col];
+  return vv === 2 ? C_IDENT : (vv === 1 ? C_SIM : C_NONE3D);
+}
+
+/* residues of structure i that fall inside the selected region, or null for all */
+function regionResis(i){
+  var reg = state.region; if(!reg) return null;
+  var st = structs[i], out = [];
+  st.ca.forEach(function(r){
+    var c = st.colByResi[r.resi];
+    if(c !== undefined && c >= reg.c0 && c <= reg.c1) out.push(r.resi);
+  });
+  return out;
+}
+
+function applyStructStyles(){
+  var v = ensureViewer(); if(!v) return;
+  applyOutline(v);
+  var style = $("sStyle").value;
+  structs.forEach(function(st, i){
+    if(!st.model) return;
+    st.model.setStyle({}, {});
+    if(!st.show) return;
+    var spec = {}, fn = function(atom){ return colourFor(i, atom.resi, atom.b); };
+    if(style === "cartoon") spec.cartoon = { colorfunc: fn, arrows: true };
+    else if(style === "stick") spec.stick = { colorfunc: fn, radius: 0.16 };
+    else spec.sphere = { colorfunc: fn, radius: 0.9 };
+    var resis = regionResis(i);
+    st.model.setStyle(resis ? { resi: resis } : {}, spec);
+  });
+  v.render();
+  var shown = structs.filter(function(s){ return s.loaded && s.show; }).length;
+  sNote(shown
+    ? "Conservation colours come from the alignment on the Alignment tab, so the threshold, "
+      + "colouring mode and colour choices there apply here too. Grey marks an unmarked residue, "
+      + "or one with no counterpart in the alignment."
+    : "Fetch a model from AlphaFold DB by UniProt accession, or upload a PDB or mmCIF file "
+      + "— including AlphaFold 3 output downloaded from the AlphaFold Server.");
+}
+
+/* Identify anything without an accession, then pull its model. Runs only while
+   the structure tab is open, so nobody downloads models they never look at. */
+function autoPopulate(){
+  if(!$("sAuto") || !$("sAuto").checked) return;
+  if($("paneStruct").hidden) return;
+  (state.rows || []).forEach(function(r, i){
+    var st = structs[i];
+    if(!st || st.busy) return;
+    if(!st.acc){
+      if(st.triedIdent) return;
+      st.triedIdent = true; st.busy = true;
+      identifyByChecksum(i, true).then(function(acc){
+        st.busy = false;
+        if(acc && !st.loaded && !st.triedFetch){ st.triedFetch = true; fetchAF(i); }
+      });
+    } else if(!st.loaded && !st.triedFetch){
+      st.triedFetch = true; fetchAF(i);
+    }
+  });
+}
+
+function scheduleAuto(){
+  clearTimeout(autoTimer);
+  autoTimer = setTimeout(function(){
+    if(structsRebuilt){ structsRebuilt = false; }
+    autoPopulate();
+  }, 500);
+}
+
+/* ---------- identifying a sequence ---------- */
+
+/* UniProt stores a CRC64 (ISO polynomial) for every UniParc sequence, so an
+   unmodified sequence can be looked up exactly, with no alignment at all. */
+var CRC64_TABLE = null;
+function crc64Hex(str){
+  if(!CRC64_TABLE){
+    CRC64_TABLE = new Array(256);
+    var POLY = 0xd800000000000000n;
+    for(var i = 0; i < 256; i++){
+      var c = BigInt(i);
+      for(var k = 0; k < 8; k++) c = (c & 1n) ? ((c >> 1n) ^ POLY) : (c >> 1n);
+      CRC64_TABLE[i] = c & 0xffffffffffffffffn;
+    }
+  }
+  var crc = 0n;
+  for(var j = 0; j < str.length; j++){
+    var byte = BigInt(str.charCodeAt(j) & 0xff);
+    crc = CRC64_TABLE[Number((crc ^ byte) & 0xffn)] ^ (crc >> 8n);
+  }
+  return crc.toString(16).toUpperCase().padStart(16, "0");
+}
+
+function setAcc(i, acc){
+  structs[i].acc = acc;
+  if(i === 0 && !$("featAcc").value) $("featAcc").value = acc;
+  var el = document.querySelector('[data-acc="' + i + '"]');
+  if(el) el.value = acc;
+}
+
+function rowSeq(i){
+  var row = (state.rows || [])[i];
+  return row ? row.seq.replace(/-/g, "").toUpperCase() : "";
+}
+
+/* Prefer a plain accession over an isoform (P49760-1) or a version (A8K7I0.1). */
+function bestAccession(list){
+  var accs = list || [];
+  var plain = accs.filter(function(a){ return !/[-.]/.test(a); });
+  if(plain.length) return plain[0];
+  return accs.length ? accs[0].split(/[-.]/)[0] : "";
+}
+
+function identifyByChecksum(i, quiet){
+  var seq = rowSeq(i);
+  if(!seq) return setStatus(i, "no sequence to identify");
+  if(!quiet) setStatus(i, "identifying...");
+  var cs = crc64Hex(seq);
+  return fetch("https://rest.uniprot.org/uniparc/search?query=checksum:" + cs + "&format=json&size=1")
+    .then(function(r){ return r.json(); })
+    .then(function(j){
+      var res = j && j.results && j.results[0];
+      if(!res){ setStatus(i, "no exact match — try BLAST"); return null; }
+      var acc = bestAccession(res.uniProtKBAccessions);
+      if(!acc){ setStatus(i, "matched " + res.uniParcId + ", no UniProt entry"); return null; }
+      setAcc(i, acc);
+      return fetch("https://rest.uniprot.org/uniprotkb/" + acc + ".json?fields=accession,id,reviewed")
+        .then(function(r){ return r.ok ? r.json() : null; })
+        .then(function(e){
+          setStatus(i, "identified " + acc + (e && e.uniProtkbId ? " (" + e.uniProtkbId + ")" : "") +
+                       " — exact sequence match");
+          return acc;
+        })
+        .catch(function(){ setStatus(i, "identified " + acc + " — exact sequence match"); return acc; });
+    })
+    .catch(function(){ setStatus(i, "lookup failed"); return null; });
+}
+
+function identifyAll(){
+  (state.rows || []).forEach(function(r, i){
+    if(!structs[i].acc) identifyByChecksum(i);
+  });
+}
+
+/* BLAST at the EBI job dispatcher. It requires an email address for job
+   tracking, which is sent to the EBI, so the field is filled in by hand. */
+var BLAST_ROOT = "https://www.ebi.ac.uk/Tools/services/rest/ncbiblast";
+
+function blastIdentify(i){
+  var email = ($("sEmail").value || "").trim();
+  if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email))
+    return setStatus(i, "BLAST needs an email — the EBI requires one");
+  try { localStorage.setItem("bap-email", email); } catch(e){}
+  var seq = rowSeq(i);
+  if(!seq) return setStatus(i, "no sequence to BLAST");
+
+  setStatus(i, "BLAST: submitting...");
+  var body = new URLSearchParams();
+  body.set("email", email);
+  body.set("program", "blastp");
+  body.set("stype", "protein");
+  body.set("database", "uniprotkb_swissprot");
+  body.set("alignments", "5");
+  body.set("scores", "5");
+  body.set("sequence", ">query\n" + seq);
+
+  fetch(BLAST_ROOT + "/run", { method:"POST", body:body })
+    .then(function(r){
+      if(!r.ok) throw new Error("the EBI refused the BLAST job");
+      return r.text();
+    })
+    .then(function(jobId){ pollBlast(i, jobId.trim(), 0); })
+    .catch(function(e){ setStatus(i, e.message || "BLAST submission failed"); });
+}
+
+function pollBlast(i, jobId, tries){
+  if(tries > 80) return setStatus(i, "BLAST timed out");
+  fetch(BLAST_ROOT + "/status/" + jobId)
+    .then(function(r){ return r.text(); })
+    .then(function(st){
+      st = st.trim();
+      if(st === "RUNNING" || st === "PENDING" || st === "QUEUED"){
+        setStatus(i, "BLAST: " + st.toLowerCase() + "... (" + (tries * 3) + "s)");
+        return setTimeout(function(){ pollBlast(i, jobId, tries + 1); }, 3000);
+      }
+      if(st !== "FINISHED") return setStatus(i, "BLAST: " + st);
+      fetch(BLAST_ROOT + "/result/" + jobId + "/ids")
+        .then(function(r){ return r.text(); })
+        .then(function(txt){
+          var first = txt.split(/\r?\n/).map(function(l){ return l.trim(); })
+                         .filter(Boolean)[0];
+          if(!first) return setStatus(i, "BLAST returned no hits");
+          var tok = first.split(":").pop().split(/\s+/)[0];
+          var acc = tok.split(/[-.]/)[0];
+          if(!acc) return setStatus(i, "BLAST hit could not be read: " + first);
+          setAcc(i, acc);
+          setStatus(i, "BLAST top hit " + acc + " — check it is the right protein");
+        });
+    })
+    .catch(function(){ setStatus(i, "BLAST polling failed"); });
+}
+
+/* A dark rim around the molecule, the way a figure in a journal usually
+   draws one. 3Dmol calls it an outline. */
+function applyOutline(v){
+  try {
+    v.setViewStyle($("sOutline").checked
+      ? { style:"outline", color:"black", width:0.06 }
+      : { style:"solid" });
+  } catch(e){}
+}
+
+/* ---------- superposition: quaternion Kabsch ---------- */
+function jacobiTop(A){
+  var n = 4, a = A.map(function(r){ return r.slice(); }),
+      v = [[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]], i, j, k;
+  for(var sweep = 0; sweep < 100; sweep++){
+    var off = 0;
+    for(i = 0; i < n; i++) for(j = i + 1; j < n; j++) off += a[i][j] * a[i][j];
+    if(off < 1e-22) break;
+    for(i = 0; i < n; i++) for(j = i + 1; j < n; j++){
+      if(Math.abs(a[i][j]) < 1e-20) continue;
+      var theta = (a[j][j] - a[i][i]) / (2 * a[i][j]);
+      var sgn = theta >= 0 ? 1 : -1;
+      var t = sgn / (Math.abs(theta) + Math.sqrt(theta * theta + 1));
+      var c = 1 / Math.sqrt(t * t + 1), sn = t * c;
+      for(k = 0; k < n; k++){
+        var aik = a[i][k], ajk = a[j][k];
+        a[i][k] = c * aik - sn * ajk; a[j][k] = sn * aik + c * ajk;
+      }
+      for(k = 0; k < n; k++){
+        var aki = a[k][i], akj = a[k][j];
+        a[k][i] = c * aki - sn * akj; a[k][j] = sn * aki + c * akj;
+        var vki = v[k][i], vkj = v[k][j];
+        v[k][i] = c * vki - sn * vkj; v[k][j] = sn * vki + c * vkj;
+      }
+    }
+  }
+  var best = 0;
+  for(i = 1; i < n; i++) if(a[i][i] > a[best][best]) best = i;
+  return [v[0][best], v[1][best], v[2][best], v[3][best]];
+}
+
+function kabsch(P, Q){
+  var n = P.length, cP = [0,0,0], cQ = [0,0,0], i;
+  for(i = 0; i < n; i++){
+    cP[0] += P[i].x; cP[1] += P[i].y; cP[2] += P[i].z;
+    cQ[0] += Q[i].x; cQ[1] += Q[i].y; cQ[2] += Q[i].z;
+  }
+  for(i = 0; i < 3; i++){ cP[i] /= n; cQ[i] /= n; }
+  var Sxx=0, Sxy=0, Sxz=0, Syx=0, Syy=0, Syz=0, Szx=0, Szy=0, Szz=0;
+  for(i = 0; i < n; i++){
+    var px = P[i].x - cP[0], py = P[i].y - cP[1], pz = P[i].z - cP[2];
+    var qx = Q[i].x - cQ[0], qy = Q[i].y - cQ[1], qz = Q[i].z - cQ[2];
+    Sxx += px*qx; Sxy += px*qy; Sxz += px*qz;
+    Syx += py*qx; Syy += py*qy; Syz += py*qz;
+    Szx += pz*qx; Szy += pz*qy; Szz += pz*qz;
+  }
+  var e = jacobiTop([
+    [Sxx+Syy+Szz,  Syz-Szy,      Szx-Sxz,      Sxy-Syx],
+    [Syz-Szy,      Sxx-Syy-Szz,  Sxy+Syx,      Szx+Sxz],
+    [Szx-Sxz,      Sxy+Syx,     -Sxx+Syy-Szz,  Syz+Szy],
+    [Sxy-Syx,      Szx+Sxz,      Syz+Szy,     -Sxx-Syy+Szz]
+  ]);
+  var q0 = e[0], q1 = e[1], q2 = e[2], q3 = e[3];
+  var R = [
+    [q0*q0+q1*q1-q2*q2-q3*q3, 2*(q1*q2-q0*q3),         2*(q1*q3+q0*q2)],
+    [2*(q1*q2+q0*q3),         q0*q0-q1*q1+q2*q2-q3*q3, 2*(q2*q3-q0*q1)],
+    [2*(q1*q3-q0*q2),         2*(q2*q3+q0*q1),         q0*q0-q1*q1-q2*q2+q3*q3]
+  ];
+  var sum = 0;
+  for(i = 0; i < n; i++){
+    var ax = P[i].x - cP[0], ay = P[i].y - cP[1], az = P[i].z - cP[2];
+    var rx = R[0][0]*ax + R[0][1]*ay + R[0][2]*az;
+    var ry = R[1][0]*ax + R[1][1]*ay + R[1][2]*az;
+    var rz = R[2][0]*ax + R[2][1]*ay + R[2][2]*az;
+    var dx = rx - (Q[i].x - cQ[0]), dy = ry - (Q[i].y - cQ[1]), dz = rz - (Q[i].z - cQ[2]);
+    sum += dx*dx + dy*dy + dz*dz;
+  }
+  return { R:R, cP:cP, cQ:cQ, rmsd:Math.sqrt(sum / n), n:n };
+}
+
+function moveAtom(a, f){
+  var x = a.x - f.cP[0], y = a.y - f.cP[1], z = a.z - f.cP[2];
+  a.x = f.R[0][0]*x + f.R[0][1]*y + f.R[0][2]*z + f.cQ[0];
+  a.y = f.R[1][0]*x + f.R[1][1]*y + f.R[1][2]*z + f.cQ[1];
+  a.z = f.R[2][0]*x + f.R[2][1]*y + f.R[2][2]*z + f.cQ[2];
+}
+
+function superpose(){
+  var v = ensureViewer(); if(!v) return;
+  sFail("");
+  var idx = [];
+  structs.forEach(function(st, i){ if(st.loaded && st.show) idx.push(i); });
+  if(idx.length < 2){
+    $("sRmsd").textContent = "";
+    return sFail("Load and tick at least two structures to superpose.");
+  }
+
+  var cut = +$("sFit").value || 0;
+  var ok = function(r){ return cut === 0 || (typeof r.b === "number" && r.b >= cut); };
+  var ref = idx[0], lines = [], refByCol = {};
+  structs[ref].ca.forEach(function(r){
+    var c = structs[ref].colByResi[r.resi];
+    if(c !== undefined) refByCol[c] = r;
+  });
+
+  for(var j = 1; j < idx.length; j++){
+    var mob = idx[j], P = [], Q = [];
+    structs[mob].ca.forEach(function(r){
+      var c = structs[mob].colByResi[r.resi];
+      var inReg = !state.region || (c !== undefined && c >= state.region.c0 && c <= state.region.c1);
+      if(c !== undefined && refByCol[c] && inReg && ok(r) && ok(refByCol[c])){ P.push(r); Q.push(refByCol[c]); }
+    });
+    if(P.length < 3){
+      lines.push(state.rows[mob].name + ": too few paired residues" +
+                 (cut ? " above pLDDT " + cut : ""));
+      continue;
+    }
+    var fit = kabsch(P, Q);
+    structs[mob].model.selectedAtoms({}).forEach(function(a){ moveAtom(a, fit); });
+    structs[mob].ca.forEach(function(r){ moveAtom(r, fit); });
+    lines.push(state.rows[mob].name + " to " + state.rows[ref].name +
+               ": RMSD " + fit.rmsd.toFixed(2) + " Å over " + fit.n + " C-alpha");
+  }
+  applyStructStyles();
+  v.zoomTo(); v.render();
+  $("sRmsd").textContent = lines.join("   ·   ");
+}
+
+/* ---------- tabs + structure wiring ---------- */
+function showTab(which){
+  var onStruct = which === "struct";
+  $("paneStruct").hidden = !onStruct;
+  $("paneAlign").hidden = onStruct;
+  $("tabStruct").setAttribute("aria-selected", String(onStruct));
+  $("tabAlign").setAttribute("aria-selected", String(!onStruct));
+  if(onStruct){
+    syncStructList();
+    scheduleAuto();
+    var v = ensureViewer();
+    if(v){
+      requestAnimationFrame(function(){ v.resize(); applyStructStyles(); v.render(); });
+      if(window.ResizeObserver && !v.__ro){
+        v.__ro = new ResizeObserver(function(){ try { v.resize(); v.render(); } catch(e){} });
+        v.__ro.observe(document.querySelector(".viewerwrap"));
+      }
+    }
+  }
+}
+$("tabAlign").addEventListener("click", function(){ showTab("align"); });
+$("tabStruct").addEventListener("click", function(){ showTab("struct"); });
+$("sColour").addEventListener("change", applyStructStyles);
+$("sStyle").addEventListener("change", applyStructStyles);
+$("sOutline").addEventListener("change", function(){
+  var v = ensureViewer(); if(!v) return;
+  applyOutline(v); v.render();
+});
+$("sSuperpose").addEventListener("click", superpose);
+$("sIdentAll").addEventListener("click", identifyAll);
+$("sAuto").addEventListener("change", function(){ if($("sAuto").checked) scheduleAuto(); });
+try { var savedEmail = localStorage.getItem("bap-email"); if(savedEmail) $("sEmail").value = savedEmail; } catch(e){}
+$("sReset").addEventListener("click", function(){ var v = ensureViewer(); if(v){ v.zoomTo(); v.render(); } });
+$("sPng").addEventListener("click", function(){
+  var v = ensureViewer(); if(!v) return;
+  fetch(v.pngURI()).then(function(r){ return r.blob(); }).then(function(b){
+    save(slug() + "-structure.png", b, "image/png")
+      .then(function(){ toast("Structure PNG saved."); }, handle);
+  });
+});
+window.addEventListener("resize", function(){ if(viewer && !$("paneStruct").hidden) viewer.resize(); });
+
+/* ---------- theme ---------- */
+var MODES = ["auto","light","dark"], mode = "auto";
+try{ var stored = localStorage.getItem("bap-theme"); if(MODES.indexOf(stored) > -1) mode = stored; }catch(e){}
+function applyTheme(){
+  if(mode === "auto") document.documentElement.removeAttribute("data-theme");
+  else document.documentElement.setAttribute("data-theme", mode);
+  $("themeBtn").textContent = "Theme: " + mode;
+  try{ localStorage.setItem("bap-theme", mode); }catch(e){}
+}
+$("themeBtn").addEventListener("click", function(){
+  mode = MODES[(MODES.indexOf(mode) + 1) % MODES.length];
+  applyTheme();
+});
+applyTheme();
+})();
+
+/* ---------- offline support (https only; no-op on file://) ---------- */
+if("serviceWorker" in navigator && location.protocol.indexOf("http") === 0){
+  var hadController = !!navigator.serviceWorker.controller, reloading = false;
+  navigator.serviceWorker.addEventListener("controllerchange", function(){
+    // a newer version took over an already-cached page: refresh once so the
+    // viewer sees it instead of yesterday's copy
+    if(hadController && !reloading){ reloading = true; location.reload(); }
+  });
+  window.addEventListener("load", function(){
+    navigator.serviceWorker.register("sw.js").catch(function(){});
+  });
+}
+</script>
+</body>
+</html>

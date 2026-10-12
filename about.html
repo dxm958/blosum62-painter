@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="How BLOSUM Alignment Painter works: the substitution rule, the alignment algorithms, the data sources and the statistics.">
+<meta name="theme-color" content="#DC0806">
+<title>About &middot; BLOSUM Alignment Painter</title>
+<link rel="stylesheet" href="css/painter.css">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<style>
+  html{scrollbar-gutter:stable}
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+    background:var(--pa-bg);color:var(--pa-ink);min-height:100vh;
+    display:flex;flex-direction:column;
+  }
+  .pa-container{flex:1}
+  .mark{width:34px;height:34px;border-radius:7px;flex:none}
+  .pa-headrow{display:flex;align-items:center;gap:.9rem}
+</style>
+<style>
+  .pa-card h2{font-size:1.1rem;color:var(--pa-head);margin-bottom:.6rem}
+  .pa-card p, .pa-card li{font-size:.9rem;line-height:1.6;color:#444;margin-bottom:.6rem}
+  .pa-card ul{padding-left:1.2rem}
+  table.pa-t{border-collapse:collapse;width:100%;font-size:.86rem;margin:.4rem 0 .8rem}
+  table.pa-t th,table.pa-t td{border-bottom:1px solid var(--pa-line);padding:.45rem .6rem;text-align:left}
+  table.pa-t th{color:var(--pa-head);font-weight:600}
+  code{font-family:ui-monospace,Menlo,monospace;font-size:.85em;background:var(--pa-soft);
+       border:1px solid var(--pa-line);border-radius:3px;padding:.05rem .25rem}
+</style>
+</head>
+<body>
+
+<div class="pa-header">
+  <div class="pa-container" style="padding:0;max-width:1100px">
+    <div class="pa-headrow">
+      <svg class="mark" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <rect x="1" y="1" width="62" height="62" rx="13" fill="#FFFFFF" stroke="#C9C9D2" stroke-width="1.5"/>
+        <ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#DC0806" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(0 32 32)"/>
+        <ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#FE6B00" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(60 32 32)"/>
+        <ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#DC0806" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(120 32 32)"/>
+        <ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#FE6B00" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(180 32 32)"/>
+        <ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#DC0806" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(240 32 32)"/>
+        <ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#FE6B00" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(300 32 32)"/>
+        <circle cx="32" cy="32" r="4.4" fill="#FFFFFF"/>
+        <text x="32.00" y="18.40" font-family="Arial,Helvetica,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">B</text>
+        <text x="43.78" y="25.20" font-family="Arial,Helvetica,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">L</text>
+        <text x="43.78" y="38.80" font-family="Arial,Helvetica,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">O</text>
+        <text x="32.00" y="45.60" font-family="Arial,Helvetica,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">S</text>
+        <text x="20.22" y="38.80" font-family="Arial,Helvetica,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">U</text>
+        <text x="20.22" y="25.20" font-family="Arial,Helvetica,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">M</text>
+      </svg>
+      <div>
+        <h1>BLOSUM Alignment Painter</h1>
+        <p class="subtitle">Comparative domain architecture, conservation and structure &mdash; entirely in your browser.</p>
+        <div class="pa-links">
+          <a href="app.html">Open the tool</a>
+          <a href="https://github.com/dxm958/blosum62-painter">GitHub</a>
+          <a href="https://doi.org/10.64898/2026.09.17.752351">Paper</a>
+          <a href="https://github.com/dxm958/blosum62-painter#how-to-cite">How to cite</a>
+          <a href="about.html">About</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="pa-container">
+
+  <div class="pa-card">
+    <h2>The colour rule</h2>
+    <table class="pa-t">
+      <tr><th>Column</th><th>Shading</th></tr>
+      <tr><td>All residues identical</td><td>red</td></tr>
+      <tr><td>Non-identical, every pair scoring BLOSUM-62 at or above the threshold</td><td>orange</td></tr>
+      <tr><td>Below the threshold, or any column containing a gap</td><td>unmarked</td></tr>
+    </table>
+    <p>Stryer's <em>Biochemistry</em> (5th ed., &sect;7.2) defines a conservative substitution as one
+       scoring <code>&gt; 0</code>, which is the default here. The more inclusive <code>&ge; 0</code>
+       is sometimes used instead. The choice is not cosmetic, and the threshold in force is reported
+       with the figure.</p>
+    <p>With three or more sequences, each residue is scored against sequence&nbsp;1 rather than
+       requiring every pair in a column to qualify, so one outlier no longer blanks its column.</p>
+  </div>
+
+  <div class="pa-card">
+    <h2>Alignment</h2>
+    <p>Pairs are aligned by Needleman&ndash;Wunsch with Gotoh affine gap costs on BLOSUM-62. Three
+       or more sequences are aligned by star alignment anchored on sequence&nbsp;1, which keeps every
+       column in the reference's coordinates &mdash; the same frame the region selection, the residue
+       numbering and the per-residue scoring all use.</p>
+    <p>Selecting a region can either trim the existing alignment or realign each sequence against the
+       region alone by semi-global alignment, which holds up better when the sequences diverge outside
+       the domain.</p>
+  </div>
+
+  <div class="pa-card">
+    <h2>Statistics</h2>
+    <p>Per-column conservation is the Henikoff position-weighted share of sequences carrying the
+       commonest residue, so a crowded clade does not outvote a lone outgroup. A selected region is
+       compared against the remainder of the protein with a Mann&ndash;Whitney U test, tie-corrected
+       because conservation values cluster heavily at 1.</p>
+  </div>
+
+  <div class="pa-card">
+    <h2>Structure</h2>
+    <p>Models come from AlphaFold DB by UniProt accession, or from PDB and mmCIF files you supply,
+       which covers AlphaFold&nbsp;3 output downloaded from the AlphaFold Server. AlphaFold DB itself
+       serves AlphaFold&nbsp;2 models; no public database serves AlphaFold&nbsp;3 predictions by
+       accession.</p>
+    <p>Superposition is quaternion Kabsch over C-alpha pairs taken from the sequence alignment,
+       restricted by default to residues with pLDDT &ge; 70. Fitting over disordered tails makes an
+       RMSD meaningless: for CLK2 against DOA it is 31.7&nbsp;&#8491; unrestricted and
+       0.55&nbsp;&#8491; over the kinase domain.</p>
+  </div>
+
+  <div class="pa-card">
+    <h2>Data sources</h2>
+    <ul>
+      <li><strong>UniProt</strong> &mdash; sequences, search, features, and sequence identification by UniParc checksum</li>
+      <li><strong>InterPro</strong> &mdash; domain and repeat annotations, including the member databases</li>
+      <li><strong>OMA</strong> &mdash; orthologues, one entry per species</li>
+      <li><strong>AlphaFold DB</strong> &mdash; predicted structures</li>
+    </ul>
+    <p>Each is queried directly from your browser. Sequences you paste are never sent anywhere; the
+       only thing that leaves the page for identification is a 16-character checksum.</p>
+  </div>
+
+  <div class="pa-card">
+    <h2>How to cite</h2>
+    <p>McQuarrie DWJ (2026). <em>BLOSUM Alignment Painter</em>.
+       <a href="https://github.com/dxm958/blosum62-painter">github.com/dxm958/blosum62-painter</a></p>
+    <p>and the paper it is described in: Tian YW, Hadzhiev Y, Abis G, Dodel M, Alard EL,
+       McQuarrie DWJ, Mardakheh FK, Conte MR, M&uuml;ller F &amp; Soller M (2026).
+       <a href="https://doi.org/10.64898/2026.09.17.752351">bioRxiv 2026.09.17.752351</a></p>
+    <p>Substitution scores are BLOSUM-62: Henikoff S &amp; Henikoff JG (1992)
+       <a href="https://doi.org/10.1073/pnas.89.22.10915"><em>PNAS</em> 89:10915&ndash;10919</a>.</p>
+  </div>
+
+</div>
+
+<div class="pa-footer">
+  <a href="index.html">Home</a> &middot; <a href="app.html">Open the tool</a> &middot;
+  <a href="https://github.com/dxm958/blosum62-painter">GitHub</a>
+  <br>
+  David W. J. McQuarrie &middot; Weill Cornell Medicine
+</div>
+
+</body>
+</html>
