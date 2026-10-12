@@ -1,6 +1,6 @@
 <img src="icons/icon-192.png" width="76" alt="">
 
-# BLOSUM Alignment Painter
+# DoStruct
 
 Align amino acid sequences and shade every column by identity or BLOSUM-62 substitution
 similarity, then export a publication-ready SVG or PNG.
@@ -10,6 +10,18 @@ similarity, then export a publication-ready SVG or PNG.
 No install, no account, no server: one static HTML file that does all the work in your browser.
 
 **Using it for a figure? Please cite it — see [How to cite](#how-to-cite).**
+
+## Conserved unannotated regions
+
+Domain databases are built from structured folds, so they cover the ordered parts of a protein
+well and the disordered parts poorly. DoStruct looks in that gap: within the residues no domain,
+repeat or zinc finger covers, it reports the runs that evolution has held on to, each with its
+mean conservation, its mean AlphaFold pLDDT, and a Mann-Whitney test against the rest of the
+unannotated sequence.
+
+The conservation cutoff is taken *within* the unannotated residues rather than across the whole
+protein — ranked globally, nearly every top-scoring residue sits inside a domain and nothing is
+left to find.
 
 ## The colour rule
 
@@ -50,7 +62,7 @@ You can also download and open `index.html`.
 
 Cite the software itself:
 
-> McQuarrie DWJ (2026). *BLOSUM Alignment Painter* (v3.6.2).
+> McQuarrie DWJ (2026). *DoStruct* (v3.7.0).
 > https://github.com/dxm958/blosum62-painter
 
 and the paper it is described in:

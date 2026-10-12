@@ -1,7 +1,7 @@
 {
-  "name": "BLOSUM Alignment Painter",
-  "short_name": "Alignment Painter",
-  "description": "Align amino acid sequences and shade every column by identity or BLOSUM-62 substitution similarity.",
+  "name": "DoStruct",
+  "short_name": "DoStruct",
+  "description": "Align orthologues, shade by BLOSUM-62 substitution similarity, and find conserved regions that no domain database describes.",
   "start_url": ".",
   "scope": ".",
   "display": "standalone",
