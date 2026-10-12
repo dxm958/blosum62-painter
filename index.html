@@ -70,18 +70,29 @@
     <span>&rarr;</span>
   </a>
 
-  <a class="pa-hero" href="app.html">
+  <div class="pa-hero pa-static">
     <div>
-      <h2>Open the tool</h2>
+      <h2>Alignment &amp; conservation</h2>
       <p>Search a protein by name, pull its orthologues, and shade the alignment by identity and
-         BLOSUM-62 substitution similarity. Restrict to any annotated domain, test whether it is
-         more conserved than the rest of the protein, and paint the result onto a predicted
-         structure.</p>
-      <p class="pa-hint">UniProt &middot; InterPro &middot; OMA &middot; AlphaFold DB &middot;
-         exports vector SVG and PNG</p>
+         BLOSUM-62 substitution similarity. Restrict to any annotated domain and test whether it is
+         more conserved than the rest of the protein.</p>
+      <p class="pa-hint">UniProt &middot; InterPro &middot; OMA &middot; exports vector SVG and PNG</p>
+      <p class="pa-hint">Domain architecture, conservation statistics and overview strips are part
+         of this view.</p>
+      <a class="pa-btn" href="app.html">Open alignment view</a>
     </div>
-    <span class="pa-go">&rarr;</span>
-  </a>
+  </div>
+
+  <div class="pa-hero pa-static">
+    <div>
+      <h2>Structure</h2>
+      <p>Fetch predicted structures from AlphaFold DB or upload PDB and mmCIF files, including
+         AlphaFold&nbsp;3 output. Conservation from the alignment is painted onto the model, and
+         structures are superposed over a chosen domain.</p>
+      <p class="pa-hint">AlphaFold DB &middot; quaternion Kabsch &middot; pLDDT-filtered fitting</p>
+      <a class="pa-btn" href="app.html#structure">Open structure view</a>
+    </div>
+  </div>
 
   <div class="pa-divider"></div>
 

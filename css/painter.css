@@ -78,3 +78,15 @@
   border-top:1px solid var(--pa-line);background:#fff;line-height:1.7;
 }
 .pa-footer a{color:#555}
+
+/* A card that describes rather than navigates: the button is the only target. */
+.pa-static{cursor:default}
+.pa-static:hover{border-color:var(--pa-line);box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.pa-btn{
+  display:inline-block;margin-top:.9rem;padding:.55rem 1.1rem;border-radius:8px;
+  background:var(--pa-accent);color:#fff;text-decoration:none;
+  font-size:.9rem;font-weight:600;transition:background .2s;
+}
+.pa-btn:hover{background:#b00604}
+.pa-btn.secondary{background:var(--pa-soft);color:var(--pa-head);border:1px solid #ddd}
+.pa-btn.secondary:hover{background:#eee}
