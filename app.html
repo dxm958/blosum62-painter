@@ -376,8 +376,7 @@ button.ghost.sm{padding:5px 11px;font-size:12px}
 .comphits .e{margin-left:auto;font-size:11px;color:var(--muted)}
 .compstruct{margin-top:10px}
 .compviewer{width:100%;height:340px;position:relative;border:1px solid var(--rule);
-  border-radius:4px;background:#fff;display:none}
-.compviewer.on{display:block}
+  border-radius:4px;background:#fff}
 .compstructopts{display:flex;gap:16px;align-items:center;flex-wrap:wrap;margin-top:7px;
   font-size:12px;color:var(--ink-2)}
 .compstructopts select{font:inherit;font-size:12px;padding:2px 4px}
@@ -609,12 +608,13 @@ button.ghost.sm{padding:5px 11px;font-size:12px}
 
     <div id="paneComp" hidden>
       <div class="compsearch">
-        <input type="search" id="compQ" placeholder="Gene name or UniProt accession, e.g. SOX9 or P48436"
+        <input type="search" id="compQ" placeholder="Human gene name or UniProt accession, e.g. SOX9 or P48436"
                autocomplete="off" spellcheck="false">
         <div id="compHits" class="comphits" hidden></div>
       </div>
-      <p class="note" id="compStatus">Every reviewed human protein, with its annotated domains
-        and the DoStruct elements found in the sequence they leave undescribed.</p>
+      <p class="note" id="compStatus">Every reviewed <strong>human</strong> protein, with its
+        annotated domains and the DoStruct elements found in the sequence they leave undescribed.
+        Other model organisms are planned.</p>
       <section class="panel" id="compPanel" hidden>
         <div class="panelhead"><h2 id="compTitle"></h2><span class="sp"></span>
           <button class="ghost sm" id="compSvg" type="button">SVG</button>
@@ -624,7 +624,6 @@ button.ghost.sm{padding:5px 11px;font-size:12px}
         <div class="compstruct">
           <div id="compViewer" class="compviewer"></div>
           <div class="compstructopts">
-            <label><input type="checkbox" id="compShowStruct"> Show AlphaFold structure</label>
             <label>Colour
               <select id="compColour">
                 <option value="elem" selected>DoStruct elements</option>
@@ -3124,9 +3123,10 @@ function compInit(){
     compIndex = j;
     var withEl = 0;
     for(var i = 0; i < j.length; i++) if(j[i][3] > 0) withEl++;
-    $("compStatus").textContent = j.length.toLocaleString() + " reviewed human proteins, " +
-      withEl.toLocaleString() + " with at least one DoStruct element. " +
-      "Search by gene name or accession.";
+    $("compStatus").innerHTML = j.length.toLocaleString() +
+      " reviewed <strong>human</strong> proteins, " + withEl.toLocaleString() +
+      " with at least one DoStruct element. Search by gene name or accession. " +
+      "Other model organisms are planned.";
     compInit.busy = false;
   }).catch(function(e){
     $("compStatus").textContent = "could not load the compendium index (" + e.message + ")";
@@ -3202,7 +3202,7 @@ function compOpen(acc){
       compCur = { meta: meta, track: (res[1] && res[1][acc]) || {} };
       $("compStatus").textContent = "";
       compDraw();
-      if($("compShowStruct").checked) compStructure();
+      compStructure();
     })
     .catch(function(e){ $("compStatus").textContent = "could not load " + acc + " (" + e.message + ")"; });
 }
@@ -3220,9 +3220,18 @@ function compDraw(){
 
   if(!m.e.length){
     $("compTable").innerHTML = "";
-    $("compNote").textContent = "No DoStruct element in this protein. " +
-      (m.d.length ? "Annotated domains leave " : "") +
-      "either too little undescribed sequence to score, or no run of six conserved residues within it.";
+    /* two quite different failures, and a user deserves to know which */
+    if(!t.c){
+      $("compNote").textContent = "This protein could not be scored: no orthologues were found " +
+        "for it in OMA, so there is no alignment to measure conservation against. " +
+        "The domains and model confidence above are unaffected.";
+    } else {
+      var covered = m.d.reduce(function(a, b){ return a + (b[1] - b[0] + 1); }, 0);
+      $("compNote").textContent = "No DoStruct element in this protein. Annotated domains cover " +
+        Math.round(100 * covered / m.n) + "% of it, leaving " + (m.n - covered) +
+        " residues, and within those no run of six consecutive residues reaches the conservation " +
+        "cutoff. Heavily annotated proteins leave the screen little room to work.";
+    }
     return;
   }
   $("compTable").innerHTML = m.e.map(function(e, i){
@@ -3248,6 +3257,12 @@ function buildCompOps(m, t, W){
     ops.push({t:"text", x:labelW - 8, y:yy, s:txt, fill:C_INK, size:size || 10, anchor:"end"});
   }
   // conservation
+  if(!t.c){
+    ops.push({t:"text", x:labelW + 6, y:9, s:"no orthologue alignment, conservation not scored",
+              fill:"#8A8A95", size:9.5, italic:true});
+    ops.push({t:"text", x:labelW - 8, y:9, s:"conservation", fill:"#8A8A95", size:10, anchor:"end"});
+    y += 24;
+  }
   if(t.c){
     var h = 34;
     ops.push({t:"rect", x:labelW, y:y, w:barW, h:h, fill:"#FAFAFB", stroke:"#C9C9D2", sw:0.5});
@@ -3329,9 +3344,6 @@ function compEnsureViewer(){
 
 function compStructure(){
   if(!compCur) return;
-  var on = $("compShowStruct").checked;
-  $("compViewer").classList.toggle("on", on);
-  if(!on) return;
   var v = compEnsureViewer();
   if(!v){ $("compStructStatus").textContent = "3D viewer unavailable"; return; }
   var acc = compCur.meta.a;
@@ -3391,10 +3403,7 @@ function compPaint(){
   }
   v.render();
 }
-$("compShowStruct").addEventListener("change", compStructure);
-$("compColour").addEventListener("change", function(){
-  if($("compShowStruct").checked){ compPaint(); }
-});
+$("compColour").addEventListener("change", compPaint);
 
 /* search box */
 $("compQ").addEventListener("input", function(){

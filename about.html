@@ -136,8 +136,8 @@
 
   <div class="pa-card">
     <h2>Compendium</h2>
-    <p>The Compendium tab holds every reviewed human protein of 150 to 2000 residues, 17&thinsp;710
-       in all, with its annotated domains and the DoStruct elements found in the sequence those
+    <p>The Compendium tab holds every reviewed <strong>human</strong> protein of 150 to 2000
+       residues, 17&thinsp;710 in all, with its annotated domains and the DoStruct elements found in the sequence those
        domains leave undescribed. 7827 proteins carry at least one element, 25&thinsp;561 in total,
        with a median length of 8 residues.</p>
     <p>These are precomputed, not calculated in the browser: orthologues were retrieved for the
@@ -145,6 +145,13 @@
        by gene name or accession to get the protein drawn to scale with its conservation profile,
        domains, elements, UniProt short features and model confidence, and optionally the AlphaFold
        structure painted by element.</p>
+    <p>Two things can stop a protein being scored, and the tool says which. A protein with no
+       orthologues in OMA has no alignment to measure against, so no conservation is reported at
+       all. A protein whose annotated domains cover nearly all of it has too little undescribed
+       sequence left for a percentile to mean anything; the ELAV/Hu proteins are the clearest
+       example, with domains covering three quarters of HuR.</p>
+    <p>The compendium currently covers human only, because the orthologue retrieval, alignment and
+       scoring were run over the human proteome. Coverage of other model organisms is planned.</p>
   </div>
 
   <div class="pa-card">

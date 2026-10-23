@@ -13,7 +13,7 @@ No install, no account, no server: one static HTML file that does all the work i
 
 ## Compendium
 
-Every reviewed human protein of 150 to 2000 residues, with its annotated domains and the
+Every reviewed **human** protein of 150 to 2000 residues, with its annotated domains and the
 DoStruct elements found in the sequence they leave undescribed: 17,710 proteins, 7,827 of
 which carry at least one element, 25,561 elements in total.
 
@@ -21,6 +21,9 @@ Search by gene name or accession. The protein is drawn to scale with its conserv
 profile, domains, elements, UniProt short features and AlphaFold confidence, and the
 structure can be painted by element. The data is precomputed and served as static shards,
 so a lookup is one small download rather than a browser-side alignment.
+
+Human only for now. The orthologue retrieval, alignment and scoring were run over the
+human proteome; other model organisms are planned.
 
 ## Conserved unannotated regions
 
