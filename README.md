@@ -14,8 +14,8 @@ No install, no account, no server: one static HTML file that does all the work i
 ## Compendium
 
 Every reviewed **human** protein of 150 to 2000 residues, with its annotated domains and the
-DoStruct elements found in the sequence they leave undescribed: 17,710 proteins, 7,827 of
-which carry at least one element, 25,561 elements in total.
+DoStruct elements found in the sequence they leave undescribed: 17,710 proteins, 6,615 of
+which carry at least one element, 19,583 elements in total.
 
 Search by gene name or accession. The protein is drawn to scale with its conservation
 profile, domains, elements, UniProt short features and AlphaFold confidence, and the
@@ -76,7 +76,7 @@ You can also download and open `index.html`.
 
 Cite the software itself:
 
-> McQuarrie DWJ (2026). *DoStruct* (v3.8.0).
+> McQuarrie DWJ (2026). *DoStruct* (v3.8.1).
 > https://github.com/dxm958/blosum62-painter
 
 and the paper it is described in:

@@ -6,7 +6,7 @@
 <meta name="description" content="How DoStruct works: the substitution rule, the alignment algorithms, the data sources and the statistics.">
 <meta name="theme-color" content="#DC0806">
 <title>About &middot; DoStruct</title>
-<link rel="stylesheet" href="css/painter.css?v=3.8.0">
+<link rel="stylesheet" href="css/painter.css?v=3.8.1">
 <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
 <style>
   html{scrollbar-gutter:stable}
@@ -138,8 +138,14 @@
     <h2>Compendium</h2>
     <p>The Compendium tab holds every reviewed <strong>human</strong> protein of 150 to 2000
        residues, 17&thinsp;710 in all, with its annotated domains and the DoStruct elements found in the sequence those
-       domains leave undescribed. 7827 proteins carry at least one element, 25&thinsp;561 in total,
+       domains leave undescribed. 6615 proteins carry at least one element, 19&thinsp;583 in total,
        with a median length of 8 residues.</p>
+    <p>A region counts as annotated if InterPro calls it a domain or a repeat, if UniProt calls it
+       a domain or zinc finger, or if InterPro calls it a family covering less than 80&thinsp;% of
+       the protein. That last rule matters: InterPro types some domains as families, MT-A70 in
+       METTL3 among them, which would otherwise leave a catalytic core looking undescribed. A
+       family spanning the whole protein is naming the protein rather than a region, so it is not
+       treated as annotation.</p>
     <p>These are precomputed, not calculated in the browser: orthologues were retrieved for the
        whole proteome, aligned, and scored once, so a lookup costs a single small download. Search
        by gene name or accession to get the protein drawn to scale with its conservation profile,
