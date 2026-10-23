@@ -361,6 +361,26 @@ button.ghost.sm{padding:5px 11px;font-size:12px}
   font-family:var(--mono);font-size:11.5px;color:var(--muted);min-height:16px;
 }
 @media (prefers-reduced-motion:reduce){*{transition:none !important;animation:none !important}}
+.compsearch{position:relative;max-width:540px;margin:0 0 10px}
+.compsearch input{width:100%;padding:9px 11px;font:inherit;font-size:13.5px;
+  border:1px solid var(--rule);border-radius:4px;background:var(--panel);color:var(--ink)}
+.compsearch input:focus{outline:2px solid var(--accent);outline-offset:-1px}
+.comphits{position:absolute;z-index:20;left:0;right:0;top:100%;margin-top:2px;max-height:280px;
+  overflow:auto;background:var(--panel);border:1px solid var(--rule);border-radius:4px;
+  box-shadow:0 6px 18px rgba(0,0,0,.10)}
+.comphits button{display:flex;gap:10px;align-items:baseline;width:100%;text-align:left;
+  padding:6px 11px;background:none;border:0;cursor:pointer;font:inherit;font-size:12.5px;color:var(--ink)}
+.comphits button:hover,.comphits button.on{background:#F0F0F3}
+.comphits .g{font-weight:600;min-width:84px}
+.comphits .a{font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+.comphits .e{margin-left:auto;font-size:11px;color:var(--muted)}
+.compstruct{margin-top:10px}
+.compviewer{width:100%;height:340px;position:relative;border:1px solid var(--rule);
+  border-radius:4px;background:#fff;display:none}
+.compviewer.on{display:block}
+.compstructopts{display:flex;gap:16px;align-items:center;flex-wrap:wrap;margin-top:7px;
+  font-size:12px;color:var(--ink-2)}
+.compstructopts select{font:inherit;font-size:12px;padding:2px 4px}
 </style>
 </head>
 <body>
@@ -584,7 +604,40 @@ button.ghost.sm{padding:5px 11px;font-size:12px}
     <nav class="tabs" role="tablist">
       <button class="tab" id="tabAlign" type="button" role="tab" aria-selected="true">Alignment</button>
       <button class="tab" id="tabStruct" type="button" role="tab" aria-selected="false">Structure</button>
+      <button class="tab" id="tabComp" type="button" role="tab" aria-selected="false">Compendium</button>
     </nav>
+
+    <div id="paneComp" hidden>
+      <div class="compsearch">
+        <input type="search" id="compQ" placeholder="Gene name or UniProt accession, e.g. SOX9 or P48436"
+               autocomplete="off" spellcheck="false">
+        <div id="compHits" class="comphits" hidden></div>
+      </div>
+      <p class="note" id="compStatus">Every reviewed human protein, with its annotated domains
+        and the DoStruct elements found in the sequence they leave undescribed.</p>
+      <section class="panel" id="compPanel" hidden>
+        <div class="panelhead"><h2 id="compTitle"></h2><span class="sp"></span>
+          <button class="ghost sm" id="compSvg" type="button">SVG</button>
+          <button class="ghost sm" id="compLoad" type="button">Open in alignment</button>
+        </div>
+        <div class="sheetwrap" id="compWrap"></div>
+        <div class="compstruct">
+          <div id="compViewer" class="compviewer"></div>
+          <div class="compstructopts">
+            <label><input type="checkbox" id="compShowStruct"> Show AlphaFold structure</label>
+            <label>Colour
+              <select id="compColour">
+                <option value="elem" selected>DoStruct elements</option>
+                <option value="cons">Conservation</option>
+                <option value="plddt">Model confidence</option>
+              </select></label>
+            <span class="note" id="compStructStatus"></span>
+          </div>
+        </div>
+        <div id="compTable" class="constable" style="margin-top:12px"></div>
+        <p class="note" id="compNote" style="margin-top:8px"></p>
+      </section>
+    </div>
 
     <div id="paneStruct" hidden>
       <div class="err" id="sErr" hidden></div>
@@ -698,7 +751,7 @@ button.ghost.sm{padding:5px 11px;font-size:12px}
 </div>
 
 <footer class="colophon">
-  <span class="ver"><svg class="mark-sm" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><rect x="1" y="1" width="62" height="62" rx="13" fill="#FFFFFF" stroke="#C9C9D2" stroke-width="1.5"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#DC0806" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(0 32 32)"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#FE6B00" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(60 32 32)"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#DC0806" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(120 32 32)"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#FE6B00" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(180 32 32)"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#DC0806" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(240 32 32)"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#FE6B00" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(300 32 32)"/><circle cx="32" cy="32" r="4.4" fill="#FFFFFF"/><text x="32.00" y="18.40" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">B</text><text x="43.78" y="25.20" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">L</text><text x="43.78" y="38.80" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">O</text><text x="32.00" y="45.60" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">S</text><text x="20.22" y="38.80" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">U</text><text x="20.22" y="25.20" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">M</text></svg>DoStruct v3.7.0</span>
+  <span class="ver"><svg class="mark-sm" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><rect x="1" y="1" width="62" height="62" rx="13" fill="#FFFFFF" stroke="#C9C9D2" stroke-width="1.5"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#DC0806" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(0 32 32)"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#FE6B00" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(60 32 32)"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#DC0806" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(120 32 32)"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#FE6B00" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(180 32 32)"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#DC0806" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(240 32 32)"/><ellipse cx="32" cy="19.5" rx="7.0" ry="11.8" fill="#FE6B00" stroke="#FFFFFF" stroke-width="1.3" transform="rotate(300 32 32)"/><circle cx="32" cy="32" r="4.4" fill="#FFFFFF"/><text x="32.00" y="18.40" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">B</text><text x="43.78" y="25.20" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">L</text><text x="43.78" y="38.80" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">O</text><text x="32.00" y="45.60" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">S</text><text x="20.22" y="38.80" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">U</text><text x="20.22" y="25.20" font-family="IBM Plex Sans,Helvetica,Arial,sans-serif" font-size="9.6" font-weight="600" fill="#231F20" text-anchor="middle" dominant-baseline="central">M</text></svg>DoStruct v3.8.0</span>
   <span>The mark is a blossom whose six petals spell the matrix in amino acid codes &mdash;
     B (Asx), L (Leu), O (pyrrolysine), S (Ser), U (selenocysteine), M (Met).</span>
   <span>Cite: McQuarrie DWJ (2026). <em>DoStruct</em>, <a href="https://github.com/dxm958/blosum62-painter">github.com/dxm958/blosum62-painter</a></span>
@@ -3056,13 +3109,331 @@ function superpose(){
   $("sRmsd").textContent = lines.join("   ·   ");
 }
 
+/* ---------- compendium: every human protein and its DoStruct elements ---------- */
+/* Data is precomputed and shipped as static shards, so a lookup costs one small
+   fetch rather than recomputing an alignment in the browser. */
+
+var compIndex = null, compShards = {}, compTracks = {}, compCur = null, compTimer = null;
+
+function compInit(){
+  if(compIndex || compInit.busy) return;
+  compInit.busy = true;
+  $("compStatus").textContent = "loading the index...";
+  compGet("data/index.json.gz").then(function(j){
+    if(!j) throw new Error("index unavailable");
+    compIndex = j;
+    var withEl = 0;
+    for(var i = 0; i < j.length; i++) if(j[i][3] > 0) withEl++;
+    $("compStatus").textContent = j.length.toLocaleString() + " reviewed human proteins, " +
+      withEl.toLocaleString() + " with at least one DoStruct element. " +
+      "Search by gene name or accession.";
+    compInit.busy = false;
+  }).catch(function(e){
+    $("compStatus").textContent = "could not load the compendium index (" + e.message + ")";
+    compInit.busy = false;
+  });
+}
+
+function compSearch(q){
+  if(!compIndex) return [];
+  q = q.trim().toUpperCase();
+  if(q.length < 2) return [];
+  var exact = [], starts = [], contains = [];
+  for(var i = 0; i < compIndex.length && contains.length < 400; i++){
+    var r = compIndex[i], g = (r[1] || "").toUpperCase(), a = r[0].toUpperCase();
+    if(g === q || a === q) exact.push(r);
+    else if(g.indexOf(q) === 0 || a.indexOf(q) === 0) starts.push(r);
+    else if(g.indexOf(q) > 0) contains.push(r);
+  }
+  // most elements first within each tier: the richer entries are the useful ones
+  function byEl(x, y){ return y[3] - x[3]; }
+  exact.sort(byEl); starts.sort(byEl); contains.sort(byEl);
+  return exact.concat(starts, contains).slice(0, 40);
+}
+
+function compRenderHits(rows){
+  var box = $("compHits");
+  if(!rows.length){ box.hidden = true; box.innerHTML = ""; return; }
+  box.hidden = false;
+  box.innerHTML = rows.map(function(r){
+    return '<button type="button" data-acc="' + esc(r[0]) + '">' +
+           '<span class="g">' + esc(r[1] || "—") + '</span>' +
+           '<span class="a">' + esc(r[0]) + '</span>' +
+           '<span class="e">' + r[2] + " aa" +
+           (r[3] ? "  ·  " + r[3] + " element" + (r[3] === 1 ? "" : "s") : "") +
+           "</span></button>";
+  }).join("");
+  box.querySelectorAll("button").forEach(function(b){
+    b.addEventListener("click", function(){
+      $("compQ").value = b.querySelector(".g").textContent;
+      box.hidden = true;
+      compOpen(b.dataset.acc);
+    });
+  });
+}
+
+/* Static hosts serve a .gz file as a binary download rather than setting
+   Content-Encoding, so the browser does not unwrap it. Decompressing here keeps
+   the shipped data small; falls back to a plain .json alongside it if the
+   browser has no DecompressionStream. */
+function compGet(url){
+  return fetch(url).then(function(r){
+    if(!r.ok) throw new Error(url.split("/").pop() + " " + r.status);
+    if(typeof DecompressionStream === "undefined")
+      return fetch(url.replace(/\.gz$/, "")).then(function(r2){ return r2.json(); });
+    return new Response(r.body.pipeThrough(new DecompressionStream("gzip"))).json();
+  });
+}
+
+function compFetch(kind, key, cache){
+  if(cache[key]) return Promise.resolve(cache[key]);
+  return compGet("data/" + kind + "/" + key + ".json.gz")
+    .then(function(j){ if(j) cache[key] = j; return j; })
+    .catch(function(){ return null; });
+}
+
+function compOpen(acc){
+  $("compStatus").textContent = "loading " + acc + "...";
+  Promise.all([compFetch("p", acc.slice(0, 2), compShards),
+               compFetch("t", acc.slice(0, 3), compTracks)])
+    .then(function(res){
+      var meta = res[0] && res[0][acc];
+      if(!meta){ $("compStatus").textContent = "no entry for " + acc; return; }
+      compCur = { meta: meta, track: (res[1] && res[1][acc]) || {} };
+      $("compStatus").textContent = "";
+      compDraw();
+      if($("compShowStruct").checked) compStructure();
+    })
+    .catch(function(e){ $("compStatus").textContent = "could not load " + acc + " (" + e.message + ")"; });
+}
+
+function compDraw(){
+  if(!compCur) return;
+  var m = compCur.meta, t = compCur.track, n = m.n;
+  $("compPanel").hidden = false;
+  $("compTitle").textContent = (m.g || m.a) + "  ·  " + m.a + "  ·  " + n + " aa";
+
+  var W = Math.max(520, Math.min(1500, ($("compWrap").clientWidth || 900) - 20));
+  var d = buildCompOps(m, t, W);
+  state.comp = d;
+  $("compWrap").innerHTML = toSVG(d, 6, false);
+
+  if(!m.e.length){
+    $("compTable").innerHTML = "";
+    $("compNote").textContent = "No DoStruct element in this protein. " +
+      (m.d.length ? "Annotated domains leave " : "") +
+      "either too little undescribed sequence to score, or no run of six conserved residues within it.";
+    return;
+  }
+  $("compTable").innerHTML = m.e.map(function(e, i){
+    var bits = [(e[1] - e[0] + 1) + " aa", "conservation " + (100 * e[2]).toFixed(0) + "%"];
+    if(e[3] !== null && e[3] !== undefined) bits.push("pLDDT " + e[3]);
+    return '<div class="crow"><span class="ck">element ' + (i + 1) + "  ·  " +
+           e[0] + "–" + e[1] + '</span>' +
+           '<span class="cv" style="font-size:12px">' + esc(e[4] || "") + '</span>' +
+           '<span class="cd">' + esc(bits.join("  ·  ")) + "</span></div>";
+  }).join("");
+  var mot = m.m.length;
+  $("compNote").textContent = m.e.length + " DoStruct element" + (m.e.length === 1 ? "" : "s") +
+    " in the " + (n - m.d.reduce(function(a, b){ return a + (b[1] - b[0] + 1); }, 0)) +
+    " residues no domain or repeat covers" +
+    (mot ? ". UniProt separately annotates " + mot + " short feature" + (mot === 1 ? "" : "s") +
+           " in this protein, shown beneath the element track." : ".");
+}
+
+function buildCompOps(m, t, W){
+  var ops = [], n = m.n, labelW = 86, barW = W - labelW - 46;
+  var sc = barW / n, y = 0;
+  function lab(yy, txt, size){
+    ops.push({t:"text", x:labelW - 8, y:yy, s:txt, fill:C_INK, size:size || 10, anchor:"end"});
+  }
+  // conservation
+  if(t.c){
+    var h = 34;
+    ops.push({t:"rect", x:labelW, y:y, w:barW, h:h, fill:"#FAFAFB", stroke:"#C9C9D2", sw:0.5});
+    // scale across the observed range: conservation sits mostly near 1, so
+    // drawing from zero flattens every feature out of view
+    var vals = t.c, srt = vals.filter(function(v){ return v !== null; }).slice().sort();
+    var lo = srt.length ? srt[Math.floor(srt.length * 0.02)] : 0;
+    var span = Math.max(0.05, 1 - lo);
+    for(i = 0; i < n; i++){
+      var v = vals[i] === null ? lo : vals[i];
+      var hh = ((v - lo) / span) * h;
+      if(hh > 0.3) ops.push({t:"rect", x:labelW + i*sc, y:y + h - hh,
+                             w:Math.max(sc, 0.6), h:hh, fill:"#C7C7D0"});
+    }
+    lab(y + h / 2, "conservation");
+    y += h + 10;
+  }
+  // domains
+  var dh = 13;
+  ops.push({t:"rect", x:labelW, y:y + dh/2 - 1.5, w:barW, h:3, fill:"#DCDCE2"});
+  m.d.forEach(function(sp){
+    ops.push({t:"rect", x:labelW + (sp[0]-1)*sc, y:y, w:Math.max(1.5,(sp[1]-sp[0]+1)*sc),
+              h:dh, fill:"#8A8A95"});
+  });
+  lab(y + dh/2, "domains");
+  y += dh + 9;
+  // elements
+  m.e.forEach(function(e){
+    ops.push({t:"rect", x:labelW + (e[0]-1)*sc, y:y, w:Math.max(2,(e[1]-e[0]+1)*sc),
+              h:dh, fill:C_IDENT});
+  });
+  lab(y + dh/2, "DoStruct");
+  y += dh + 9;
+  // UniProt short features, for context only
+  if(m.m.length){
+    m.m.forEach(function(f){
+      ops.push({t:"rect", x:labelW + (f[0]-1)*sc, y:y + 3, w:Math.max(2,(f[1]-f[0]+1)*sc),
+                h:dh - 6, fill:"#0072B2"});
+    });
+    lab(y + dh/2, "UniProt sites", 9);
+    y += dh + 9;
+  }
+  // pLDDT
+  if(t.p){
+    var PL = [[90,"#0053D6"],[70,"#65CBF3"],[50,"#FFDB13"],[-1,"#FF7D45"]];
+    for(var k = 0; k < n; k++){
+      var p = t.p[k];
+      if(p === null || p === undefined) continue;
+      var col = "#FF7D45";
+      for(var q = 0; q < PL.length; q++) if(p >= PL[q][0]){ col = PL[q][1]; break; }
+      ops.push({t:"rect", x:labelW + k*sc, y:y, w:Math.max(sc,0.6), h:10, fill:col});
+    }
+    lab(y + 5, "pLDDT", 9);
+    y += 10 + 9;
+  }
+  // residue scale
+  var step = niceStep(n, barW, 70);
+  for(var pos = step; pos <= n; pos += step){
+    var px = labelW + pos * sc;
+    ops.push({t:"line", x1:px, y1:y, x2:px, y2:y + 4, stroke:C_INK, w:1});
+    ops.push({t:"text", x:px, y:y + 11.5, s:String(pos), fill:C_INK, size:9.5, anchor:"middle"});
+  }
+  ops.push({t:"line", x1:labelW, y1:y, x2:labelW + barW, y2:y, stroke:C_INK, w:0.8});
+  y += 18;
+  return { ops:ops, width:Math.ceil(W), height:Math.ceil(y), labelFont:FONTS.arial };
+}
+
+/* structure view: AlphaFold model painted by element, conservation or confidence */
+var compViewer = null, compModel = null, compLoaded = null;
+
+function compEnsureViewer(){
+  if(compViewer) return compViewer;
+  if(typeof $3Dmol === "undefined") return null;
+  try {
+    compViewer = $3Dmol.createViewer($("compViewer"), { backgroundColor: "white" });
+  } catch(e){ return null; }
+  return compViewer;
+}
+
+function compStructure(){
+  if(!compCur) return;
+  var on = $("compShowStruct").checked;
+  $("compViewer").classList.toggle("on", on);
+  if(!on) return;
+  var v = compEnsureViewer();
+  if(!v){ $("compStructStatus").textContent = "3D viewer unavailable"; return; }
+  var acc = compCur.meta.a;
+  if(compLoaded === acc){ compPaint(); v.resize(); v.render(); return; }
+  $("compStructStatus").textContent = "fetching AlphaFold model...";
+  fetch("https://alphafold.ebi.ac.uk/api/prediction/" + encodeURIComponent(acc))
+    .then(function(r){ return r.ok ? r.json() : null; })
+    .then(function(j){
+      var url = j && j[0] && j[0].pdbUrl;
+      if(!url) throw new Error("no model");
+      return fetch(url);
+    })
+    .then(function(r){ return r.text(); })
+    .then(function(pdb){
+      if(compModel){ try { v.removeModel(compModel); } catch(e){} }
+      compModel = v.addModel(pdb, "pdb");
+      compLoaded = acc;
+      $("compStructStatus").textContent = "AlphaFold model for " + acc;
+      try { v.setViewStyle({ style: "outline", color: "black", width: 0.03 }); } catch(e){}
+      compPaint();
+      v.zoomTo(); v.resize(); v.render();
+    })
+    .catch(function(){ $("compStructStatus").textContent = "no AlphaFold model for " + acc; });
+}
+
+function compPaint(){
+  var v = compViewer;
+  if(!v || !compModel || !compCur) return;
+  var mode = $("compColour").value, m = compCur.meta, t = compCur.track;
+  v.setStyle({}, { cartoon: { color: "#D5D5DC", thickness: 0.3 } });
+  if(mode === "elem"){
+    m.d.forEach(function(d){
+      v.setStyle({ resi: d[0] + "-" + d[1] }, { cartoon: { color: "#8A8A95", thickness: 0.3 } });
+    });
+    // elements last and thicker, so they are never hidden by an overlapping domain
+    m.e.forEach(function(e){
+      v.setStyle({ resi: e[0] + "-" + e[1] }, { cartoon: { color: C_IDENT, thickness: 0.55 } });
+      v.addStyle({ resi: e[0] + "-" + e[1] }, { stick: { colorscheme: "redCarbon", radius: 0.16 } });
+    });
+  } else if(mode === "cons" && t.c){
+    for(var i = 0; i < t.c.length; i++){
+      var c = t.c[i];
+      if(c === null) continue;
+      var g = Math.round(235 - 150 * Math.max(0, Math.min(1, (c - 0.4) / 0.6)));
+      v.setStyle({ resi: i + 1 },
+                 { cartoon: { color: "rgb(" + (235) + "," + g + "," + g + ")" } });
+    }
+  } else if(mode === "plddt" && t.p){
+    var PL = [[90,"#0053D6"],[70,"#65CBF3"],[50,"#FFDB13"],[-1,"#FF7D45"]];
+    for(var k = 0; k < t.p.length; k++){
+      var p = t.p[k];
+      if(p === null || p === undefined) continue;
+      var col = "#FF7D45";
+      for(var q = 0; q < PL.length; q++) if(p >= PL[q][0]){ col = PL[q][1]; break; }
+      v.setStyle({ resi: k + 1 }, { cartoon: { color: col } });
+    }
+  }
+  v.render();
+}
+$("compShowStruct").addEventListener("change", compStructure);
+$("compColour").addEventListener("change", function(){
+  if($("compShowStruct").checked){ compPaint(); }
+});
+
+/* search box */
+$("compQ").addEventListener("input", function(){
+  clearTimeout(compTimer);
+  var q = this.value;
+  compTimer = setTimeout(function(){ compRenderHits(compSearch(q)); }, 120);
+});
+$("compQ").addEventListener("keydown", function(ev){
+  if(ev.key === "Enter"){
+    var rows = compSearch(this.value);
+    if(rows.length){ $("compHits").hidden = true; compOpen(rows[0][0]); }
+  }
+  if(ev.key === "Escape") $("compHits").hidden = true;
+});
+document.addEventListener("click", function(ev){
+  if(!ev.target.closest(".compsearch")) $("compHits").hidden = true;
+});
+$("compSvg").addEventListener("click", function(){
+  if(state.comp) download((compCur.meta.g || compCur.meta.a) + "_dostruct.svg",
+                          toSVG(state.comp, 10, true), "image/svg+xml");
+});
+$("compLoad").addEventListener("click", function(){
+  if(!compCur) return;
+  $("featAcc").value = compCur.meta.a;
+  showTab("align");
+  setFeatStatus("fetching " + compCur.meta.a + " ...");
+  loadFeatures(compCur.meta.a);
+});
+
 /* ---------- tabs + structure wiring ---------- */
 function showTab(which){
-  var onStruct = which === "struct";
+  var onStruct = which === "struct", onComp = which === "comp";
   $("paneStruct").hidden = !onStruct;
-  $("paneAlign").hidden = onStruct;
+  $("paneComp").hidden = !onComp;
+  $("paneAlign").hidden = onStruct || onComp;
   $("tabStruct").setAttribute("aria-selected", String(onStruct));
-  $("tabAlign").setAttribute("aria-selected", String(!onStruct));
+  $("tabComp").setAttribute("aria-selected", String(onComp));
+  $("tabAlign").setAttribute("aria-selected", String(!onStruct && !onComp));
+  if(onComp) compInit();
   if(onStruct){
     syncStructList();
     scheduleAuto();
@@ -3078,6 +3449,7 @@ function showTab(which){
 }
 $("tabAlign").addEventListener("click", function(){ showTab("align"); });
 $("tabStruct").addEventListener("click", function(){ showTab("struct"); });
+$("tabComp").addEventListener("click", function(){ showTab("comp"); });
 $("sColour").addEventListener("change", applyStructStyles);
 $("sStyle").addEventListener("change", applyStructStyles);
 $("sOutline").addEventListener("change", function(){

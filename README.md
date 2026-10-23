@@ -11,6 +11,17 @@ No install, no account, no server: one static HTML file that does all the work i
 
 **Using it for a figure? Please cite it — see [How to cite](#how-to-cite).**
 
+## Compendium
+
+Every reviewed human protein of 150 to 2000 residues, with its annotated domains and the
+DoStruct elements found in the sequence they leave undescribed: 17,710 proteins, 7,827 of
+which carry at least one element, 25,561 elements in total.
+
+Search by gene name or accession. The protein is drawn to scale with its conservation
+profile, domains, elements, UniProt short features and AlphaFold confidence, and the
+structure can be painted by element. The data is precomputed and served as static shards,
+so a lookup is one small download rather than a browser-side alignment.
+
 ## Conserved unannotated regions
 
 Domain databases are built from structured folds, so they cover the ordered parts of a protein
@@ -62,7 +73,7 @@ You can also download and open `index.html`.
 
 Cite the software itself:
 
-> McQuarrie DWJ (2026). *DoStruct* (v3.7.0).
+> McQuarrie DWJ (2026). *DoStruct* (v3.8.0).
 > https://github.com/dxm958/blosum62-painter
 
 and the paper it is described in:
