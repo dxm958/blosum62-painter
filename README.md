@@ -29,7 +29,7 @@ human proteome; other model organisms are planned.
 
 Domain databases are built from structured folds, so they cover the ordered parts of a protein
 well and the disordered parts poorly. DoStruct looks in that gap: within the residues no domain,
-repeat or zinc finger covers, it reports the runs that evolution has held on to, each with its
+repeat, zinc finger or confined family entry covers, it reports the runs that evolution has held on to, each with its
 mean conservation, its mean AlphaFold pLDDT, and a Mann-Whitney test against the rest of the
 unannotated sequence.
 
